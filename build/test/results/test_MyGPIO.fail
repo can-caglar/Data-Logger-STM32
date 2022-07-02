@@ -1,0 +1,58 @@
+---
+:source:
+  :path: test
+  :file: test_MyGPIO.c
+:successes:
+- :test: test_MyGPIO_ConstantsAreCorrect
+  :line: 53
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn
+  :line: 74
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn
+  :line: 81
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh
+  :line: 95
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh
+  :line: 104
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes
+  :line: 114
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputCanBeSetLow_1Pin
+  :line: 126
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_InitPinOutsideRangeReturnsNullPtr
+  :line: 136
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes
+  :line: 147
+  :message: ''
+  :unity_test_time: 0
+- :test: test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput
+  :line: 159
+  :message: ''
+  :unity_test_time: 0
+:failures:
+- :test: test_MyGPIO_WritingToUninitialisedPortDoesNothing
+  :line: 92
+  :message: Expected 1 Was 0
+  :unity_test_time: 0
+:ignores: []
+:counts:
+  :total: 11
+  :passed: 10
+  :failed: 1
+  :ignored: 0
+:stdout: []
+:time: 0.04627630003960803
