@@ -36,6 +36,7 @@ void* MyGPIO_Init(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, GPIO_Mode_e mode
 
 Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high)
 {
+    Error_Code_e err = ECODE_OK;
     if (high)
     {
         gpio_port->ODR |= pin_mask;
@@ -44,7 +45,18 @@ Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high
     {
         gpio_port->ODR &= ~pin_mask;
     }
-    return ECODE_OK;
+    // TODO: refactor below.
+    for (uint8_t pin = 0; pin < MAX_GPIO_PINS; pin++)
+    {
+        if (pinInMask(pin, pin_mask))
+        {
+            if (!isConfiguredAsOutput(gpio_port->MODER, pin))
+            {
+                err = ECODE_NOT_INITIALIZED;
+            }
+        }
+    }
+    return err;
 }
 
 /************************ Private functions **********************/
@@ -70,11 +82,10 @@ io_register moderMask(GPIO_Mode_e mode, uint8_t pin)
     return (mode << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
 }
 
-static uint8_t isConfiguredAsOutput(io_register moder, const uint8_t pin)
+uint8_t isConfiguredAsOutput(io_register moder, const uint8_t pin)
 {
     io_register expected_moder = moderMask(GPIO_OUTPUT, pin);
     io_register moder_mask = moderMask(0x3, pin);
     moder &= moder_mask;
     return expected_moder == moder;
-    //return (moder & 0xFFFFFFFF) == getPositionForPinInRegister(pin)
 }

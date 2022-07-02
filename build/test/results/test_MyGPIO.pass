@@ -15,6 +15,10 @@
   :line: 81
   :message: ''
   :unity_test_time: 0
+- :test: test_MyGPIO_WritingToUninitialisedPortDoesNothing
+  :line: 90
+  :message: ''
+  :unity_test_time: 0
 - :test: test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh
   :line: 95
   :message: ''
@@ -43,16 +47,12 @@
   :line: 159
   :message: ''
   :unity_test_time: 0
-:failures:
-- :test: test_MyGPIO_WritingToUninitialisedPortDoesNothing
-  :line: 92
-  :message: Expected 1 Was 0
-  :unity_test_time: 0
+:failures: []
 :ignores: []
 :counts:
   :total: 11
-  :passed: 10
-  :failed: 1
+  :passed: 11
+  :failed: 0
   :ignored: 0
 :stdout: []
-:time: 0.04627630003960803
+:time: 0.04525739996461198
