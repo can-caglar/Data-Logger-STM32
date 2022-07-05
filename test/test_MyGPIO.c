@@ -38,6 +38,7 @@ static io_register pinToMODER_Out(int pin);
 static io_register posToBits(int pin);
 static void assertOnlyTheseBitsHigh(const io_register mask, const io_register reg);
 static void assertBitsAreLOW(const io_register mask, const io_register reg);
+static io_register pinToMODER_OutAllPins(void);
 
 void setUp(void)
 {
@@ -87,16 +88,26 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
     assertOnlyTheseBitsHigh(expected, FakeGPIOA.MODER);
 }
 
+void test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins(void)
+{
+    MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
+    
+    io_register expected = pinToMODER_OutAllPins();
+
+    assertOnlyTheseBitsHigh(expected, FakeGPIOA.MODER);
+}
+
 void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 {
-    TEST_ASSERT_EQUAL_INT(ECODE_NOT_INITIALIZED, MyGPIO_Write(&FakeGPIOA, pin4, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_NOT_OUTPUT, MyGPIO_Write(&FakeGPIOA, pin4, 1));
+    assertOnlyTheseBitsHigh(0, FakeGPIOA.ODR);  // no bits shall be high?, CONTINUE here...
 }
 
 void test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh(void)
 {
     MyGPIO_Init(&FakeGPIOA, pin4, GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, pin4, 1);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin4, 1));
 
     assertOnlyTheseBitsHigh(posToBits(4), FakeGPIOA.ODR);
 }
@@ -105,7 +116,7 @@ void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 {
     MyGPIO_Init(&FakeGPIOA, (pin6 | pin7), GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, (pin6 | pin7), 1);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, (pin6 | pin7), 1));
 
     io_register expected = posToBits(6) | posToBits(7);
     assertOnlyTheseBitsHigh(expected, FakeGPIOA.ODR);
@@ -115,9 +126,10 @@ void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 {
     MyGPIO_Init(&FakeGPIOA, (pin6 | pin7 | pin8), GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, pin6, 1);
-    MyGPIO_Write(&FakeGPIOA, pin7, 1);
-    MyGPIO_Write(&FakeGPIOA, pin8, 1);
+
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin6, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin7, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin8, 1));
 
     io_register expected = posToBits(6) | posToBits(7) |  posToBits(8);
     assertOnlyTheseBitsHigh(expected, FakeGPIOA.ODR);
@@ -126,9 +138,9 @@ void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 {
     MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
-    MyGPIO_Write(&FakeGPIOA, pins_all, 1);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pins_all, 1));
 
-    MyGPIO_Write(&FakeGPIOA, pin8, 0);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin8, 0));
 
     assertBitsAreLOW(posToBits(8), FakeGPIOA.ODR);
 }
@@ -147,10 +159,10 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 {
     MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
-    MyGPIO_Write(&FakeGPIOA, pins_all, 1);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pins_all, 1));
 
-    MyGPIO_Write(&FakeGPIOA, pin6, 0);
-    MyGPIO_Write(&FakeGPIOA, pin8, 0);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin6, 0));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin8, 0));
 
     io_register expected = 0xFFFF & ~(posToBits(6) | posToBits(8));
     assertOnlyTheseBitsHigh(expected, FakeGPIOA.ODR);
@@ -161,8 +173,8 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
     MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
     MyGPIO_Init(&FakeGPIOB, pins_all, GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, pin1 | pin2, 1);
-    MyGPIO_Write(&FakeGPIOB, pin1 | pin3, 1);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOA, pin1 | pin2, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOB, pin1 | pin3, 1));
 
     assertOnlyTheseBitsHigh(posToBits(1) | posToBits(2), FakeGPIOA.ODR);
     assertOnlyTheseBitsHigh(posToBits(1) | posToBits(3), FakeGPIOB.ODR);
@@ -174,6 +186,16 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 static io_register pinToMODER_Out(int pin)
 {
     return (0x1U << (pin * 2));
+}
+
+static io_register pinToMODER_OutAllPins(void)
+{
+    io_register ret = 0;
+    for (uint8_t i = 0; i < MAX_GPIO_PINS; i++)
+    {
+        ret |= pinToMODER_Out(i);
+    }
+    return ret;
 }
 
 static io_register posToBits(int pin)

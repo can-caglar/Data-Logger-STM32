@@ -9,7 +9,7 @@
 // Library assumes clock for peripheral has been enabled already
 
 // Private functions forward decl
-static uint8_t pinInMask(const uint8_t bit, const GPIO_Pin_e mask);
+static uint32_t pinInMask(const uint8_t bit, const GPIO_Pin_e mask);
 static io_register getPositionForPinInRegister(const uint8_t pin, const uint8_t num_bits);
 static io_register moderMask(GPIO_Mode_e mode, uint8_t pin);
 static void configureAsOutput(io_register* moder, const uint8_t pin);
@@ -37,22 +37,25 @@ void* MyGPIO_Init(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, GPIO_Mode_e mode
 Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high)
 {
     Error_Code_e err = ECODE_OK;
-    if (high)
-    {
-        gpio_port->ODR |= pin_mask;
-    }
-    else
-    {
-        gpio_port->ODR &= ~pin_mask;
-    }
-    // TODO: refactor below.
+    // TODO: refactor this functions.
     for (uint8_t pin = 0; pin < MAX_GPIO_PINS; pin++)
     {
         if (pinInMask(pin, pin_mask))
         {
             if (!isConfiguredAsOutput(gpio_port->MODER, pin))
             {
-                err = ECODE_NOT_INITIALIZED;
+                err = ECODE_NOT_OUTPUT;
+            }
+            else
+            {
+                    if (high)  // refactor this
+                    {
+                        gpio_port->ODR |= (1UL << pin); // refactor this
+                    }
+                    else
+                    {
+                        gpio_port->ODR &= ~(1UL << pin);  // refactor this
+                    }
             }
         }
     }
@@ -61,7 +64,7 @@ Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high
 
 /************************ Private functions **********************/
 
-uint8_t pinInMask(const uint8_t pin, const GPIO_Pin_e mask)
+uint32_t pinInMask(const uint8_t pin, const GPIO_Pin_e mask)
 {
     return (mask & (1UL << pin));
 }

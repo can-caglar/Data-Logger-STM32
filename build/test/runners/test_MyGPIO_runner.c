@@ -13,6 +13,7 @@ extern void tearDown(void);
 extern void test_MyGPIO_ConstantsAreCorrect(void);
 extern void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void);
 extern void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void);
+extern void test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins(void);
 extern void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void);
 extern void test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh(void);
 extern void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void);
@@ -85,17 +86,18 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
 int main(void)
 {
   UnityBegin("test_MyGPIO.c");
-  run_test(test_MyGPIO_ConstantsAreCorrect, "test_MyGPIO_ConstantsAreCorrect", 53);
-  run_test(test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn, "test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn", 74);
-  run_test(test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn, "test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn", 81);
-  run_test(test_MyGPIO_WritingToUninitialisedPortDoesNothing, "test_MyGPIO_WritingToUninitialisedPortDoesNothing", 90);
-  run_test(test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh, "test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh", 95);
-  run_test(test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh, "test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh", 104);
-  run_test(test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes, "test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes", 114);
-  run_test(test_MyGPIO_OutputCanBeSetLow_1Pin, "test_MyGPIO_OutputCanBeSetLow_1Pin", 126);
-  run_test(test_MyGPIO_InitPinOutsideRangeReturnsNullPtr, "test_MyGPIO_InitPinOutsideRangeReturnsNullPtr", 136);
-  run_test(test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes, "test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes", 147);
-  run_test(test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput, "test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput", 159);
+  run_test(test_MyGPIO_ConstantsAreCorrect, "test_MyGPIO_ConstantsAreCorrect", 54);
+  run_test(test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn, "test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn", 75);
+  run_test(test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn, "test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn", 82);
+  run_test(test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins, "test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins", 91);
+  run_test(test_MyGPIO_WritingToUninitialisedPortDoesNothing, "test_MyGPIO_WritingToUninitialisedPortDoesNothing", 100);
+  run_test(test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh, "test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh", 106);
+  run_test(test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh, "test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh", 115);
+  run_test(test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes, "test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes", 125);
+  run_test(test_MyGPIO_OutputCanBeSetLow_1Pin, "test_MyGPIO_OutputCanBeSetLow_1Pin", 138);
+  run_test(test_MyGPIO_InitPinOutsideRangeReturnsNullPtr, "test_MyGPIO_InitPinOutsideRangeReturnsNullPtr", 148);
+  run_test(test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes, "test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes", 159);
+  run_test(test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput, "test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput", 171);
 
   return UnityEnd();
 }

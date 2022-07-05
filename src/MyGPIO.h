@@ -6,7 +6,7 @@
 
 typedef enum
 {
-    GPIO_INPUT,
+    GPIO_INPUT = 0UL,
     GPIO_OUTPUT
 } GPIO_Mode_e;
 

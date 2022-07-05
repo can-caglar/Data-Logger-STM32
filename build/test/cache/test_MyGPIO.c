@@ -69,6 +69,8 @@ static void assertOnlyTheseBitsHigh(const io_register mask, const io_register re
 
 static void assertBitsAreLOW(const io_register mask, const io_register reg);
 
+static io_register pinToMODER_OutAllPins(void);
+
 
 
 void setUp(void)
@@ -101,13 +103,13 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(55), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(56), UNITY_DISPLAY_STYLE_HEX32);
 
     UnityAssertEqualNumber((UNITY_INT)(UNITY_INT32)((0x1)), (UNITY_INT)(UNITY_INT32)((GPIO_OUTPUT)), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(56), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(57), UNITY_DISPLAY_STYLE_HEX32);
 
 
 
@@ -115,7 +117,7 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(58), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(59), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -143,7 +145,7 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
        ((void *)0)
 
-       ), (UNITY_UINT)(70), UNITY_DISPLAY_STYLE_HEX32);
+       ), (UNITY_UINT)(71), UNITY_DISPLAY_STYLE_HEX32);
 
     }
 
@@ -183,15 +185,35 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 
 
 
+void test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins(void)
+
+{
+
+    MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
+
+
+
+    io_register expected = pinToMODER_OutAllPins();
+
+
+
+    assertOnlyTheseBitsHigh(expected, FakeGPIOA.MODER);
+
+}
+
+
+
 void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 
 {
 
-    UnityAssertEqualNumber((UNITY_INT)((ECODE_NOT_INITIALIZED)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin4, 1))), (
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_NOT_OUTPUT)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin4, 1))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(92), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(102), UNITY_DISPLAY_STYLE_INT);
+
+    assertOnlyTheseBitsHigh(0, FakeGPIOA.ODR);
 
 }
 
@@ -205,7 +227,11 @@ void test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh(void)
 
 
 
-    MyGPIO_Write(&FakeGPIOA, pin4, 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin4, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(110), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -223,7 +249,11 @@ void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 
 
 
-    MyGPIO_Write(&FakeGPIOA, (pin6 | pin7), 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, (pin6 | pin7), 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(119), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -243,11 +273,25 @@ void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 
 
 
-    MyGPIO_Write(&FakeGPIOA, pin6, 1);
 
-    MyGPIO_Write(&FakeGPIOA, pin7, 1);
 
-    MyGPIO_Write(&FakeGPIOA, pin8, 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin6, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(130), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin7, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(131), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin8, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(132), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -265,11 +309,19 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 
     MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, pins_all, 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pins_all, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(141), UNITY_DISPLAY_STYLE_INT);
 
 
 
-    MyGPIO_Write(&FakeGPIOA, pin8, 0);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin8, 0))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(143), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -289,7 +341,7 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(139), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(151), UNITY_DISPLAY_STYLE_HEX32);
 
     assertOnlyTheseBitsHigh(0, FakeGPIOA.MODER);
 
@@ -301,7 +353,7 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(143), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(155), UNITY_DISPLAY_STYLE_HEX32);
 
     assertOnlyTheseBitsHigh(0, FakeGPIOA.MODER);
 
@@ -315,13 +367,25 @@ void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 
     MyGPIO_Init(&FakeGPIOA, pins_all, GPIO_OUTPUT);
 
-    MyGPIO_Write(&FakeGPIOA, pins_all, 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pins_all, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(162), UNITY_DISPLAY_STYLE_INT);
 
 
 
-    MyGPIO_Write(&FakeGPIOA, pin6, 0);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin6, 0))), (
 
-    MyGPIO_Write(&FakeGPIOA, pin8, 0);
+   ((void *)0)
+
+   ), (UNITY_UINT)(164), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin8, 0))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(165), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -343,9 +407,17 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 
 
 
-    MyGPIO_Write(&FakeGPIOA, pin1 | pin2, 1);
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOA, pin1 | pin2, 1))), (
 
-    MyGPIO_Write(&FakeGPIOB, pin1 | pin3, 1);
+   ((void *)0)
+
+   ), (UNITY_UINT)(176), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write(&FakeGPIOB, pin1 | pin3, 1))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(177), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -373,6 +445,26 @@ static io_register pinToMODER_Out(int pin)
 
 
 
+static io_register pinToMODER_OutAllPins(void)
+
+{
+
+    io_register ret = 0;
+
+    for (uint8_t i = 0; i < 16; i++)
+
+    {
+
+        ret |= pinToMODER_Out(i);
+
+    }
+
+    return ret;
+
+}
+
+
+
 static io_register posToBits(int pin)
 
 {
@@ -391,7 +483,7 @@ static void assertOnlyTheseBitsHigh(const io_register mask, const io_register re
 
    ((void *)0)
 
-   ), (UNITY_UINT)(186));
+   ), (UNITY_UINT)(208));
 
     assertBitsAreLOW(~mask, reg);
 
@@ -407,6 +499,6 @@ static void assertBitsAreLOW(const io_register mask, const io_register reg)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(192));
+   ), (UNITY_UINT)(214));
 
 }

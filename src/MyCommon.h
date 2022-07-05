@@ -7,7 +7,7 @@
 typedef enum
 {
     ECODE_OK,
-    ECODE_NOT_INITIALIZED
+    ECODE_NOT_OUTPUT
 } Error_Code_e;
 
 // GPIO ports and pins
