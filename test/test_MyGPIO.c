@@ -4,9 +4,9 @@
 #include <string.h>
 #include "unity.h"
 #include "MyGPIO.h"
-#include "Fake_stm32f407xx.h"
 #include "MyRCC.h"
 #include "MyCommon.h"
+#include "fake_stm32f407xx.h"
 
 // Prettier names
 #define pin0        GPIO_PIN_0_e
@@ -32,31 +32,21 @@
 
 // Forward declarations for test helper functions
 static io_register pinToMODER_Out(int pin);
+static io_register pinToMODER(int pin, GPIO_Mode_e mode);
 static io_register posToBits(int pin);
 static void assertOnlyTheseBitsHigh(const io_register mask, const io_register reg);
 static void assertBitsAreLOW(const io_register mask, const io_register reg);
 static io_register pinToMODER_OutAllPins(void);
 static void enablePeripheralClocks(void);
 
-// Target shall use actual registers. Dev machine will use fake ones in RAM.
-// To use actual registers, peripheral clocks have to be enabled.
-#ifdef ON_TARGET
-#elif defined(ON_DEV_PC)
-    GPIO_TypeDef FakeGPIOA;
-    GPIO_TypeDef FakeGPIOB;
-    RCC_TypeDef  FakeRCC;
-    #define GPIOA (&FakeGPIOA)
-    #define RCC   (&FakeRCC)
-#else
-    #error Either ON_TARGET or ON_DEV_PC must be defined. Your config seems wrong.
-#endif
-
 void setUp(void)
 {
-    // NOTE: If wanting to test this on the target, enable periph clocks!
     enablePeripheralClocks();
-    memset(GPIOA, 0, sizeof *GPIOA);
-    memset(&FakeGPIOB, 0, sizeof FakeGPIOB);
+    GPIOD->MODER = 0;
+    GPIOC->MODER = 0;
+
+    GPIOD->ODR = 0;
+    GPIOC->ODR = 0;
 }
 
 void tearDown(void)
@@ -86,117 +76,139 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
 {
-    MyGPIO_Init(GPIOA, pin1, GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, pin1, GPIO_OUTPUT);
 
-    assertOnlyTheseBitsHigh(pinToMODER_Out(1), GPIOA->MODER);
+    assertOnlyTheseBitsHigh(pinToMODER_Out(1), GPIOC->MODER);
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 {
-    MyGPIO_Init(GPIOA, (GPIO_Pin_e)(pin2 | pin3 | pin4), GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, (GPIO_Pin_e)(pin2 | pin3 | pin4), GPIO_OUTPUT);
     
     io_register expected = pinToMODER_Out(2) | pinToMODER_Out(3) | pinToMODER_Out(4);
 
-    assertOnlyTheseBitsHigh(expected, GPIOA->MODER);
+    assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenAllPinsPassedInSameTime(void)
 {
-    MyGPIO_Init(GPIOA, pins_all, GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, pins_all, GPIO_OUTPUT);
     
     io_register expected = pinToMODER_OutAllPins();
 
-    assertOnlyTheseBitsHigh(expected, GPIOA->MODER);
+    assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
 
 void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 {
-    TEST_ASSERT_EQUAL_INT(ECODE_NOT_OUTPUT, MyGPIO_Write(GPIOA, pin4, 1));
-    assertOnlyTheseBitsHigh(0, GPIOA->ODR);
+    TEST_ASSERT_EQUAL_INT(ECODE_NOT_OUTPUT, MyGPIO_Write(GPIOC, pin4, GPIO_HIGH));
+    assertOnlyTheseBitsHigh(0, GPIOC->ODR);
 }
 
 void test_MyGPIO_SinglePinCanBeSetHigh(void)
 {
-    MyGPIO_Init(GPIOA, pin4, GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, pin4, GPIO_OUTPUT);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin4, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin4, GPIO_HIGH));
 
-    assertOnlyTheseBitsHigh(posToBits(4), GPIOA->ODR);
+    assertOnlyTheseBitsHigh(posToBits(4), GPIOC->ODR);
 }
 
 void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 {
-    MyGPIO_Init(GPIOA, (GPIO_Pin_e)(pin6 | pin7), GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, (GPIO_Pin_e)(pin6 | pin7), GPIO_OUTPUT);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, (GPIO_Pin_e)(pin6 | pin7), 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_e)(pin6 | pin7), GPIO_HIGH));
 
     io_register expected = posToBits(6) | posToBits(7);
-    assertOnlyTheseBitsHigh(expected, GPIOA->ODR);
+    assertOnlyTheseBitsHigh(expected, GPIOC->ODR);
 }
 
 void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 {
-    MyGPIO_Init(GPIOA, (GPIO_Pin_e)(pin6 | pin7 | pin8), GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, (GPIO_Pin_e)(pin6 | pin7 | pin8), GPIO_OUTPUT);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin6, 1));
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin7, 1));
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin8, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin6, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin7, 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin8, 1));
 
     io_register expected = posToBits(6) | posToBits(7) |  posToBits(8);
-    assertOnlyTheseBitsHigh(expected, GPIOA->ODR);
+    assertOnlyTheseBitsHigh(expected, GPIOC->ODR);
 }
 
 void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 {
-    MyGPIO_Init(GPIOA, pins_all, GPIO_OUTPUT);
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pins_all, 1));
+    MyGPIO_Init(GPIOC, pins_all, GPIO_OUTPUT);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pins_all, GPIO_HIGH));
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin8, 0));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin8, GPIO_LOW));
 
-    assertBitsAreLOW(posToBits(8), GPIOA->ODR);
+    assertBitsAreLOW(posToBits(8), GPIOC->ODR);
 }
 
 void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 {
     io_register mask = posToBits(MAX_GPIO_PINS);
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOA, (GPIO_Pin_e)mask, GPIO_OUTPUT));
-    assertOnlyTheseBitsHigh(0, GPIOA->MODER);
+    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOC, (GPIO_Pin_e)mask, GPIO_OUTPUT));
+    assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 
     mask = posToBits(31);
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOA,(GPIO_Pin_e)mask, GPIO_OUTPUT));
-    assertOnlyTheseBitsHigh(0, GPIOA->MODER);
+    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOC,(GPIO_Pin_e)mask, GPIO_OUTPUT));
+    assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 }
 
 void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 {
-    MyGPIO_Init(GPIOA, pins_all, GPIO_OUTPUT);
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pins_all, 1));
+    MyGPIO_Init(GPIOC, pins_all, GPIO_OUTPUT);
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pins_all, GPIO_HIGH));
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin6, 0));
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, pin8, 0));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin6, GPIO_LOW));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin8, GPIO_LOW));
 
     io_register expected = 0xFFFF & ~(posToBits(6) | posToBits(8));
-    assertOnlyTheseBitsHigh(expected, GPIOA->ODR);
+    assertOnlyTheseBitsHigh(expected, GPIOC->ODR);
 }
 
 void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 {
-    MyGPIO_Init(GPIOA, pins_all, GPIO_OUTPUT);
-    MyGPIO_Init(&FakeGPIOB, pins_all, GPIO_OUTPUT);
+    MyGPIO_Init(GPIOC, pins_all, GPIO_OUTPUT);
+    MyGPIO_Init(GPIOD, pins_all, GPIO_OUTPUT);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOA, (GPIO_Pin_e)(pin1 | pin2), 1));
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(&FakeGPIOB, (GPIO_Pin_e)(pin1 | pin3), 1));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_e)(pin1 | pin2), GPIO_HIGH));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOD, (GPIO_Pin_e)(pin1 | pin3), GPIO_HIGH));
 
-    assertOnlyTheseBitsHigh(posToBits(1) | posToBits(2), GPIOA->ODR);
-    assertOnlyTheseBitsHigh(posToBits(1) | posToBits(3), FakeGPIOB.ODR);
+    assertOnlyTheseBitsHigh(posToBits(1) | posToBits(2), GPIOC->ODR);
+    assertOnlyTheseBitsHigh(posToBits(1) | posToBits(3), GPIOD->ODR);
 }
 
+void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
+{
+    MyGPIO_Init(GPIOC, pins_all, GPIO_OUTPUT);
+
+    MyGPIO_Init(GPIOC, pin1, GPIO_INPUT);
+    
+    io_register expected = pinToMODER_OutAllPins() & ~(pinToMODER(1, GPIO_MODE_MASK));
+    assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
+}
+
+void test_MyGPIO_InputIsReadStraightFromRegister(void)
+{
+    MyGPIO_Init(GPIOC, pin1, GPIO_INPUT);
+    GPIOC->IDR = ~0U;
+
+    TEST_ASSERT_EQUAL(GPIO_HIGH, MyGPIO_Read(GPIOC, pin1));
+}
 
 /************************* Private functions *********************/
 
 static io_register pinToMODER_Out(int pin)
 {
-    return (0x1U << (pin * 2));
+    return pinToMODER(pin, GPIO_OUTPUT);
+}
+
+static io_register pinToMODER(int pin, GPIO_Mode_e mode)
+{
+    return (mode << (pin * 2));
 }
 
 static io_register pinToMODER_OutAllPins(void)
@@ -227,8 +239,13 @@ static void assertBitsAreLOW(const io_register mask, const io_register reg)
 
 static void enablePeripheralClocks(void)
 {
-    MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_A_e);
-    MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_B_e);
+    static int enabled = 0;
+    if (!enabled)
+    {
+        enabled = 1;
+        MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_C_e);
+        MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_D_e);
+    }
 }
 
 #endif // TEST
@@ -242,16 +259,15 @@ Functional requirements
 - [x] Init can take in mask for 1 or more pins
 - [x] Init with mask outside pin max returns null pointer
 - [x] Init can be called multiple times and retains integrity of MODER
-- [ ] After init a port as output, all pins ???
 - [ ] (later) push/pull or open drain may be enabled (out type)
 - [ ] Multiple ports can be initialised as output and behave correctly
-- [ ] Writing to an uninitialized pin returns uninitialised error and does nothing to ODR
+- [x] Writing to an uninitialized pin returns uninitialised error and does nothing to ODR
 
-- [ ] Does not init clock - should fail on target test unless clock enabled
+- [x] Test inits clock
 - [ ] GPIO has 4 modes, in, out, alternate and analog
 
 // Input
-- [ ] In, when configured as pull/up, means values are 1 at default or 0 if configured as pull/down
+- [ ] In, when configured as pull/up, means IDR values are 1 at default or 0 if configured as pull/down
 - [ ] Input can be queried
 - [ ] If in, will support IRQs too
 

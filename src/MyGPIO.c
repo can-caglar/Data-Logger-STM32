@@ -13,7 +13,10 @@ static uint32_t pinInMask(const uint8_t bit, const GPIO_Pin_e mask);
 static io_register getPositionForPinInRegister(const uint8_t pin, const uint8_t num_bits);
 static io_register moderMask(GPIO_Mode_e mode, uint8_t pin);
 static void configureAsOutput(io_register* moder, const uint8_t pin);
+static void configureAsInput(io_register* moder, const uint8_t pin);
 static uint8_t isConfiguredAsOutput(io_register moder, const uint8_t pin);
+static inline void clearBit(io_register* reg, const uint8_t pin);
+static inline void setBit(io_register* reg, const uint8_t pin);
 
 enum
 {
@@ -28,16 +31,23 @@ void* MyGPIO_Init(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, GPIO_Mode_e mode
     {
         if (pinInMask(pin, pin_mask))
         {
-            configureAsOutput(&gpio_port->MODER, pin);
+            switch(mode)
+            {
+                case GPIO_OUTPUT:
+                    configureAsOutput(&gpio_port->MODER, pin);
+                    break;
+                case GPIO_INPUT:
+                    configureAsInput(&gpio_port->MODER, pin);
+                    break;
+            }
         }
     }
     return 0;
 }
 
-Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high)
+Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, GPIO_State_e high)
 {
     Error_Code_e err = ECODE_OK;
-    // TODO: refactor this functions.
     for (uint8_t pin = 0; pin < MAX_GPIO_PINS; pin++)
     {
         if (pinInMask(pin, pin_mask))
@@ -48,18 +58,23 @@ Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_e pin_mask, int high
             }
             else
             {
-                    if (high)  // refactor this
-                    {
-                        gpio_port->ODR |= (1UL << pin); // refactor this
-                    }
-                    else
-                    {
-                        gpio_port->ODR &= ~(1UL << pin);  // refactor this
-                    }
+                if (high == GPIO_HIGH)
+                {
+                    setBit(&gpio_port->ODR, pin);
+                }
+                else
+                {
+                    clearBit(&gpio_port->ODR, pin);
+                }
             }
         }
     }
     return err;
+}
+
+GPIO_State_e MyGPIO_Read(GPIO_TypeDef* gpio_reg, GPIO_Pin_e pin)
+{
+    return (gpio_reg->IDR & pin) != 0;
 }
 
 /************************ Private functions **********************/
@@ -79,6 +94,11 @@ void configureAsOutput(io_register* moder, const uint8_t pin)
     *moder |= (GPIO_OUTPUT << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
 }
 
+static void configureAsInput(io_register* moder, const uint8_t pin)
+{
+    *moder &= ~(GPIO_MODE_MASK << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
+}
+
 io_register moderMask(GPIO_Mode_e mode, uint8_t pin)
 {
     return (mode << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
@@ -90,4 +110,14 @@ uint8_t isConfiguredAsOutput(io_register moder, const uint8_t pin)
     io_register moder_mask = moderMask(GPIO_MODE_MASK, pin);
     moder &= moder_mask;
     return expected_moder == moder;
+}
+
+static void clearBit(io_register* reg, const uint8_t pin)
+{
+    *reg &= ~(0x1UL << pin);
+}
+
+static void setBit(io_register* reg, const uint8_t pin)
+{
+    *reg |= (0x1UL << pin);
 }

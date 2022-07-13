@@ -379,7 +379,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Source Group 1</GroupName>
+          <GroupName>MyHAL</GroupName>
           <Files>
             <File>
               <FileName>MyGPIO.c</FileName>
@@ -440,6 +440,16 @@
               <FileName>unity.c</FileName>
               <FileType>1</FileType>
               <FilePath>C:\DEV\Unity\src\unity.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Debug</GroupName>
+          <Files>
+            <File>
+              <FileName>retarget.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\retarget.c</FilePath>
             </File>
           </Files>
         </Group>

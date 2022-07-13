@@ -1,1 +1,9 @@
 .\objects\test_myrcc_runner.o: build\test\runners\test_MyRCC_runner.c
+.\objects\test_myrcc_runner.o: C:\DEV\Unity\src\unity.h
+.\objects\test_myrcc_runner.o: C:\DEV\Unity\src\unity_internals.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\setjmp.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+.\objects\test_myrcc_runner.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
