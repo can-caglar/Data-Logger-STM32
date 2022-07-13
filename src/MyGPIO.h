@@ -7,7 +7,8 @@
 typedef enum
 {
     GPIO_INPUT = 0UL,
-    GPIO_OUTPUT
+    GPIO_OUTPUT = 1UL,
+    GPIO_MODE_MASK = 3UL
 } GPIO_Mode_e;
 
 void* MyGPIO_Init(GPIO_TypeDef* gpio_reg, GPIO_Pin_e pin_mask, GPIO_Mode_e mode);

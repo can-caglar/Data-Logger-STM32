@@ -7,9 +7,10 @@
 
   <Targets>
     <Target>
-      <TargetName>Target 1</TargetName>
+      <TargetName>Target_test</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -256,17 +257,17 @@
                 <Size>0x0</Size>
               </XRAM>
               <OCR_RVCT1>
-                <Type>0</Type>
+                <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
                 <Size>0x0</Size>
               </OCR_RVCT1>
               <OCR_RVCT2>
-                <Type>0</Type>
+                <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
                 <Size>0x0</Size>
               </OCR_RVCT2>
               <OCR_RVCT3>
-                <Type>0</Type>
+                <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
                 <Size>0x0</Size>
               </OCR_RVCT3>
@@ -276,7 +277,7 @@
                 <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
-                <Type>0</Type>
+                <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
                 <Size>0x0</Size>
               </OCR_RVCT5>
@@ -334,9 +335,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>ON_TARGET TEST</Define>
               <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <IncludePath>C:\DEV\Unity\src;.\src;.\test\support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,6 +380,68 @@
       <Groups>
         <Group>
           <GroupName>Source Group 1</GroupName>
+          <Files>
+            <File>
+              <FileName>MyGPIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyGPIO.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyRCC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyRCC.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyCommon.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyCommon.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyGPIO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyGPIO.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyRCC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyRCC.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Tests</GroupName>
+          <Files>
+            <File>
+              <FileName>test_MyGPIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_MyGPIO.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_MyRCC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_MyRCC.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_MyGPIO_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\build\test\runners\test_MyGPIO_runner.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_MyRCC_runner.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\build\test\runners\test_MyRCC_runner.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Unity</GroupName>
+          <Files>
+            <File>
+              <FileName>unity.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\DEV\Unity\src\unity.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -396,13 +459,13 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.1.1" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.3.0"/>
         <targetInfos>
-          <targetInfo name="Target 1"/>
+          <targetInfo name="Target_test"/>
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS">
         <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
         <targetInfos>
-          <targetInfo name="Target 1"/>
+          <targetInfo name="Target_test"/>
         </targetInfos>
       </component>
     </components>
@@ -412,7 +475,7 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS"/>
         <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
         <targetInfos>
-          <targetInfo name="Target 1"/>
+          <targetInfo name="Target_test"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.6.2">
@@ -420,7 +483,7 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.3" condition="STM32F4 CMSIS"/>
         <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
         <targetInfos>
-          <targetInfo name="Target 1"/>
+          <targetInfo name="Target_test"/>
         </targetInfos>
       </file>
     </files>

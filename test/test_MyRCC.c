@@ -1,43 +1,47 @@
-#ifdef TEST
+//#ifdef TEST
 
-#include "unity.h"
+//#include "unity.h"
 
-#include "MyRCC.h"
-#include "Fake_stm32f407xx.h"
-#include "MyCommon.h"
+//#include "MyRCC.h"
+//#include "Fake_stm32f407xx.h"
+//#include "MyCommon.h"
 
-#include <stdio.h>
+//#include <stdio.h>
+//#include <string.h>
 
-void setUp(void)
-{
-}
+//RCC_TypeDef FakeRCC;
 
-void tearDown(void)
-{
-}
+//void setUp(void)
+//{
+//    memset(&FakeRCC, 0, sizeof FakeRCC);
+//}
 
-void test_MyRCC_GpioClockEnableWorksForAllPorts(void)
-{
-    // need to then write tests for the clock enable module (make rcc module and test it)
-    // rcc module can just make use of the RCC_TypeDef struct as they contain all ports
-    for (int i = GPIO_PORT_A_e; i < GPIO_PORT_COUNT_e; i++)
-    {
-        TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_GPIOClockEnable(&FakeRCC.AHB1ENR, i));
-        TEST_ASSERT_BIT_HIGH(i, FakeRCC.AHB1ENR);
-    }
-}
+//void tearDown(void)
+//{
+//}
 
-// When back, read through test and structure of code again to familarise.
-// I think we have done the important part of MyRCC, so we can continue working on the GPIO driver
-// TDD helped identify that it's best to leave the gpio clock enable outside of gpio driver. how cool.
+//void test_MyRCC_GpioClockEnableWorksForAllPorts(void)
+//{
+//    // need to then write tests for the clock enable module (make rcc module and test it)
+//    // rcc module can just make use of the RCC_TypeDef struct as they contain all ports
+//    for (int i = GPIO_PORT_A_e; i < GPIO_PORT_COUNT_e; i++)
+//    {
+//        TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_GPIOClockEnable(&FakeRCC.AHB1ENR, i));
+//        TEST_ASSERT_BIT_HIGH(i, FakeRCC.AHB1ENR);
+//    }
+//}
 
-#endif // TEST
+//// When back, read through test and structure of code again to familarise.
+//// I think we have done the important part of MyRCC, so we can continue working on the GPIO driver
+//// TDD helped identify that it's best to leave the gpio clock enable outside of gpio driver. how cool.
 
-/*
-- [ ] MyRCC will be responsible for enabling the clocks for GPIO peripherals
-- [ ] Eventually, will also be responsible for resetting peripheral (clocks?)
-- [ ] For setting system clock
-- [ ] And other peripherals
+//#endif // TEST
+
+///*
+//- [ ] MyRCC will be responsible for enabling the clocks for GPIO peripherals
+//- [ ] Eventually, will also be responsible for resetting peripheral (clocks?)
+//- [ ] For setting system clock
+//- [ ] And other peripherals
 
 
-*/
+//*/

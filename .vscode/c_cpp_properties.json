@@ -14,7 +14,8 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "TEST"
+                "TEST",
+                "ON_DEV_PC"
             ],
             "compilerPath": "C:\\Program Files\\LLVM\\bin\\clang.exe",
             "cStandard": "c11",

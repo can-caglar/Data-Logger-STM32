@@ -1,7 +1,9 @@
 ---
 src/MyGPIO.c:
 - TEST
+- ON_DEV_PC
 src/MyRCC.c:
 - TEST
+- ON_DEV_PC
 build/test/mocks/mock_MyRCC.c:
 - TEST

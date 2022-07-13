@@ -81,14 +81,13 @@ void configureAsOutput(io_register* moder, const uint8_t pin)
 
 io_register moderMask(GPIO_Mode_e mode, uint8_t pin)
 {
-    mode &= 0x3;
     return (mode << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
 }
 
 uint8_t isConfiguredAsOutput(io_register moder, const uint8_t pin)
 {
     io_register expected_moder = moderMask(GPIO_OUTPUT, pin);
-    io_register moder_mask = moderMask(0x3, pin);
+    io_register moder_mask = moderMask(GPIO_MODE_MASK, pin);
     moder &= moder_mask;
     return expected_moder == moder;
 }

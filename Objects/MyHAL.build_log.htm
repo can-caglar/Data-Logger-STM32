@@ -22,18 +22,23 @@ Dialog DLL:      TCM.DLL V1.35.1.0
  
 <h2>Project:</h2>
 C:\Users\canca\OneDrive\Study\Embedded\tdd_embedded_systems\on_target_3\MyHAL.uvprojx
-Project File Date:  06/28/2022
+Project File Date:  07/13/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
-Rebuild target 'Target 1'
+Rebuild target 'Target_test'
+compiling test_MyRCC_runner.c...
+compiling test_MyRCC.c...
+compiling MyRCC.c...
 assembling startup_stm32f407xx.s...
+compiling test_MyGPIO_runner.c...
+compiling unity.c...
+compiling test_MyGPIO.c...
+test\test_MyGPIO.c(47): error:  #35: #error directive: gundi
+      #error gundi
+test\test_MyGPIO.c: 0 warnings, 1 error
 compiling system_stm32f4xx.c...
-linking...
-.\Objects\MyHAL.axf: Error: L6218E: Undefined symbol main (referred from __rtentry2.o).
-Not enough information to list image symbols.
-Not enough information to list load addresses in the image map.
-Finished: 2 information, 0 warning and 1 error messages.
+compiling MyGPIO.c...
 ".\Objects\MyHAL.axf" - 1 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
@@ -51,7 +56,7 @@ Package Vendor: Keil
    * Component: Startup Version: 2.6.3
 
 <h2>Collection of Component include folders:</h2>
-  .\RTE\_Target_1
+  .\RTE\_Target_test
   C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include
   C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
@@ -61,9 +66,9 @@ Package Vendor: Keil
 
    * Component: Keil::Device:Startup:2.6.3
       Source file:   MDK\Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s
       Source file:   MDK\Device\Source\ARM\STM32F4xx_OTP.s
       Include file:  Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c
 Target not created.
 Build Time Elapsed:  00:00:03

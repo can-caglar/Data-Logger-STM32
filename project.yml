@@ -49,6 +49,7 @@
   :test:
     - *common_defines
     - TEST
+    - ON_DEV_PC
   :test_preprocess:
     - *common_defines
     - TEST

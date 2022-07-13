@@ -3,8 +3,8 @@
 
 #include <stm32f407xx.h>
 
-GPIO_TypeDef FakeGPIOA = { 0 };
-GPIO_TypeDef FakeGPIOB = { 0 };
-RCC_TypeDef FakeRCC = { 0 };
+// GPIO_TypeDef FakeGPIOA = { 0 };
+// GPIO_TypeDef FakeGPIOB = { 0 };
+// RCC_TypeDef FakeRCC = { 0 };
 
 #endif

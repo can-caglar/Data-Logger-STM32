@@ -4,51 +4,51 @@
   :file: test_MyGPIO.c
 :successes:
 - :test: test_MyGPIO_ConstantsAreCorrect
-  :line: 54
+  :line: 66
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn
-  :line: 75
+  :line: 87
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn
-  :line: 82
+  :line: 94
   :message: ''
   :unity_test_time: 0
-- :test: test_MyGPIO_OutputIsInitialisedCorrectlyForAll16Pins
-  :line: 91
+- :test: test_MyGPIO_OutputIsInitialisedCorrectlyWhenAllPinsPassedInSameTime
+  :line: 103
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_WritingToUninitialisedPortDoesNothing
-  :line: 100
+  :line: 112
   :message: ''
   :unity_test_time: 0
-- :test: test_MyGPIO_OutputSinglePinPassedInCanBeSetHigh
-  :line: 106
+- :test: test_MyGPIO_SinglePinCanBeSetHigh
+  :line: 118
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh
-  :line: 115
+  :line: 127
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes
-  :line: 125
+  :line: 137
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_OutputCanBeSetLow_1Pin
-  :line: 138
+  :line: 149
   :message: ''
   :unity_test_time: 0
 - :test: test_MyGPIO_InitPinOutsideRangeReturnsNullPtr
-  :line: 148
-  :message: ''
-  :unity_test_time: 0
-- :test: test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes
   :line: 159
   :message: ''
   :unity_test_time: 0
+- :test: test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes
+  :line: 170
+  :message: ''
+  :unity_test_time: 0
 - :test: test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput
-  :line: 171
+  :line: 182
   :message: ''
   :unity_test_time: 0
 :failures: []
@@ -59,4 +59,4 @@
   :failed: 0
   :ignored: 0
 :stdout: []
-:time: 0.06656919999659294
+:time: 0.042236899999807065
