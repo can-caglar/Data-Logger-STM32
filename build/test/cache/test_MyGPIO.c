@@ -31,13 +31,17 @@ void setUp(void)
 
     (&FakeGPIOD)->MODER = 0;
 
-    (&FakeGPIOC)->MODER = 0;
-
-
-
     (&FakeGPIOD)->ODR = 0;
 
+    (&FakeGPIOD)->IDR = 0;
+
+
+
+    (&FakeGPIOC)->MODER = 0;
+
     (&FakeGPIOC)->ODR = 0;
+
+    (&FakeGPIOD)->IDR = 0;
 
 }
 
@@ -59,13 +63,13 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(58), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(60), UNITY_DISPLAY_STYLE_HEX32);
 
     UnityAssertEqualNumber((UNITY_INT)(UNITY_INT32)((0x1)), (UNITY_INT)(UNITY_INT32)((GPIO_OUTPUT)), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(59), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(61), UNITY_DISPLAY_STYLE_HEX32);
 
 
 
@@ -73,7 +77,7 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(61), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(63), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -101,7 +105,7 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
        ((void *)0)
 
-       ), (UNITY_UINT)(73), UNITY_DISPLAY_STYLE_HEX32);
+       ), (UNITY_UINT)(75), UNITY_DISPLAY_STYLE_HEX32);
 
     }
 
@@ -167,7 +171,7 @@ void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(104), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(106), UNITY_DISPLAY_STYLE_INT);
 
     assertOnlyTheseBitsHigh(0, (&FakeGPIOC)->ODR);
 
@@ -187,7 +191,7 @@ void test_MyGPIO_SinglePinCanBeSetHigh(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(112), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(114), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -209,7 +213,7 @@ void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(121), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(123), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -233,19 +237,19 @@ void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(131), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(133), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write((&FakeGPIOC), GPIO_PIN_7_e, 1))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(132), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(134), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write((&FakeGPIOC), GPIO_PIN_8_e, 1))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(133), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(135), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -267,7 +271,7 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(142), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(144), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -275,7 +279,7 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(144), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(146), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -295,7 +299,7 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(152), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(154), UNITY_DISPLAY_STYLE_HEX32);
 
     assertOnlyTheseBitsHigh(0, (&FakeGPIOC)->MODER);
 
@@ -307,7 +311,7 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(156), UNITY_DISPLAY_STYLE_HEX32);
+   ), (UNITY_UINT)(158), UNITY_DISPLAY_STYLE_HEX32);
 
     assertOnlyTheseBitsHigh(0, (&FakeGPIOC)->MODER);
 
@@ -325,7 +329,7 @@ void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(163), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(165), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -333,13 +337,13 @@ void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(165), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(167), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write((&FakeGPIOC), GPIO_PIN_8_e, GPIO_LOW))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(166), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(168), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -365,13 +369,13 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(177), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(179), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((ECODE_OK)), (UNITY_INT)((MyGPIO_Write((&FakeGPIOD), (GPIO_Pin_e)(GPIO_PIN_1_e | GPIO_PIN_3_e), GPIO_HIGH))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(178), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(180), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -403,7 +407,7 @@ void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
 
 
 
-void test_MyGPIO_InputIsReadStraightFromRegister(void)
+void test_MyGPIO_InputIsReadStraightFromIDRRegister(void)
 
 {
 
@@ -417,7 +421,7 @@ void test_MyGPIO_InputIsReadStraightFromRegister(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(199), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(201), UNITY_DISPLAY_STYLE_INT);
 
 }
 
@@ -485,7 +489,7 @@ static void assertOnlyTheseBitsHigh(const io_register mask, const io_register re
 
    ((void *)0)
 
-   ), (UNITY_UINT)(231));
+   ), (UNITY_UINT)(233));
 
     assertBitsAreLOW(~mask, reg);
 
@@ -501,7 +505,7 @@ static void assertBitsAreLOW(const io_register mask, const io_register reg)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(237));
+   ), (UNITY_UINT)(239));
 
 }
 

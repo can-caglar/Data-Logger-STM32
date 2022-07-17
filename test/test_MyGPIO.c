@@ -43,10 +43,12 @@ void setUp(void)
 {
     enablePeripheralClocks();
     GPIOD->MODER = 0;
-    GPIOC->MODER = 0;
-
     GPIOD->ODR = 0;
+    GPIOD->IDR = 0;
+
+    GPIOC->MODER = 0;
     GPIOC->ODR = 0;
+    GPIOD->IDR = 0;
 }
 
 void tearDown(void)
@@ -191,7 +193,7 @@ void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
 
-void test_MyGPIO_InputIsReadStraightFromRegister(void)
+void test_MyGPIO_InputIsReadStraightFromIDRRegister(void)
 {
     MyGPIO_Init(GPIOC, pin1, GPIO_INPUT);
     GPIOC->IDR = ~0U;
