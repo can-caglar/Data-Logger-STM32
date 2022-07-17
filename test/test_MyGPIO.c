@@ -6,7 +6,7 @@
 #include "MyGPIO.h"
 #include "MyRCC.h"
 #include "MyCommon.h"
-#include "fake_stm32f407xx.h"
+#include "user_stm32f407xx.h"
 
 // Prettier names
 #define pin0_mask        GPIO_PIN_0_e

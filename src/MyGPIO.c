@@ -1,6 +1,6 @@
 #include "MyGPIO.h"
 #include "MyRCC.h"
-#include <stm32f407xx.h>
+#include <user_stm32f407xx.h>
 
 #ifdef TEST
 #include <stdio.h>
