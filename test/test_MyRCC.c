@@ -9,14 +9,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#define ALL_BITS (~0U)
+
 void setUp(void)
 {
    RCC->AHB1ENR = 0;
+   RCC->APB2ENR = 0;
 }
 
 void tearDown(void)
 {
    RCC->AHB1ENR = 0;
+   RCC->APB2ENR = 0;
 }
 
 void test_MyRCC_GpioClockEnableWorksForAllPorts(void)
@@ -26,6 +30,15 @@ void test_MyRCC_GpioClockEnableWorksForAllPorts(void)
        TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), i));
        TEST_ASSERT_BIT_HIGH(i, RCC->AHB1ENR);
    }
+}
+
+void test_MyRCC_USARTClockEnable(void)
+{
+   TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_USARTClockEnable(&(RCC->APB2ENR), USART6_Mask));
+   TEST_ASSERT_BIT_HIGH(5, RCC->APB2ENR);
+
+   TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_USARTClockEnable(&(RCC->APB2ENR), USART1_Mask));
+   TEST_ASSERT_BIT_HIGH(4, RCC->APB2ENR);
 }
 
 #endif // TEST

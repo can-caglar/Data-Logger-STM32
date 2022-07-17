@@ -67,6 +67,12 @@ typedef enum
     MAX_GPIO_PINS
 } GPIO_Pin_Number_e;
 
+typedef enum
+{
+    USART1_Mask = (0x1U << 4),
+    USART6_Mask = (0x1U << 5),
+} USART_Mask_e;
+
 typedef volatile uint32_t io_register;
 
 #endif
