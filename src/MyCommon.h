@@ -44,9 +44,28 @@ typedef enum
     GPIO_PIN_14_e = (0x1UL << 14),
     GPIO_PIN_15_e = (0x1UL << 15),
     GPIO_PIN_ALL_e = (0xFFFFUL),
-} GPIO_Pin_e;
+} GPIO_Pin_Mask_e;
 
-#define MAX_GPIO_PINS 16
+typedef enum
+{
+    pin_num_0,
+    pin_num_1,
+    pin_num_2,
+    pin_num_3,
+    pin_num_4,
+    pin_num_5,
+    pin_num_6,
+    pin_num_7,
+    pin_num_8,
+    pin_num_9,
+    pin_num_10,
+    pin_num_11,
+    pin_num_12,
+    pin_num_13,
+    pin_num_14,
+    pin_num_15,
+    MAX_GPIO_PINS
+} GPIO_Pin_Number_e;
 
 typedef volatile uint32_t io_register;
 

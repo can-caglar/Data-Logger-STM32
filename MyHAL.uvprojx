@@ -417,19 +417,9 @@
               <FilePath>.\test\test_MyGPIO.c</FilePath>
             </File>
             <File>
-              <FileName>test_MyRCC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\test\test_MyRCC.c</FilePath>
-            </File>
-            <File>
               <FileName>test_MyGPIO_runner.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\build\test\runners\test_MyGPIO_runner.c</FilePath>
-            </File>
-            <File>
-              <FileName>test_MyRCC_runner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\build\test\runners\test_MyRCC_runner.c</FilePath>
             </File>
           </Files>
         </Group>

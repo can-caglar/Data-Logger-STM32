@@ -81,3 +81,4 @@
 # gitignore for other parts of the project
 *.pass
 *.out
+build/test/*
