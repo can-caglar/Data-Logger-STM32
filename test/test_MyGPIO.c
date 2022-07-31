@@ -31,9 +31,6 @@
 // Helper macros
 #define MY_SIZE_OF_ARR(x) ((sizeof(x) / sizeof(x[0])))
 
-#define FIRST_16_BITS   0xFFFF
-#define ALL_32_BITS     0xFFFFFFFF
-
 // Forward declarations for test helper functions
 static io_register MODERfromPinAndMode_Out(GPIO_Pin_Number_e pin);
 static io_register MODERfromPinAndMode(GPIO_Pin_Number_e pin, GPIO_Mode_e mode);
@@ -51,7 +48,6 @@ void setUp(void)
 
     memset(GPIOD, 0, sizeof *GPIOC);
     memset(GPIOC, 0, sizeof *GPIOD);
-
     memset(&testGPIO, 0, sizeof(testGPIO));
 }
 
@@ -92,11 +88,6 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
     MyGPIO_Init(&testGPIO);
 
     assertOnlyTheseBitsHigh(MODERfromPinAndMode_Out(pin_num_1), GPIOC->MODER);
-}
-
-void test_MyGPIO_OutputReturnsObjectPassedIn(void)
-{
-    TEST_IGNORE_MESSAGE("Not yet implemented return of gpio init");
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
@@ -182,20 +173,20 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
     assertBitsAreLOW(posToBits(pin_num_8), GPIOC->ODR);
 }
 
-void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
+void test_MyGPIO_InitPinOutsideRangeReturnsError(void)
 {
     io_register mask = posToBits(MAX_GPIO_PINS);
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
     testGPIO.mode = GPIO_OUTPUT;
 
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&testGPIO));
+    TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 
     mask = posToBits((GPIO_Pin_Number_e)31);
     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
 
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&testGPIO));
+    TEST_ASSERT_EQUAL_PTR(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 }
 
@@ -291,7 +282,8 @@ void test_MyGPIO_ReadingFromPortNotInitialisedAsInputReturns0(void)
 void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (pin0_mask | pin1_mask | pin2_mask | pin3_mask | pin4_mask | pin5_mask | pin6_mask | pin7_mask);
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)
+        (pin0_mask | pin1_mask | pin2_mask | pin3_mask | pin4_mask | pin5_mask | pin6_mask | pin7_mask);
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = GPIO_ALTF_3;
 
@@ -314,7 +306,8 @@ void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
 void test_MyGPIO_InitAsAlternateFunction_Pins8to15(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (pin8_mask | pin9_mask | pin10_mask | pin11_mask | pin12_mask | pin13_mask | pin14_mask | pin15_mask);
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)
+        (pin8_mask | pin9_mask | pin10_mask | pin11_mask | pin12_mask | pin13_mask | pin14_mask | pin15_mask);
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = GPIO_ALTF_5;
 
@@ -334,20 +327,34 @@ void test_MyGPIO_InitAsAlternateFunction_Pins8to15(void)
     TEST_ASSERT_EQUAL_HEX(0x55555555, testGPIO.gpio_register->AFR[AFR_HIGH]);
 }
 
-test_MyGPIO_AltFunctionInitAboveLimitDoesNothing(void)
+void test_MyGPIO_AltFunctionInitAboveLimitDoesNothingAndReturnsError(void)
 {
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = pin2_mask;
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = GPIO_MAX_ALT_FUNCTIONS;
 
-    MyGPIO_Init(&testGPIO);
+    TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
 
     TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_LOW]);
     TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
-
 }
 
+// void test_MyGPIO_InitErrorRemainsWithIntegrityIfSomeThingsPass(void)
+// {
+//     io_register mask = posToBits(MAX_GPIO_PINS);
+//     testGPIO.gpio_register = GPIOC;
+//     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;  // bad pin mask
+//     testGPIO.mode = GPIO_OUTPUT;
+
+//     TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
+
+//     mask = posToBits((GPIO_Pin_Number_e)31);
+//     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
+
+//     TEST_ASSERT_EQUAL_PTR(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
+//     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
+// }
 
 /************************* Private functions *********************/
 

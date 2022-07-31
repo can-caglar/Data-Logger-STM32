@@ -19,6 +19,9 @@ uint8_t isConfiguredAs(GPIO_Mode_e whatMode, io_register moder, const GPIO_Pin_N
 static inline void clearBit(io_register* reg, const uint8_t pin);
 static inline void setBit(io_register* reg, const uint8_t pin);
 static uint8_t bitIsHigh(io_register* reg, const uint8_t bit);
+static inline uint8_t noError(const Error_Code_e* err);
+
+// TODO static uint8 checkAltFunc(GPIO_ALTF_e altf);
 
 enum
 {
@@ -27,35 +30,50 @@ enum
 };
 
 // Public functions
-void* MyGPIO_Init(const MyGPIO* gpio)
+Error_Code_e MyGPIO_Init(const MyGPIO* gpio)
 {
+    Error_Code_e err = ECODE_OK;
     GPIO_TypeDef* gpio_port = gpio->gpio_register;
     GPIO_Pin_Mask_e pin_mask = gpio->pin_mask;
     GPIO_Mode_e mode = gpio->mode;
     GPIO_ALTF_e alt_func = gpio->alt_func;
 
-    // for all pins
-    for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
+    // Check params
+    if (noError(&err))
     {
-        if (pinInMask(pin, pin_mask))
+        err = (alt_func >= GPIO_MAX_ALT_FUNCTIONS) ? ECODE_BAD_PARAM : ECODE_OK;
+    }
+    if (noError(&err))
+    {
+        err = (pin_mask & LAST_16_BITS) ? ECODE_BAD_PARAM : ECODE_OK;
+    }
+
+    // Start init...
+    if (noError(&err))
+    {
+        // for all pins
+        for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
         {
-            switch(mode)
+            if (pinInMask(pin, pin_mask))
             {
-                case GPIO_OUTPUT:
-                    configureAsOutput(&gpio_port->MODER, pin);
-                    break;
-                case GPIO_INPUT:
-                    configureAsInput(&gpio_port->MODER, pin);
-                    break;
-                case GPIO_ALT:
-                    configureAsAltFunction(&gpio_port->MODER, &gpio_port->AFR, alt_func, pin);
-                    break;
-                default:
-                    break;
+                switch(mode)
+                {
+                    case GPIO_OUTPUT:
+                        configureAsOutput(&gpio_port->MODER, pin);
+                        break;
+                    case GPIO_INPUT:
+                        configureAsInput(&gpio_port->MODER, pin);
+                        break;
+                    case GPIO_ALT:
+                        configureAsAltFunction(&gpio_port->MODER, gpio_port->AFR, alt_func, pin);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
-    return ECODE_OK;
+    return err;
 }
 
 Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_State_e high)
@@ -155,4 +173,9 @@ static void setBit(io_register* reg, const uint8_t pin)
 static uint8_t bitIsHigh(io_register* reg, const uint8_t bit)
 {
     return (GPIO_State_e)(*reg & (0x1UL << bit)) != 0;
+}
+
+static inline uint8_t noError(const Error_Code_e* err)
+{
+    return *err == ECODE_OK;
 }

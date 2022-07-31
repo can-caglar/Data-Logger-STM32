@@ -3,11 +3,16 @@
 
 #include <stdint.h>
 
+#define FIRST_16_BITS  0x0000FFFF
+#define LAST_16_BITS   0xFFFF0000
+#define ALL_32_BITS    0xFFFFFFFF
+
 // Error codes
 typedef enum
 {
     ECODE_OK,
-    ECODE_NOT_OUTPUT
+    ECODE_NOT_OUTPUT,
+    ECODE_BAD_PARAM,
 } Error_Code_e;
 
 // GPIO ports and pins
