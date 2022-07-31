@@ -173,21 +173,9 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
     assertBitsAreLOW(posToBits(pin_num_8), GPIOC->ODR);
 }
 
-void test_MyGPIO_InitPinOutsideRangeReturnsError(void)
+void test_MyGPIO_InitPinMaskIsSizeIs2Bytes(void)
 {
-    io_register mask = posToBits(MAX_GPIO_PINS);
-    testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
-    testGPIO.mode = GPIO_OUTPUT;
-
-    TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
-    assertOnlyTheseBitsHigh(0, GPIOC->MODER);
-
-    mask = posToBits((GPIO_Pin_Number_e)31);
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
-
-    TEST_ASSERT_EQUAL_PTR(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
-    assertOnlyTheseBitsHigh(0, GPIOC->MODER);
+    TEST_ASSERT_EQUAL(2, sizeof(GPIO_Pin_Mask_e));
 }
 
 void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
@@ -340,21 +328,6 @@ void test_MyGPIO_AltFunctionInitAboveLimitDoesNothingAndReturnsError(void)
     TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
 }
 
-// void test_MyGPIO_InitErrorRemainsWithIntegrityIfSomeThingsPass(void)
-// {
-//     io_register mask = posToBits(MAX_GPIO_PINS);
-//     testGPIO.gpio_register = GPIOC;
-//     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;  // bad pin mask
-//     testGPIO.mode = GPIO_OUTPUT;
-
-//     TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
-
-//     mask = posToBits((GPIO_Pin_Number_e)31);
-//     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
-
-//     TEST_ASSERT_EQUAL_PTR(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
-//     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
-// }
 
 /************************* Private functions *********************/
 

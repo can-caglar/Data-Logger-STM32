@@ -30,6 +30,7 @@ enum
 };
 
 // Public functions
+
 Error_Code_e MyGPIO_Init(const MyGPIO* gpio)
 {
     Error_Code_e err = ECODE_OK;
@@ -42,10 +43,6 @@ Error_Code_e MyGPIO_Init(const MyGPIO* gpio)
     if (noError(&err))
     {
         err = (alt_func >= GPIO_MAX_ALT_FUNCTIONS) ? ECODE_BAD_PARAM : ECODE_OK;
-    }
-    if (noError(&err))
-    {
-        err = (pin_mask & LAST_16_BITS) ? ECODE_BAD_PARAM : ECODE_OK;
     }
 
     // Start init...
@@ -143,6 +140,7 @@ static void configureAsAltFunction(io_register* moder, io_register* alt_func_reg
     }
     else
     {
+        pin -= pin_num_8;
         alt_func_reg[AFR_HIGH] |= alt_func << (pin * BITS_PER_PIN_AFR);
     }
 }                   

@@ -416,6 +416,11 @@
               <FileType>5</FileType>
               <FilePath>.\src\MyUSART.h</FilePath>
             </File>
+            <File>
+              <FileName>MyCommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyCommon.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
