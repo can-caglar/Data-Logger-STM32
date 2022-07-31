@@ -14,6 +14,7 @@ static io_register getPositionForPinInRegister(const GPIO_Pin_Number_e pin, cons
 static io_register moderMask(GPIO_Mode_e mode, GPIO_Pin_Number_e pin);
 static void configureAsOutput(io_register* moder, const GPIO_Pin_Number_e pin);
 static void configureAsInput(io_register* moder, const GPIO_Pin_Number_e pin);
+static void configureAsAltFunction(io_register* moder, io_register* alt_func_reg, GPIO_ALTF_e alt_func, GPIO_Pin_Number_e pin);
 uint8_t isConfiguredAs(GPIO_Mode_e whatMode, io_register moder, const GPIO_Pin_Number_e pin);
 static inline void clearBit(io_register* reg, const uint8_t pin);
 static inline void setBit(io_register* reg, const uint8_t pin);
@@ -22,37 +23,16 @@ static uint8_t bitIsHigh(io_register* reg, const uint8_t bit);
 enum
 {
     BITS_PER_PIN_MODER = 2,
+    BITS_PER_PIN_AFR = 4,
 };
 
 // Public functions
-void* MyGPIO_InitOlder(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e mode)
-{
-    // for all pins
-    for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
-    {
-        if (pinInMask(pin, pin_mask))
-        {
-            switch(mode)
-            {
-                case GPIO_OUTPUT:
-                    configureAsOutput(&gpio_port->MODER, pin);
-                    break;
-                case GPIO_INPUT:
-                    configureAsInput(&gpio_port->MODER, pin);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    return ECODE_OK;
-}
-
 void* MyGPIO_Init(const MyGPIO* gpio)
 {
     GPIO_TypeDef* gpio_port = gpio->gpio_register;
     GPIO_Pin_Mask_e pin_mask = gpio->pin_mask;
     GPIO_Mode_e mode = gpio->mode;
+    GPIO_ALTF_e alt_func = gpio->alt_func;
 
     // for all pins
     for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
@@ -68,9 +48,7 @@ void* MyGPIO_Init(const MyGPIO* gpio)
                     configureAsInput(&gpio_port->MODER, pin);
                     break;
                 case GPIO_ALT:
-                    gpio_port->MODER |= GPIO_ALT << (pin * 2);
-                    gpio_port->AFR[0] |= gpio->alt_func << (pin * 4);
-                    // configureAlternateFunction(&gpio_port->MODER, &gpio_port->AFR, gpio->alt_func ,pin);
+                    configureAsAltFunction(&gpio_port->MODER, &gpio_port->AFR, alt_func, pin);
                     break;
                 default:
                     break;
@@ -137,6 +115,19 @@ static void configureAsInput(io_register* moder, const GPIO_Pin_Number_e pin)
 {
     *moder &= ~(GPIO_MODE_MASK << getPositionForPinInRegister(pin, BITS_PER_PIN_MODER));
 }
+
+static void configureAsAltFunction(io_register* moder, io_register* alt_func_reg, GPIO_ALTF_e alt_func, GPIO_Pin_Number_e pin)
+{
+    *moder |= GPIO_ALT << (pin * 2);
+    if (pin < pin_num_8)
+    {
+        alt_func_reg[AFR_LOW] |= alt_func << (pin * BITS_PER_PIN_AFR);
+    }
+    else
+    {
+        alt_func_reg[AFR_HIGH] |= alt_func << (pin * BITS_PER_PIN_AFR);
+    }
+}                   
 
 io_register moderMask(GPIO_Mode_e mode, GPIO_Pin_Number_e pin)
 {

@@ -34,9 +34,6 @@
 #define FIRST_16_BITS   0xFFFF
 #define ALL_32_BITS     0xFFFFFFFF
 
-#define AFR_LOW 0
-#define AFR_HIGH 1
-
 // Forward declarations for test helper functions
 static io_register MODERfromPinAndMode_Out(GPIO_Pin_Number_e pin);
 static io_register MODERfromPinAndMode(GPIO_Pin_Number_e pin, GPIO_Mode_e mode);
@@ -312,6 +309,43 @@ void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
     TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->MODER);
     TEST_ASSERT_EQUAL_HEX(0x33333333, testGPIO.gpio_register->AFR[AFR_LOW]);
     TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
+}
+
+void test_MyGPIO_InitAsAlternateFunction_Pins8to15(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (pin8_mask | pin9_mask | pin10_mask | pin11_mask | pin12_mask | pin13_mask | pin14_mask | pin15_mask);
+    testGPIO.mode = GPIO_ALT;
+    testGPIO.alt_func = GPIO_ALTF_5;
+
+    io_register expected = MODERfromPinAndMode(pin_num_8, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_9, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_10, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_11, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_12, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_13, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_14, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_15, GPIO_ALT);
+
+    MyGPIO_Init(&testGPIO);
+
+    TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->MODER);
+    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_LOW]);
+    TEST_ASSERT_EQUAL_HEX(0x55555555, testGPIO.gpio_register->AFR[AFR_HIGH]);
+}
+
+test_MyGPIO_AltFunctionInitAboveLimitDoesNothing(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin2_mask;
+    testGPIO.mode = GPIO_ALT;
+    testGPIO.alt_func = GPIO_MAX_ALT_FUNCTIONS;
+
+    MyGPIO_Init(&testGPIO);
+
+    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_LOW]);
+    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
+
 }
 
 

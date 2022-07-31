@@ -75,12 +75,27 @@ typedef enum
 
 typedef enum
 {
-    GPIO_ALTF_0,
+    GPIO_ALTF_0 = 0,
     GPIO_ALTF_1,
     GPIO_ALTF_2,
     GPIO_ALTF_3,
-    // TODO, add more alt functions
+    GPIO_ALTF_4,
+    GPIO_ALTF_5,
+    GPIO_ALTF_6,
+    GPIO_ALTF_7,
+    GPIO_ALTF_8,
+    GPIO_ALTF_9,
+    GPIO_ALTF_10,
+    GPIO_ALTF_11,
+    GPIO_ALTF_12,
+    GPIO_ALTF_13,
+    GPIO_ALTF_14,
+    GPIO_ALTF_15,
+    GPIO_MAX_ALT_FUNCTIONS,
 } GPIO_ALTF_e;
+
+#define AFR_LOW 0
+#define AFR_HIGH 1
 
 typedef volatile uint32_t io_register;
 

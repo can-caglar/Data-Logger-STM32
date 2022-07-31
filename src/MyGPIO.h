@@ -28,7 +28,6 @@ typedef struct MyGPIO
     GPIO_ALTF_e alt_func;
 } MyGPIO;
 
-void* MyGPIO_InitOlder(GPIO_TypeDef* gpio_reg, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e mode);
 void* MyGPIO_Init(const MyGPIO* gpio);
 Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_reg, GPIO_Pin_Mask_e pin_mask, GPIO_State_e high);
 GPIO_State_e MyGPIO_Read(GPIO_TypeDef* gpio_reg, GPIO_Pin_Number_e pin);
