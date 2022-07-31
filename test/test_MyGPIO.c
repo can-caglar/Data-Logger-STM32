@@ -6,6 +6,7 @@
 #include "MyGPIO.h"
 #include "MyRCC.h"
 #include "MyCommon.h"
+#include "MyBitStuff.h"
 #include "user_stm32f407xx.h"
 
 // Prettier names
@@ -29,6 +30,9 @@
 
 // Helper macros
 #define MY_SIZE_OF_ARR(x) ((sizeof(x) / sizeof(x[0])))
+
+#define FIRST_16_BITS   0xFFFF
+#define ALL_32_BITS     0xFFFFFFFF
 
 // Forward declarations for test helper functions
 static io_register pinToMODER_Out(GPIO_Pin_Number_e pin);
@@ -236,8 +240,9 @@ void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
     testGPIO.pin_mask = pin1_mask;
     MyGPIO_Init(&testGPIO);
 
-    io_register expected = pinToMODER_OutAllPins() & ~(pinToMODER(pin_num_1, GPIO_MODE_MASK));
-    assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
+    io_register expected = pinToMODER_OutAllPins();
+    CONF_BITS(GPIO_MODE_MASK << pin_num_1, expected, GPIO_INPUT << pin_num_1);
+    TEST_ASSERT_BITS(ALL_32_BITS, GPIOC->MODER, expected);
 }
 
 void test_MyGPIO_InputIsReadStraightFromIDRRegisterForHighSignal(void)
