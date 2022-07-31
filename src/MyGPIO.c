@@ -67,6 +67,11 @@ void* MyGPIO_Init(const MyGPIO* gpio)
                 case GPIO_INPUT:
                     configureAsInput(&gpio_port->MODER, pin);
                     break;
+                case GPIO_ALT:
+                    gpio_port->MODER |= GPIO_ALT << (pin * 2);
+                    gpio_port->AFR[0] |= gpio->alt_func << (pin * 4);
+                    // configureAlternateFunction(&gpio_port->MODER, &gpio_port->AFR, gpio->alt_func ,pin);
+                    break;
                 default:
                     break;
             }

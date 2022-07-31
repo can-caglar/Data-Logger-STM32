@@ -73,6 +73,15 @@ typedef enum
     USART6_Mask = (0x1U << 5),
 } USART_Mask_e;
 
+typedef enum
+{
+    GPIO_ALTF_0,
+    GPIO_ALTF_1,
+    GPIO_ALTF_2,
+    GPIO_ALTF_3,
+    // TODO, add more alt functions
+} GPIO_ALTF_e;
+
 typedef volatile uint32_t io_register;
 
 #endif

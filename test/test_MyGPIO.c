@@ -34,13 +34,16 @@
 #define FIRST_16_BITS   0xFFFF
 #define ALL_32_BITS     0xFFFFFFFF
 
+#define AFR_LOW 0
+#define AFR_HIGH 1
+
 // Forward declarations for test helper functions
-static io_register pinToMODER_Out(GPIO_Pin_Number_e pin);
-static io_register pinToMODER(GPIO_Pin_Number_e pin, GPIO_Mode_e mode);
+static io_register MODERfromPinAndMode_Out(GPIO_Pin_Number_e pin);
+static io_register MODERfromPinAndMode(GPIO_Pin_Number_e pin, GPIO_Mode_e mode);
 static io_register posToBits(GPIO_Pin_Number_e pin);
 static void assertOnlyTheseBitsHigh(const io_register mask, const io_register reg);
 static void assertBitsAreLOW(const io_register mask, const io_register reg);
-static io_register pinToMODER_OutAllPins(void);
+static io_register MODERfromPinAndMode_OutAllPins(void);
 static void enablePeripheralClocks(void);
 
 MyGPIO testGPIO;
@@ -48,13 +51,9 @@ MyGPIO testGPIO;
 void setUp(void)
 {
     enablePeripheralClocks();
-    GPIOD->MODER = 0;
-    GPIOD->ODR = 0;
-    GPIOD->IDR = 0;
 
-    GPIOC->MODER = 0;
-    GPIOC->ODR = 0;
-    GPIOD->IDR = 0;
+    memset(GPIOD, 0, sizeof *GPIOC);
+    memset(GPIOC, 0, sizeof *GPIOD);
 
     memset(&testGPIO, 0, sizeof(testGPIO));
 }
@@ -95,7 +94,12 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
     testGPIO.mode = GPIO_OUTPUT;
     MyGPIO_Init(&testGPIO);
 
-    assertOnlyTheseBitsHigh(pinToMODER_Out(pin_num_1), GPIOC->MODER);
+    assertOnlyTheseBitsHigh(MODERfromPinAndMode_Out(pin_num_1), GPIOC->MODER);
+}
+
+void test_MyGPIO_OutputReturnsObjectPassedIn(void)
+{
+    TEST_IGNORE_MESSAGE("Not yet implemented return of gpio init");
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
@@ -106,7 +110,7 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 
     MyGPIO_Init(&testGPIO);
 
-    io_register expected = pinToMODER_Out(pin_num_2) | pinToMODER_Out(pin_num_3) | pinToMODER_Out(pin_num_4);
+    io_register expected = MODERfromPinAndMode_Out(pin_num_2) | MODERfromPinAndMode_Out(pin_num_3) | MODERfromPinAndMode_Out(pin_num_4);
 
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
@@ -118,7 +122,7 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenAllPinsPassedInSameTime(void)
     testGPIO.mode = GPIO_OUTPUT;
     MyGPIO_Init(&testGPIO);
 
-    io_register expected = pinToMODER_OutAllPins();
+    io_register expected = MODERfromPinAndMode_OutAllPins();
 
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
@@ -187,12 +191,14 @@ void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
     testGPIO.mode = GPIO_OUTPUT;
+
     TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&testGPIO));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 
     mask = posToBits((GPIO_Pin_Number_e)31);
-    testGPIO.pin_mask = mask;
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&mask));
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
+
+    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&testGPIO));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 }
 
@@ -240,7 +246,7 @@ void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
     testGPIO.pin_mask = pin1_mask;
     MyGPIO_Init(&testGPIO);
 
-    io_register expected = pinToMODER_OutAllPins();
+    io_register expected = MODERfromPinAndMode_OutAllPins();
     CONF_BITS(GPIO_MODE_MASK << pin_num_1, expected, GPIO_INPUT << pin_num_1);
     TEST_ASSERT_BITS(ALL_32_BITS, GPIOC->MODER, expected);
 }
@@ -250,10 +256,14 @@ void test_MyGPIO_InputIsReadStraightFromIDRRegisterForHighSignal(void)
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = pin3_mask;
     testGPIO.mode = GPIO_INPUT;
-    MyGPIO_Init(&testGPIO);
-    GPIOC->IDR = (0x1U << pin_num_3);
+    GPIOC->IDR = (0x1U << pin_num_3);   // set it to some value (this won't do anything on target but doesnt matter)
 
-    TEST_ASSERT_EQUAL(GPIO_HIGH, MyGPIO_Read(GPIOC, pin_num_3));
+    MyGPIO_Init(&testGPIO);
+    io_register idr = (GPIOC->IDR & (0x1U << pin_num_3));   // read IDR back
+
+    GPIO_State_e expectedState = (idr == 0) ? GPIO_LOW : GPIO_HIGH;
+
+    TEST_ASSERT_BITS(FIRST_16_BITS, expectedState, MyGPIO_Read(GPIOC, pin_num_3));
 }
 
 void test_MyGPIO_InputIsReadStraightFromIDRRegisterForLowSignal(void)
@@ -261,12 +271,13 @@ void test_MyGPIO_InputIsReadStraightFromIDRRegisterForLowSignal(void)
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = pin1_mask;
     testGPIO.mode = GPIO_INPUT;
-    GPIOC->IDR = ~0U;
+    GPIOC->IDR &= ~(posToBits(pin_num_1));
 
     MyGPIO_Init(&testGPIO);
+    io_register idr = (GPIOC->IDR & (0x1U << pin_num_1));   // read IDR back
+    GPIO_State_e expectedState = (idr == 0) ? GPIO_LOW : GPIO_HIGH;
 
-    GPIOC->IDR &= ~(posToBits(pin_num_1));
-    TEST_ASSERT_EQUAL(GPIO_LOW, MyGPIO_Read(GPIOC, pin_num_1));
+    TEST_ASSERT_EQUAL(expectedState, MyGPIO_Read(GPIOC, pin_num_1));
 }
 
 void test_MyGPIO_ReadingFromPortNotInitialisedAsInputReturns0(void)
@@ -279,33 +290,49 @@ void test_MyGPIO_ReadingFromPortNotInitialisedAsInputReturns0(void)
 
     TEST_ASSERT_EQUAL(GPIO_LOW, MyGPIO_Read(GPIOC, pin_num_2));
 }
-#if 0
 
-void test_MyGPIO_InitAsAlternateFunction(void)
+void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
 {
-    MyGPIO_Init(GPIOC, pin3_mask, GPIO_ALT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (pin0_mask | pin1_mask | pin2_mask | pin3_mask | pin4_mask | pin5_mask | pin6_mask | pin7_mask);
+    testGPIO.mode = GPIO_ALT;
+    testGPIO.alt_func = GPIO_ALTF_3;
+
+    io_register expected = MODERfromPinAndMode(pin_num_0, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_1, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_2, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_3, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_4, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_5, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_6, GPIO_ALT)
+        |  MODERfromPinAndMode(pin_num_7, GPIO_ALT);
+
+    MyGPIO_Init(&testGPIO);
+
+    TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->MODER);
+    TEST_ASSERT_EQUAL_HEX(0x33333333, testGPIO.gpio_register->AFR[AFR_LOW]);
+    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
 }
 
-#endif
 
 /************************* Private functions *********************/
 
-static io_register pinToMODER_Out(GPIO_Pin_Number_e pin)
+static io_register MODERfromPinAndMode_Out(GPIO_Pin_Number_e pin)
 {
-    return pinToMODER(pin, GPIO_OUTPUT);
+    return MODERfromPinAndMode(pin, GPIO_OUTPUT);
 }
 
-static io_register pinToMODER(GPIO_Pin_Number_e pin, GPIO_Mode_e mode)
+static io_register MODERfromPinAndMode(GPIO_Pin_Number_e pin, GPIO_Mode_e mode)
 {
     return (mode << (pin * 2));
 }
 
-static io_register pinToMODER_OutAllPins(void)
+static io_register MODERfromPinAndMode_OutAllPins(void)
 {
     io_register ret = 0;
     for (GPIO_Pin_Number_e i = pin_num_0; i < MAX_GPIO_PINS; i++)
     {
-        ret |= pinToMODER_Out(i);
+        ret |= MODERfromPinAndMode_Out(i);
     }
     return ret;
 }

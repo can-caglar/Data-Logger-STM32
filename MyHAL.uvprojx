@@ -422,14 +422,14 @@
           <GroupName>Tests</GroupName>
           <Files>
             <File>
-              <FileName>test_MyUSART.c</FileName>
+              <FileName>test_MyGPIO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\test\test_MyUSART.c</FilePath>
+              <FilePath>.\test\test_MyGPIO.c</FilePath>
             </File>
             <File>
-              <FileName>test_MyUSART_runner.c</FileName>
+              <FileName>test_MyGPIO_runner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\build\test\runners\test_MyUSART_runner.c</FilePath>
+              <FilePath>.\build\test\runners\test_MyGPIO_runner.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -4,6 +4,7 @@
 #include "stm32f407xx.h"
 #include "MyCommon.h"
 
+// TODO, move to common?
 typedef enum
 {
     GPIO_INPUT = 0UL,
@@ -12,6 +13,7 @@ typedef enum
     GPIO_MODE_MASK = 3UL
 } GPIO_Mode_e;
 
+// TODO, move to common?
 typedef enum
 {
     GPIO_LOW = 0,
@@ -23,6 +25,7 @@ typedef struct MyGPIO
     GPIO_TypeDef* gpio_register;
     GPIO_Pin_Mask_e pin_mask;
     GPIO_Mode_e mode;
+    GPIO_ALTF_e alt_func;
 } MyGPIO;
 
 void* MyGPIO_InitOlder(GPIO_TypeDef* gpio_reg, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e mode);

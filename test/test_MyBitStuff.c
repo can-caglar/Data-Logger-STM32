@@ -56,11 +56,3 @@ void testConfBitsChangesOnlyMaskedBitsWhenSetting(void)
     CONF_BITS(0x00FF, myReg, 0xFFFF);
     TEST_ASSERT_BITS(0xFFFF, 0x00FF, myReg);
 }
-
-/*
-
-    CONF_BITS((0x3 << 2), myReg, (0x6 << 2));
-
-    TEST_ASSERT_BITS(~0U, 0x2 << 2, myReg);
-
-*/
