@@ -39,6 +39,8 @@ static void assertBitsAreLOW(const io_register mask, const io_register reg);
 static io_register pinToMODER_OutAllPins(void);
 static void enablePeripheralClocks(void);
 
+MyGPIO testGPIO;
+
 void setUp(void)
 {
     enablePeripheralClocks();
@@ -49,6 +51,8 @@ void setUp(void)
     GPIOC->MODER = 0;
     GPIOC->ODR = 0;
     GPIOD->IDR = 0;
+
+    memset(&testGPIO, 0, sizeof(testGPIO));
 }
 
 void tearDown(void)
@@ -62,7 +66,7 @@ void test_MyGPIO_ConstantsAreCorrect(void)
 
     TEST_ASSERT_EQUAL_INT(16, MAX_GPIO_PINS);
 
-    GPIO_Pin_Mask_e pins[MAX_GPIO_PINS] = 
+    GPIO_Pin_Mask_e pins[MAX_GPIO_PINS] =
     {
         GPIO_PIN_0_e, GPIO_PIN_1_e, GPIO_PIN_2_e, GPIO_PIN_3_e,
         GPIO_PIN_4_e, GPIO_PIN_5_e, GPIO_PIN_6_e, GPIO_PIN_7_e,
@@ -74,19 +78,30 @@ void test_MyGPIO_ConstantsAreCorrect(void)
     {
         TEST_ASSERT_EQUAL_HEX(1UL << i, pins[i]);
     }
+
+    TEST_ASSERT_EQUAL(0, GPIO_INPUT);
+    TEST_ASSERT_EQUAL(1, GPIO_OUTPUT);
+    TEST_ASSERT_EQUAL(2, GPIO_ALT);
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
 {
-    MyGPIO_Init(GPIOC, pin1_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin1_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
 
     assertOnlyTheseBitsHigh(pinToMODER_Out(pin_num_1), GPIOC->MODER);
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 {
-    MyGPIO_Init(GPIOC, (GPIO_Pin_Mask_e)(pin2_mask | pin3_mask | pin4_mask), GPIO_OUTPUT);
-    
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin2_mask | pin3_mask | pin4_mask);
+    testGPIO.mode = GPIO_OUTPUT;
+
+    MyGPIO_Init(&testGPIO);
+
     io_register expected = pinToMODER_Out(pin_num_2) | pinToMODER_Out(pin_num_3) | pinToMODER_Out(pin_num_4);
 
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
@@ -94,13 +109,15 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenAllPinsPassedInSameTime(void)
 {
-    MyGPIO_Init(GPIOC, pins_all_mask, GPIO_OUTPUT);
-    
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pins_all_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
+
     io_register expected = pinToMODER_OutAllPins();
 
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
-
 void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 {
     TEST_ASSERT_EQUAL_INT(ECODE_NOT_OUTPUT, MyGPIO_Write(GPIOC, pin4_mask, GPIO_HIGH));
@@ -109,7 +126,10 @@ void test_MyGPIO_WritingToUninitialisedPortDoesNothing(void)
 
 void test_MyGPIO_SinglePinCanBeSetHigh(void)
 {
-    MyGPIO_Init(GPIOC, pin4_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin4_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin4_mask, GPIO_HIGH));
 
@@ -118,7 +138,10 @@ void test_MyGPIO_SinglePinCanBeSetHigh(void)
 
 void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 {
-    MyGPIO_Init(GPIOC, (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask), GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask);
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask), GPIO_HIGH));
 
@@ -128,7 +151,10 @@ void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 
 void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 {
-    MyGPIO_Init(GPIOC, (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask | pin8_mask), GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask | pin8_mask);
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin6_mask, GPIO_HIGH));
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin7_mask, GPIO_HIGH));
@@ -140,7 +166,10 @@ void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 
 void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 {
-    MyGPIO_Init(GPIOC, pins_all_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pins_all_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pins_all_mask, GPIO_HIGH));
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin8_mask, GPIO_LOW));
@@ -151,17 +180,24 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 void test_MyGPIO_InitPinOutsideRangeReturnsNullPtr(void)
 {
     io_register mask = posToBits(MAX_GPIO_PINS);
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOC, (GPIO_Pin_Mask_e)mask, GPIO_OUTPUT));
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (GPIO_Pin_Mask_e)mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&testGPIO));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 
     mask = posToBits((GPIO_Pin_Number_e)31);
-    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(GPIOC,(GPIO_Pin_Mask_e)mask, GPIO_OUTPUT));
+    testGPIO.pin_mask = mask;
+    TEST_ASSERT_EQUAL_PTR(0, MyGPIO_Init(&mask));
     assertOnlyTheseBitsHigh(0, GPIOC->MODER);
 }
 
 void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 {
-    MyGPIO_Init(GPIOC, pins_all_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pins_all_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pins_all_mask, GPIO_HIGH));
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, pin6_mask, GPIO_LOW));
@@ -173,8 +209,14 @@ void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
 
 void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 {
-    MyGPIO_Init(GPIOC, pins_all_mask, GPIO_OUTPUT);
-    MyGPIO_Init(GPIOD, pins_all_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pins_all_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+
+    MyGPIO_Init(&testGPIO);
+
+    testGPIO.gpio_register = GPIOD;
+    MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_e)(pin1_mask | pin2_mask), GPIO_HIGH));
     TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOD, (GPIO_Pin_Mask_e)(pin1_mask | pin3_mask), GPIO_HIGH));
@@ -185,17 +227,25 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
 
 void test_MyGPIO_InitialiseAsInputMakesRegisterValue00(void)
 {
-    MyGPIO_Init(GPIOC, pins_all_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pins_all_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO); // to see if changes make effect
 
-    MyGPIO_Init(GPIOC, pin1_mask, GPIO_INPUT);
-    
+    testGPIO.mode = GPIO_INPUT;
+    testGPIO.pin_mask = pin1_mask;
+    MyGPIO_Init(&testGPIO);
+
     io_register expected = pinToMODER_OutAllPins() & ~(pinToMODER(pin_num_1, GPIO_MODE_MASK));
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
 
 void test_MyGPIO_InputIsReadStraightFromIDRRegisterForHighSignal(void)
 {
-    MyGPIO_Init(GPIOC, pin3_mask, GPIO_INPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin3_mask;
+    testGPIO.mode = GPIO_INPUT;
+    MyGPIO_Init(&testGPIO);
     GPIOC->IDR = (0x1U << pin_num_3);
 
     TEST_ASSERT_EQUAL(GPIO_HIGH, MyGPIO_Read(GPIOC, pin_num_3));
@@ -203,19 +253,35 @@ void test_MyGPIO_InputIsReadStraightFromIDRRegisterForHighSignal(void)
 
 void test_MyGPIO_InputIsReadStraightFromIDRRegisterForLowSignal(void)
 {
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin1_mask;
+    testGPIO.mode = GPIO_INPUT;
     GPIOC->IDR = ~0U;
-    MyGPIO_Init(GPIOC, pin1_mask, GPIO_INPUT);
+
+    MyGPIO_Init(&testGPIO);
+
     GPIOC->IDR &= ~(posToBits(pin_num_1));
     TEST_ASSERT_EQUAL(GPIO_LOW, MyGPIO_Read(GPIOC, pin_num_1));
 }
 
 void test_MyGPIO_ReadingFromPortNotInitialisedAsInputReturns0(void)
 {
-    MyGPIO_Init(GPIOC, pin2_mask, GPIO_OUTPUT);
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin2_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    MyGPIO_Init(&testGPIO);
     GPIOC->IDR = ~0U;
 
     TEST_ASSERT_EQUAL(GPIO_LOW, MyGPIO_Read(GPIOC, pin_num_2));
 }
+#if 0
+
+void test_MyGPIO_InitAsAlternateFunction(void)
+{
+    MyGPIO_Init(GPIOC, pin3_mask, GPIO_ALT);
+}
+
+#endif
 
 /************************* Private functions *********************/
 

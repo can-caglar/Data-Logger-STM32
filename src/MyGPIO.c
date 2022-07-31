@@ -25,7 +25,7 @@ enum
 };
 
 // Public functions
-void* MyGPIO_Init(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e mode)
+void* MyGPIO_InitOlder(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e mode)
 {
     // for all pins
     for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
@@ -45,7 +45,34 @@ void* MyGPIO_Init(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_Mode_e
             }
         }
     }
-    return 0;
+    return ECODE_OK;
+}
+
+void* MyGPIO_Init(const MyGPIO* gpio)
+{
+    GPIO_TypeDef* gpio_port = gpio->gpio_register;
+    GPIO_Pin_Mask_e pin_mask = gpio->pin_mask;
+    GPIO_Mode_e mode = gpio->mode;
+
+    // for all pins
+    for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
+    {
+        if (pinInMask(pin, pin_mask))
+        {
+            switch(mode)
+            {
+                case GPIO_OUTPUT:
+                    configureAsOutput(&gpio_port->MODER, pin);
+                    break;
+                case GPIO_INPUT:
+                    configureAsInput(&gpio_port->MODER, pin);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    return ECODE_OK;
 }
 
 Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_State_e high)
