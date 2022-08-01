@@ -9,24 +9,24 @@
 #include "MyBitStuff.h"
 #include "user_stm32f407xx.h"
 
-// Prettier names
-#define pin0_mask        GPIO_PIN_0_e
-#define pin1_mask        GPIO_PIN_1_e
-#define pin2_mask        GPIO_PIN_2_e
-#define pin3_mask        GPIO_PIN_3_e
-#define pin4_mask        GPIO_PIN_4_e
-#define pin5_mask        GPIO_PIN_5_e
-#define pin6_mask        GPIO_PIN_6_e
-#define pin7_mask        GPIO_PIN_7_e
-#define pin8_mask        GPIO_PIN_8_e
-#define pin9_mask        GPIO_PIN_9_e
-#define pin10_mask       GPIO_PIN_10_e
-#define pin11_mask       GPIO_PIN_11_e
-#define pin12_mask       GPIO_PIN_12_e
-#define pin13_mask       GPIO_PIN_13_e
-#define pin14_mask       GPIO_PIN_14_e
-#define pin15_mask       GPIO_PIN_15_e
-#define pins_all_mask    GPIO_PIN_ALL_e
+// // Prettier names
+// #define pin0_mask        pin0_mask
+// #define pin1_mask        pin1_mask
+// #define pin2_mask        GPIO_PIN_2_e
+// #define pin3_mask        GPIO_PIN_3_e
+// #define pin4_mask        GPIO_PIN_4_e
+// #define pin5_mask        GPIO_PIN_5_e
+// #define pin6_mask        GPIO_PIN_6_e
+// #define pin7_mask        GPIO_PIN_7_e
+// #define pin8_mask        GPIO_PIN_8_e
+// #define pin9_mask        GPIO_PIN_9_e
+// #define pin10_mask       GPIO_PIN_10_e
+// #define pin11_mask       GPIO_PIN_11_e
+// #define pin12_mask       GPIO_PIN_12_e
+// #define pin13_mask       GPIO_PIN_13_e
+// #define pin14_mask       GPIO_PIN_14_e
+// #define pin15_mask       GPIO_PIN_15_e
+// #define pins_all_mask    GPIO_PIN_ALL_e
 
 // Helper macros
 #define MY_SIZE_OF_ARR(x) ((sizeof(x) / sizeof(x[0])))
@@ -61,19 +61,22 @@ void test_MyGPIO_ConstantsAreCorrect(void)
     TEST_ASSERT_EQUAL_HEX(0x1, GPIO_OUTPUT);
 
     TEST_ASSERT_EQUAL_INT(16, MAX_GPIO_PINS);
+    TEST_ASSERT_EQUAL_INT(16, MAX_ALT_FUNCTIONS);
 
-    GPIO_Pin_Mask_e pins[MAX_GPIO_PINS] =
+    GPIO_Pin_Mask_t pins[MAX_GPIO_PINS] =
     {
-        GPIO_PIN_0_e, GPIO_PIN_1_e, GPIO_PIN_2_e, GPIO_PIN_3_e,
-        GPIO_PIN_4_e, GPIO_PIN_5_e, GPIO_PIN_6_e, GPIO_PIN_7_e,
-        GPIO_PIN_8_e, GPIO_PIN_9_e, GPIO_PIN_10_e, GPIO_PIN_11_e,
-        GPIO_PIN_12_e, GPIO_PIN_13_e, GPIO_PIN_14_e, GPIO_PIN_15_e,
+        pin0_mask, pin1_mask, pin2_mask, pin3_mask,
+        pin4_mask, pin5_mask, pin6_mask, pin7_mask,
+        pin8_mask, pin9_mask, pin10_mask, pin11_mask,
+        pin12_mask, pin13_mask, pin14_mask, pin15_mask,
     };
 
     for (int i = 0; i < MAX_GPIO_PINS; i++)
     {
         TEST_ASSERT_EQUAL_HEX(1UL << i, pins[i]);
     }
+
+    TEST_ASSERT_EQUAL_HEX(pins_all_mask, 0xFFFF);
 
     TEST_ASSERT_EQUAL(0, GPIO_INPUT);
     TEST_ASSERT_EQUAL(1, GPIO_OUTPUT);
@@ -93,7 +96,7 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin2_mask | pin3_mask | pin4_mask);
+    testGPIO.pin_mask = (GPIO_Pin_Mask_t)(pin2_mask | pin3_mask | pin4_mask);
     testGPIO.mode = GPIO_OUTPUT;
 
     MyGPIO_Init(&testGPIO);
@@ -135,11 +138,11 @@ void test_MyGPIO_SinglePinCanBeSetHigh(void)
 void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask);
+    testGPIO.pin_mask = (GPIO_Pin_Mask_t)(pin6_mask | pin7_mask);
     testGPIO.mode = GPIO_OUTPUT;
     MyGPIO_Init(&testGPIO);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask), GPIO_HIGH));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_t)(pin6_mask | pin7_mask), GPIO_HIGH));
 
     io_register expected = posToBits(pin_num_6) | posToBits(pin_num_7);
     assertOnlyTheseBitsHigh(expected, GPIOC->ODR);
@@ -148,7 +151,7 @@ void test_MyGPIO_OutputMultiplePinsPassedInCanBeSetHigh(void)
 void test_MyGPIO_OutputCanBeSetHighWhenCalledMultipleTimes(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)(pin6_mask | pin7_mask | pin8_mask);
+    testGPIO.pin_mask = (GPIO_Pin_Mask_t)(pin6_mask | pin7_mask | pin8_mask);
     testGPIO.mode = GPIO_OUTPUT;
     MyGPIO_Init(&testGPIO);
 
@@ -175,7 +178,7 @@ void test_MyGPIO_OutputCanBeSetLow_1Pin(void)
 
 void test_MyGPIO_InitPinMaskIsSizeIs2Bytes(void)
 {
-    TEST_ASSERT_EQUAL(2, sizeof(GPIO_Pin_Mask_e));
+    TEST_ASSERT_EQUAL(2, sizeof(GPIO_Pin_Mask_t));
 }
 
 void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
@@ -204,8 +207,8 @@ void test_MyGPIO_MultiplePortsMayBeInitialisedAsOutput(void)
     testGPIO.gpio_register = GPIOD;
     MyGPIO_Init(&testGPIO);
 
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_e)(pin1_mask | pin2_mask), GPIO_HIGH));
-    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOD, (GPIO_Pin_Mask_e)(pin1_mask | pin3_mask), GPIO_HIGH));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOC, (GPIO_Pin_Mask_t)(pin1_mask | pin2_mask), GPIO_HIGH));
+    TEST_ASSERT_EQUAL_INT(ECODE_OK, MyGPIO_Write(GPIOD, (GPIO_Pin_Mask_t)(pin1_mask | pin3_mask), GPIO_HIGH));
 
     assertOnlyTheseBitsHigh(posToBits(pin_num_1) | posToBits(pin_num_2), GPIOC->ODR);
     assertOnlyTheseBitsHigh(posToBits(pin_num_1) | posToBits(pin_num_3), GPIOD->ODR);
@@ -270,7 +273,7 @@ void test_MyGPIO_ReadingFromPortNotInitialisedAsInputReturns0(void)
 void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)
+    testGPIO.pin_mask = (GPIO_Pin_Mask_t)
         (pin0_mask | pin1_mask | pin2_mask | pin3_mask | pin4_mask | pin5_mask | pin6_mask | pin7_mask);
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = GPIO_ALTF_3;
@@ -294,7 +297,7 @@ void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
 void test_MyGPIO_InitAsAlternateFunction_Pins8to15(void)
 {
     testGPIO.gpio_register = GPIOC;
-    testGPIO.pin_mask = (GPIO_Pin_Mask_e)
+    testGPIO.pin_mask = (GPIO_Pin_Mask_t)
         (pin8_mask | pin9_mask | pin10_mask | pin11_mask | pin12_mask | pin13_mask | pin14_mask | pin15_mask);
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = GPIO_ALTF_5;
@@ -320,7 +323,7 @@ void test_MyGPIO_AltFunctionInitAboveLimitDoesNothingAndReturnsError(void)
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = pin2_mask;
     testGPIO.mode = GPIO_ALT;
-    testGPIO.alt_func = GPIO_MAX_ALT_FUNCTIONS;
+    testGPIO.alt_func = MAX_ALT_FUNCTIONS;
 
     TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
 

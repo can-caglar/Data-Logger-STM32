@@ -30,24 +30,24 @@ typedef enum
     GPIO_PORT_COUNT_e,
 } GPIO_Port_e;
 
-typedef uint16_t GPIO_Pin_Mask_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_0_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_1_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_2_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_3_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_4_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_5_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_6_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_7_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_8_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_9_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_10_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_11_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_12_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_13_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_14_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_15_e;
-extern const GPIO_Pin_Mask_e GPIO_PIN_ALL_e;
+typedef uint16_t GPIO_Pin_Mask_t;
+extern const GPIO_Pin_Mask_t pin0_mask;
+extern const GPIO_Pin_Mask_t pin1_mask;
+extern const GPIO_Pin_Mask_t pin2_mask;
+extern const GPIO_Pin_Mask_t pin3_mask;
+extern const GPIO_Pin_Mask_t pin4_mask;
+extern const GPIO_Pin_Mask_t pin5_mask;
+extern const GPIO_Pin_Mask_t pin6_mask;
+extern const GPIO_Pin_Mask_t pin7_mask;
+extern const GPIO_Pin_Mask_t pin8_mask;
+extern const GPIO_Pin_Mask_t pin9_mask;
+extern const GPIO_Pin_Mask_t pin10_mask;
+extern const GPIO_Pin_Mask_t pin11_mask;
+extern const GPIO_Pin_Mask_t pin12_mask;
+extern const GPIO_Pin_Mask_t pin13_mask;
+extern const GPIO_Pin_Mask_t pin14_mask;
+extern const GPIO_Pin_Mask_t pin15_mask;
+extern const GPIO_Pin_Mask_t pins_all_mask;
 
 typedef enum
 {
@@ -94,7 +94,7 @@ typedef enum
     GPIO_ALTF_13,
     GPIO_ALTF_14,
     GPIO_ALTF_15,
-    GPIO_MAX_ALT_FUNCTIONS,
+    MAX_ALT_FUNCTIONS,
 } GPIO_ALTF_e;
 
 #define AFR_LOW 0

@@ -9,7 +9,7 @@
 // Library assumes clock for peripheral has been enabled already
 
 // Private functions forward decl
-static uint32_t pinInMask(const GPIO_Pin_Number_e bit, const GPIO_Pin_Mask_e mask);
+static uint32_t pinInMask(const GPIO_Pin_Number_e bit, const GPIO_Pin_Mask_t mask);
 static io_register getPositionForPinInRegister(const GPIO_Pin_Number_e pin, const uint8_t num_bits);
 static io_register moderMask(GPIO_Mode_e mode, GPIO_Pin_Number_e pin);
 static void configureAsOutput(io_register* moder, const GPIO_Pin_Number_e pin);
@@ -35,14 +35,14 @@ Error_Code_e MyGPIO_Init(const MyGPIO* gpio)
 {
     Error_Code_e err = ECODE_OK;
     GPIO_TypeDef* gpio_port = gpio->gpio_register;
-    GPIO_Pin_Mask_e pin_mask = gpio->pin_mask;
+    GPIO_Pin_Mask_t pin_mask = gpio->pin_mask;
     GPIO_Mode_e mode = gpio->mode;
     GPIO_ALTF_e alt_func = gpio->alt_func;
 
     // Check params
     if (noError(&err))
     {
-        err = (alt_func >= GPIO_MAX_ALT_FUNCTIONS) ? ECODE_BAD_PARAM : ECODE_OK;
+        err = (alt_func >= MAX_ALT_FUNCTIONS) ? ECODE_BAD_PARAM : ECODE_OK;
     }
 
     // Start init...
@@ -73,7 +73,7 @@ Error_Code_e MyGPIO_Init(const MyGPIO* gpio)
     return err;
 }
 
-Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_e pin_mask, GPIO_State_e high)
+Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_port, GPIO_Pin_Mask_t pin_mask, GPIO_State_e high)
 {
     Error_Code_e err = ECODE_OK;
     for (GPIO_Pin_Number_e pin = pin_num_0; pin < MAX_GPIO_PINS; pin++)
@@ -111,7 +111,7 @@ GPIO_State_e MyGPIO_Read(GPIO_TypeDef* gpio_reg, GPIO_Pin_Number_e pin)
 
 /************************ Private functions **********************/
 
-uint32_t pinInMask(const GPIO_Pin_Number_e pin, const GPIO_Pin_Mask_e mask)
+uint32_t pinInMask(const GPIO_Pin_Number_e pin, const GPIO_Pin_Mask_t mask)
 {
     return (mask & (1UL << pin));
 }

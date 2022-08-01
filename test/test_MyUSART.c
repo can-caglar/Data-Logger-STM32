@@ -1,12 +1,22 @@
 #include "unity.h"
 #include "MyRCC.h"
 #include "MyUSART.h"
+#include "MyGPIO.h"
 #include "user_stm32f407xx.h"
 #include "MyBitStuff.h"
+
+MyGPIO UARTGPIO;
 
 void setUp(void)
 {
     MyRCC_USARTClockEnable(RCC_USART6_EN_REG, USART6_Mask);
+    MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, GPIO_PORT_C_e);
+
+    // UARTGPIO.gpio_register = GPIOC;
+    // UARTGPIO.mode = GPIO_ALT;
+    // UARTGPIO.alt_func = GPIO_ALTF_7;
+    // UARTGPIO.pin_mask = (pin_mask_6 | pin_mask_7 | pin_mask_8);
+    // TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&UARTGPIO));
 }
 
 void tearDown(void)
@@ -33,8 +43,9 @@ void test_UsartInit(void)
     TEST_ASSERT_BIT_HIGH(3, USART6->CR1);  // send idle frame
 }
 
-// Continue: go back to GPIO module and add alternate function ability on there.
-// ... then on this module, initialise the GPIO pins associated with the USART
+// Continue: [x] go back to GPIO module and add alternate function ability on there.
+// [...] then on this module, initialise the GPIO pins associated with the USART
+// ...and continue to initialise USART!
 
 /*
 - [ ] Word length can be set with M bit in USART_CR1 (set = 9 bit word, reset = 8 bit word)

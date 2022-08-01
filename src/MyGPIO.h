@@ -23,13 +23,13 @@ typedef enum
 typedef struct MyGPIO
 {
     GPIO_TypeDef* gpio_register;
-    GPIO_Pin_Mask_e pin_mask;
+    GPIO_Pin_Mask_t pin_mask;
     GPIO_Mode_e mode;
     GPIO_ALTF_e alt_func;
 } MyGPIO;
 
 Error_Code_e MyGPIO_Init(const MyGPIO* gpio);
-Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_reg, GPIO_Pin_Mask_e pin_mask, GPIO_State_e high);
+Error_Code_e MyGPIO_Write(GPIO_TypeDef* gpio_reg, GPIO_Pin_Mask_t pin_mask, GPIO_State_e high);
 GPIO_State_e MyGPIO_Read(GPIO_TypeDef* gpio_reg, GPIO_Pin_Number_e pin);
 
 #endif // MYGPIO_H

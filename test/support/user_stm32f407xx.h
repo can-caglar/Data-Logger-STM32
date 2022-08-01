@@ -33,7 +33,6 @@ void SystemCoreClockUpdate(void);
 
 // Common to all
 #define RCC_GPIO_EN_REG (&(RCC->AHB1ENR))
-
 #define RCC_USART1_EN_REG (&(RCC->APB2ENR))
 #define RCC_USART6_EN_REG (&(RCC->APB2ENR))
 
