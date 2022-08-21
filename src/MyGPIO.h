@@ -20,12 +20,28 @@ typedef enum
     GPIO_HIGH = 1,
 } GPIO_State_e;
 
+typedef enum
+{
+    GPIO_PUSH_PULL,
+    GPIO_OPEN_DRAIN,
+} GPIO_OutputType_e;
+
+typedef enum
+{
+    GPIO_PUPD_NONE = 0x0,
+    GPIO_PUPD_UP   = 0x1,
+    GPIO_PUPD_DOWN = 0x2,
+    GPIO_PUPD_MASK = 0x3
+} GPIO_PullUpDown_e;
+
 typedef struct MyGPIO
 {
     GPIO_TypeDef* gpio_register;
     GPIO_Pin_Mask_t pin_mask;
     GPIO_Mode_e mode;
     GPIO_ALTF_e alt_func;
+    GPIO_OutputType_e output_type;
+    GPIO_PullUpDown_e pupd;
 } MyGPIO;
 
 Error_Code_e MyGPIO_Init(const MyGPIO* gpio);

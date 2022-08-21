@@ -9,25 +9,6 @@
 #include "MyBitStuff.h"
 #include "user_stm32f407xx.h"
 
-// // Prettier names
-// #define pin0_mask        pin0_mask
-// #define pin1_mask        pin1_mask
-// #define pin2_mask        GPIO_PIN_2_e
-// #define pin3_mask        GPIO_PIN_3_e
-// #define pin4_mask        GPIO_PIN_4_e
-// #define pin5_mask        GPIO_PIN_5_e
-// #define pin6_mask        GPIO_PIN_6_e
-// #define pin7_mask        GPIO_PIN_7_e
-// #define pin8_mask        GPIO_PIN_8_e
-// #define pin9_mask        GPIO_PIN_9_e
-// #define pin10_mask       GPIO_PIN_10_e
-// #define pin11_mask       GPIO_PIN_11_e
-// #define pin12_mask       GPIO_PIN_12_e
-// #define pin13_mask       GPIO_PIN_13_e
-// #define pin14_mask       GPIO_PIN_14_e
-// #define pin15_mask       GPIO_PIN_15_e
-// #define pins_all_mask    GPIO_PIN_ALL_e
-
 // Helper macros
 #define MY_SIZE_OF_ARR(x) ((sizeof(x) / sizeof(x[0])))
 
@@ -81,6 +62,18 @@ void test_MyGPIO_ConstantsAreCorrect(void)
     TEST_ASSERT_EQUAL(0, GPIO_INPUT);
     TEST_ASSERT_EQUAL(1, GPIO_OUTPUT);
     TEST_ASSERT_EQUAL(2, GPIO_ALT);
+    TEST_ASSERT_EQUAL(3, GPIO_MODE_MASK);
+
+    /* GPIOx_OTYPER */
+    TEST_ASSERT_EQUAL(0, GPIO_PUSH_PULL);
+    TEST_ASSERT_EQUAL(1, GPIO_OPEN_DRAIN);
+
+    /* GPIOx_PUPDR */
+    TEST_ASSERT_EQUAL(0, GPIO_PUPD_NONE);
+    TEST_ASSERT_EQUAL(1, GPIO_PUPD_UP);
+    TEST_ASSERT_EQUAL(2, GPIO_PUPD_DOWN);
+    TEST_ASSERT_EQUAL(3, GPIO_PUPD_MASK);
+
 }
 
 void test_MyGPIO_OutputIsInitialisedCorrectlyWhen1PinPassedIn(void)
@@ -101,7 +94,9 @@ void test_MyGPIO_OutputIsInitialisedCorrectlyWhenMultiplePinsPassedIn(void)
 
     MyGPIO_Init(&testGPIO);
 
-    io_register expected = MODERfromPinAndMode_Out(pin_num_2) | MODERfromPinAndMode_Out(pin_num_3) | MODERfromPinAndMode_Out(pin_num_4);
+    io_register expected = MODERfromPinAndMode_Out(pin_num_2)
+        | MODERfromPinAndMode_Out(pin_num_3)
+        | MODERfromPinAndMode_Out(pin_num_4);
 
     assertOnlyTheseBitsHigh(expected, GPIOC->MODER);
 }
@@ -181,7 +176,7 @@ void test_MyGPIO_InitPinMaskIsSizeIs2Bytes(void)
     TEST_ASSERT_EQUAL(2, sizeof(GPIO_Pin_Mask_t));
 }
 
-void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimes(void)
+void test_MyGPIO_OutputCanBeSetLowWhenCalledMultipleTimesWithDifferentPins(void)
 {
     testGPIO.gpio_register = GPIOC;
     testGPIO.pin_mask = pins_all_mask;
@@ -240,7 +235,7 @@ void test_MyGPIO_InputIsReadStraightFromIDRRegisterForHighSignal(void)
     MyGPIO_Init(&testGPIO);
     io_register idr = (GPIOC->IDR & (0x1U << pin_num_3));   // read IDR back
 
-    GPIO_State_e expectedState = (idr == 0) ? GPIO_LOW : GPIO_HIGH;
+    GPIO_State_e expectedState = (idr == 0) ? GPIO_LOW : GPIO_HIGH; // expected output to be whatever IDR is
 
     TEST_ASSERT_BITS(FIRST_16_BITS, expectedState, MyGPIO_Read(GPIOC, pin_num_3));
 }
@@ -287,6 +282,8 @@ void test_MyGPIO_InitAsAlternateFunction_Pins0to7(void)
         |  MODERfromPinAndMode(pin_num_6, GPIO_ALT)
         |  MODERfromPinAndMode(pin_num_7, GPIO_ALT);
 
+    GPIOC->AFR[AFR_LOW] = ~0;  // to make sure things really change
+
     MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->MODER);
@@ -311,10 +308,13 @@ void test_MyGPIO_InitAsAlternateFunction_Pins8to15(void)
         |  MODERfromPinAndMode(pin_num_14, GPIO_ALT)
         |  MODERfromPinAndMode(pin_num_15, GPIO_ALT);
 
+    GPIOC->AFR[AFR_HIGH] = 0xABCDEF;  // to make sure things really change
+    GPIOC->AFR[AFR_LOW] = 0xABCDEF;  // to make sure things haven't changed
+
     MyGPIO_Init(&testGPIO);
 
     TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->MODER);
-    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_LOW]);
+    TEST_ASSERT_EQUAL_HEX(0xABCDEF, testGPIO.gpio_register->AFR[AFR_LOW]);
     TEST_ASSERT_EQUAL_HEX(0x55555555, testGPIO.gpio_register->AFR[AFR_HIGH]);
 }
 
@@ -325,12 +325,142 @@ void test_MyGPIO_AltFunctionInitAboveLimitDoesNothingAndReturnsError(void)
     testGPIO.mode = GPIO_ALT;
     testGPIO.alt_func = MAX_ALT_FUNCTIONS;
 
+    io_register expected = 0x55555555;
+    GPIOC->AFR[AFR_LOW] = expected;
+    GPIOC->AFR[AFR_HIGH] = expected;
+
     TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyGPIO_Init(&testGPIO));
 
-    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_LOW]);
-    TEST_ASSERT_EQUAL_HEX(0, testGPIO.gpio_register->AFR[AFR_HIGH]);
+    TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->AFR[AFR_LOW]);
+    TEST_ASSERT_EQUAL_HEX(expected, testGPIO.gpio_register->AFR[AFR_HIGH]);
 }
 
+void test_MyGPIO_outputTypeCanBeConfiguredAsPushPull(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin5_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+
+    testGPIO.output_type = GPIO_PUSH_PULL;
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_BIT_LOW(pin_num_5, testGPIO.gpio_register->OTYPER);
+}
+
+void test_MyGPIO_outputTypeCanBeConfiguredAsOpenDrainForOnePin(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin7_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+
+    testGPIO.output_type = GPIO_OPEN_DRAIN;
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX((1UL << pin_num_7), testGPIO.gpio_register->OTYPER);
+}
+
+void test_MyGPIO_outputTypeCanBeConfiguredAsOpenDrainForMultiplePins(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = (pin9_mask | pin10_mask);
+    testGPIO.mode = GPIO_OUTPUT;
+
+    testGPIO.output_type = GPIO_OPEN_DRAIN;
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX((1UL << 9) | (1UL << 10), testGPIO.gpio_register->OTYPER);
+}
+
+void test_MyGPIO_outputTypeCanBeSetAsOpenDrainAndWontMessUpPreviousConfig(void)
+{
+    testGPIO.gpio_register = GPIOC; // both GPIOC
+    testGPIO.pin_mask = pin9_mask;  // pin 9 for this
+    testGPIO.mode = GPIO_OUTPUT;
+    testGPIO.output_type = GPIO_OPEN_DRAIN;
+
+    MyGPIO secondGpio =
+    {
+        .gpio_register = GPIOC,  // both GPIOC
+        .pin_mask = pin3_mask,  // pin 3 for this
+        .mode = GPIO_OUTPUT,
+        .output_type = GPIO_OPEN_DRAIN
+    };
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&secondGpio));
+
+    TEST_ASSERT_EQUAL_HEX((1UL << 3) | (1UL << 9), GPIOC->OTYPER);
+}
+
+void test_MyGPIO_canBeConfiguredAsPullupWithoutAffectingOthers(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin2_mask | pin3_mask;
+    testGPIO.mode = GPIO_INPUT;
+
+    testGPIO.pupd = GPIO_PUPD_UP;
+    GPIOC->PUPDR = ~0;
+    io_register expected = ~((3 << (2 * pin_num_2)) | (3 << (2 * pin_num_3)));
+    expected |=  (1 << (2 * pin_num_2)) | (1 << (2 * pin_num_3));
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX(expected, GPIOC->PUPDR);
+}
+
+void test_MyGPIO_canBeConfiguredAsPulldownWithoutAffectingOthers(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin7_mask | pin15_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+
+    testGPIO.pupd = GPIO_PUPD_DOWN;
+
+    GPIOC->PUPDR = ~0;
+    io_register expected = ~((3 << (2 * pin_num_7)) | (3 << (2 * pin_num_15)));
+    expected |=  (0x2 << (2 * pin_num_7)) | (0x2 << (2 * pin_num_15));
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX(expected, GPIOC->PUPDR);
+}
+
+void test_MyGPIO_canBeConfiguredAsNoPullUpOrPulldown(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin1_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+
+    testGPIO.pupd = GPIO_PUPD_NONE;
+
+    GPIOC->PUPDR = ~0;
+    io_register expected = ~(0x3 << (2 * pin_num_1));
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX(expected, GPIOC->PUPDR);
+}
+
+void test_MyGPIO_outputAsPushPull(void)
+{
+    testGPIO.gpio_register = GPIOC;
+    testGPIO.pin_mask = pin10_mask;
+    testGPIO.mode = GPIO_OUTPUT;
+    testGPIO.output_type = GPIO_PUSH_PULL;
+
+    GPIOC->OTYPER = ~0;
+    io_register expected = ~(1 << pin_num_10);
+
+    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&testGPIO));
+
+    TEST_ASSERT_EQUAL_HEX(expected, GPIOC->OTYPER);
+}
+
+// TODO, what happens if a reserved value is sent for output type config
+// TODO, gpio config can be changed and values are as expected
 
 /************************* Private functions *********************/
 

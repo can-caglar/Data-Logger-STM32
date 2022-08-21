@@ -13,6 +13,7 @@ typedef enum
     ECODE_OK,
     ECODE_NOT_OUTPUT,
     ECODE_BAD_PARAM,
+    ECODE_NOT_READY,
 } Error_Code_e;
 
 // GPIO ports and pins
@@ -31,6 +32,7 @@ typedef enum
 } GPIO_Port_e;
 
 typedef uint16_t GPIO_Pin_Mask_t;
+
 extern const GPIO_Pin_Mask_t pin0_mask;
 extern const GPIO_Pin_Mask_t pin1_mask;
 extern const GPIO_Pin_Mask_t pin2_mask;
@@ -94,6 +96,7 @@ typedef enum
     GPIO_ALTF_13,
     GPIO_ALTF_14,
     GPIO_ALTF_15,
+    GPIO_ALTF_MASK = GPIO_ALTF_15,
     MAX_ALT_FUNCTIONS,
 } GPIO_ALTF_e;
 
