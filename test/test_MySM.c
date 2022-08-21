@@ -41,7 +41,7 @@ void test_IDLE_to_PROCESSING_shouldntHappen(void)
 {
     // Currently in IDLE
     MyReceiver_Clear_Expect();
-    MyReceiver_Receive_ExpectAndReturn(DONE);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
     MySM_Run();
 
     remainsInIdleStateWhenNotReceiving();
@@ -72,38 +72,38 @@ void test_RCV_to_PROCESSING_then_IDLE(void)
 static void remainsInIdleStateWhenNotReceiving(void)
 {
     MyReceiver_Clear_Expect();
-    MyReceiver_Receive_ExpectAndReturn(NOT_RECEIVED);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
     MySM_Run();
 }
 
 static void moveFromIdleToReceivingOnceReceived(void)
 {
     MyReceiver_Clear_Expect();
-    MyReceiver_Receive_ExpectAndReturn(RECEIVED);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
     MySM_Run();
 }
 
 static void expectMyReceiver_NotReceive(void)
 {
-    MyReceiver_Receive_ExpectAndReturn(NOT_RECEIVED);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
     MySM_Run();
 }
 
 static void remainsInReceivingStateWhilstNOTReceiving(void)
 {
-    MyReceiver_Receive_ExpectAndReturn(NOT_RECEIVED);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
     MySM_Run();
 }
 
 static void remainsInReceivingStateWHILSTReceiving(void)
 {
-    MyReceiver_Receive_ExpectAndReturn(RECEIVED);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
     MySM_Run();
 }
 
 static void moveFromReceivingToProcessingOnceReceiveDone(void)
 {
-    MyReceiver_Receive_ExpectAndReturn(DONE);
+    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
     MySM_Run();
 }
 

@@ -12,6 +12,6 @@ typedef enum
 
 Error_Code_e MyUSART_Init(USART_TypeDef* usart, const USART_BR_e baud);
 Error_Code_e MyUSART_Write(USART_TypeDef* usart, const unsigned char bytes);
-Error_Code_e MyUSART_Read(USART_TypeDef* usart, unsigned char* outchar);
+Error_Code_e MyUSART_Read(USART_TypeDef* usart, unsigned char* readData);
 
 #endif
