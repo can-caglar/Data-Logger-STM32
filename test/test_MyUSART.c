@@ -32,15 +32,12 @@ void setUp(void)
     MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, GPIO_PORT_C_e);
 
     // Configure GPIO pins used in USART
-    // USART6 TX is PC6,
-    // USART6 RX is PC7,
-    // USART6 CK is PC8 // TODO, why are we initting pin 8?
-    UARTGPIO.gpio_register = GPIOC;
+    UARTGPIO.gpio_register = MY_USART_GPIO;
     UARTGPIO.mode = GPIO_ALT;
-    UARTGPIO.alt_func = GPIO_ALTF_8;
+    UARTGPIO.alt_func = MY_USART_ALT;
     UARTGPIO.output_type = GPIO_PUSH_PULL;
     UARTGPIO.pupd = GPIO_PUPD_UP;
-    UARTGPIO.pin_mask = (pin6_mask | pin7_mask);
+    UARTGPIO.pin_mask = (MY_USART_TX | MY_USART_RX);
     TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&UARTGPIO));
 }
 

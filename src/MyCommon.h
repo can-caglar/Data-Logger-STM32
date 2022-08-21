@@ -105,4 +105,10 @@ typedef enum
 
 typedef volatile uint32_t io_register;
 
+#define MY_USART        USART6  
+#define MY_USART_GPIO   GPIOC
+#define MY_USART_TX     pin6_mask 
+#define MY_USART_RX     pin7_mask 
+#define MY_USART_ALT    GPIO_ALTF_8 
+
 #endif

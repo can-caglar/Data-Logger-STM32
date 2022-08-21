@@ -56,7 +56,7 @@ void test_RECV(void)
     remainsInReceivingStateWHILSTReceiving();
 }
 
-void test_RCV_to_PROCESSING(void)
+void test_RCV_to_PROCESSING_then_IDLE(void)
 {
     moveFromIdleToReceivingOnceReceived();
 
