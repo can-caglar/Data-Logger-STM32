@@ -1,3 +1,10 @@
+/* MyReceiver.c
+ *
+ * Responsible for storing, updating and clearing
+ * a command received from USART.
+ * 
+ * It will echo the command back on the USART.
+*/
 #include "MyReceiver.h"
 #include "MyGPIO.h"
 #include "MyUSART.h"
@@ -5,6 +12,8 @@
 
 static MyGPIO uartGpio;
 static USART_TypeDef* rcvrUsart;
+static Error_Code_e receiveState = RCVR_NOT_RECEIVED;
+static void resetGlobals(void);
 
 #define MAX_CHARACTERS 11
 
@@ -20,6 +29,8 @@ void MyReceiver_Init(USART_TypeDef* usart,
                      GPIO_Pin_Mask_t rx,
                      GPIO_Pin_Mask_t tx)
 {
+    resetGlobals();
+
     uartGpio.gpio_register = gpio;
     uartGpio.pin_mask = (rx | tx);
     uartGpio.mode = GPIO_ALT;
@@ -30,7 +41,6 @@ void MyReceiver_Init(USART_TypeDef* usart,
     MyUSART_Init(usart, USART_BR_19200);
 
     rcvrUsart = usart;
-    memset(&inbuf, 0, sizeof(inbuf));
 }
 
 ReceiverEcode_e MyReceiver_Receive(void)
@@ -38,21 +48,35 @@ ReceiverEcode_e MyReceiver_Receive(void)
     char data = 0;
     if (MyUSART_Read(rcvrUsart, &data) == ECODE_OK)
     {
-        if (inbuf.index < (MAX_CHARACTERS - 1))
+        if (inbuf.index < (MAX_CHARACTERS - 1)
+            && data != '\n')
         {
-            if (data != '\n')
-            {
-                inbuf.character[inbuf.index++] = data;
-                return RCVR_RECEIVED;
-            }
+            inbuf.character[inbuf.index++] = data;
+            receiveState = RCVR_RECEIVED;
         }
-        return RCVR_DONE;
-        
+        else
+        {
+            receiveState = RCVR_DONE;
+        }
     }
-    return RCVR_NOT_RECEIVED;
+    MyUSART_Write(rcvrUsart, data);
+    return receiveState;
 }
 
 char* MyReceiver_GetBuffer(void)
 {
     return inbuf.character;
+}
+
+void MyReceiver_Clear(void)
+{
+    resetGlobals();
+}
+
+/***************************** Private *******************/
+
+static void resetGlobals(void)
+{
+    receiveState = RCVR_NOT_RECEIVED;
+    memset(&inbuf, 0, sizeof(inbuf));
 }
