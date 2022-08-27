@@ -5,6 +5,7 @@
 #include "MyReceiver.h"
 #include "MyProcessor.h"
 #include "MyTransmitter.h"
+// #include "MyCommon.h"
 
 typedef enum MySMState
 {
@@ -19,10 +20,9 @@ void MySM_Run(void)
 {
     switch (SM)
     {
-        case IDLE:
+        case IDLE:  // this feels a bit unnecessary now!
         {
-            MyReceiver_Clear();
-            if (MyReceiver_Receive() == RECEIVED)
+            if (MyReceiver_Receive() == RCVR_RECEIVED)
             {
                 SM = RECEIVING;
             }
@@ -30,7 +30,7 @@ void MySM_Run(void)
         break;
         case RECEIVING:
         {
-            if (MyReceiver_Receive() == DONE)
+            if (MyReceiver_Receive() == RCVR_DONE)
             {
                 SM = PROCESSING;
             }
@@ -42,6 +42,7 @@ void MySM_Run(void)
             MyProcessor_HandleCommandWithString(rcvBuf);
             char* xmitBuf = MyProcessor_GetResponseMessage();
             MyTransmitter_Transmit(xmitBuf);
+            MyReceiver_Clear(); // processing done, clear it
             SM = IDLE;
         }
         break;
@@ -51,5 +52,6 @@ void MySM_Run(void)
 void MySM_Init(void)
 {
     SM = IDLE;
+    MyReceiver_Init(USART6, MY_USART_GPIO, MY_USART_ALT, MY_USART_RX, MY_USART_TX);
 }
 

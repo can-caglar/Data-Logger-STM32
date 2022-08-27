@@ -4,6 +4,7 @@
 #include "mock_MyReceiver.h"
 #include "mock_MyProcessor.h"
 #include "mock_MyTransmitter.h"
+#include "MyCommon.h"
 
 static void remainsInIdleStateWhenNotReceiving(void);
 static void remainsInReceivingStateWhilstNOTReceiving(void);
@@ -16,6 +17,12 @@ static void expectToDoTransmit(void);
 
 void setUp(void)
 {
+    // init shall initialise MyReceiver
+    MyReceiver_Init_Expect(USART6,
+        MY_USART_GPIO,
+        MY_USART_ALT,
+        MY_USART_RX,
+        MY_USART_TX);
     MySM_Init();    // starts off at IDLE state
 }
 
@@ -40,7 +47,6 @@ void test_IDLE_to_RECV(void)
 void test_IDLE_to_PROCESSING_shouldntHappen(void)
 {
     // Currently in IDLE
-    MyReceiver_Clear_Expect();
     MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
     MySM_Run();
 
@@ -67,18 +73,17 @@ void test_RCV_to_PROCESSING_then_IDLE(void)
     remainsInIdleStateWhenNotReceiving();
 }
 
+
 /******************************* Helper functions ****************************/
 
 static void remainsInIdleStateWhenNotReceiving(void)
 {
-    MyReceiver_Clear_Expect();
     MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
     MySM_Run();
 }
 
 static void moveFromIdleToReceivingOnceReceived(void)
 {
-    MyReceiver_Clear_Expect();
     MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
     MySM_Run();
 }
@@ -115,6 +120,7 @@ static void expectToDoProcessing(void)
     MyProcessor_HandleCommandWithString_Expect(fakeStr);
     MyProcessor_GetResponseMessage_ExpectAndReturn(fakeResponse);
     MyTransmitter_Transmit_Expect(fakeResponse);
+    MyReceiver_Clear_Expect();
     MySM_Run();
 }
 
@@ -126,7 +132,7 @@ static void expectToDoProcessing(void)
 [ ] The board returns original cmd + "success" or "fail" to terminal
 
 [ ] State machine:
-[ ] Initial state is: IDLE (where the buffer is cleared and waiting to receive)
+[x] Initial state is: IDLE (where the buffer is cleared and waiting to receive)
 [ ] If start receiving, go to: RECEIVING (where buf size is checked etc)
 [ ] If received or buffer full, go to: PROCESSING
 [ ] If found function, go to: INVOKING, if not found go to TRANSMIT

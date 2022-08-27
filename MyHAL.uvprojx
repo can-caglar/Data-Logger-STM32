@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET TEST</Define>
               <Undefine></Undefine>
-              <IncludePath>C:\DEV\Unity\src;.\src;.\test\support</IncludePath>
+              <IncludePath>C:\DEV\Unity\src;.\test\support;.\test;.\test\helper;C:\DEV\CMock\src;C:\DEV\Unity\test\testdata;.\build\test\mocks;.\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -382,11 +382,6 @@
           <GroupName>MyHAL</GroupName>
           <Files>
             <File>
-              <FileName>MyGPIO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\MyGPIO.c</FilePath>
-            </File>
-            <File>
               <FileName>MyRCC.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyRCC.c</FilePath>
@@ -407,11 +402,6 @@
               <FilePath>.\src\MyRCC.h</FilePath>
             </File>
             <File>
-              <FileName>MyUSART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\MyUSART.c</FilePath>
-            </File>
-            <File>
               <FileName>MyUSART.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\MyUSART.h</FilePath>
@@ -421,32 +411,38 @@
               <FileType>1</FileType>
               <FilePath>.\src\MyCommon.c</FilePath>
             </File>
+            <File>
+              <FileName>MyReceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyReceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyReceiver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyReceiver.h</FilePath>
+            </File>
+            <File>
+              <FileName>MySM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MySM.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyUSART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyUSART.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyGPIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyGPIO.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Tests</GroupName>
-          <Files>
-            <File>
-              <FileName>test_MyUSART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\test\test_MyUSART.c</FilePath>
-            </File>
-            <File>
-              <FileName>test_MyUSART_runner.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\build\test\runners\test_MyUSART_runner.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>Unity</GroupName>
-          <Files>
-            <File>
-              <FileName>unity.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>C:\DEV\Unity\src\unity.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>Debug</GroupName>
@@ -455,6 +451,19 @@
               <FileName>retarget.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\retarget.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Mocks</GroupName>
+        </Group>
+        <Group>
+          <GroupName>CMock</GroupName>
+          <Files>
+            <File>
+              <FileName>cmock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\DEV\CMock\src\cmock.c</FilePath>
             </File>
           </Files>
         </Group>

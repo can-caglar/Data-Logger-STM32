@@ -12,7 +12,7 @@
 
 static MyGPIO uartGpio;
 static USART_TypeDef* rcvrUsart;
-static Error_Code_e receiveState = RCVR_NOT_RECEIVED;
+static ReceiverEcode_e receiveState = RCVR_NOT_RECEIVED;
 static void resetGlobals(void);
 
 #define MAX_CHARACTERS 11
@@ -45,7 +45,7 @@ void MyReceiver_Init(USART_TypeDef* usart,
 
 ReceiverEcode_e MyReceiver_Receive(void)
 {
-    char data = 0;
+    unsigned char data = 0;
     if (MyUSART_Read(rcvrUsart, &data) == ECODE_OK)
     {
         if (inbuf.index < (MAX_CHARACTERS - 1)
@@ -56,6 +56,7 @@ ReceiverEcode_e MyReceiver_Receive(void)
         }
         else
         {
+            data = '\n';
             receiveState = RCVR_DONE;
         }
     }

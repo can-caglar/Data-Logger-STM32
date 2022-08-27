@@ -12,7 +12,11 @@ ReceiverEcode_e receiveFromUsart(char byte);
 ReceiverEcode_e receiveFromUsart_String(char* string);
 ReceiverEcode_e receiveFromUsartButUsartNotReady(void);
 ReceiverEcode_e initAndReceive(char* string);
-ReceiverEcode_e expectReceive(char* receivedByte, Error_Code_e willReturn);
+ReceiverEcode_e expectReceiveAndEcho(char* receivedByte, Error_Code_e willReturn);
+
+// 10 characters
+#define FULL_STRING     "0123456789"
+#define EXCESS_STRING   "0123456789abc"
 
 void setUp(void)
 {
@@ -45,7 +49,7 @@ void test_MyReceiver_Init_WillInitialiseUSARTAndGPIOProperly(void)
 void test_MyReceiver_Receive_WillReadFromUSARTEvenIfNotInitialised(void)
 {
     char received = 0;
-    expectReceive(&received, ECODE_OK);
+    expectReceiveAndEcho(&received, ECODE_OK);
 }
 
 void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
@@ -68,15 +72,29 @@ void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
     TEST_ASSERT_EQUAL_STRING("", buf);
 }
 
-void test_MyReceiver_GetBuffer_FillsUpAfter10Characters(void)
+void test_MyReceiver_GetBuffer_FillsUpAfter10CharactersAndWillEchoNewline(void)
 {
     initMyReceiverNoExpectations();
 
-    ReceiverEcode_e err = receiveFromUsart_String("0123456789abc");
+    // receive a full string
+    ReceiverEcode_e err = receiveFromUsart_String(FULL_STRING);
+    TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
+    char* buf = MyReceiver_GetBuffer();
+    TEST_ASSERT_EQUAL_STRING(FULL_STRING, buf);
+
+    // receive 1 more character. should echo '\n' now
+    char readData = 0;  // should pass in a 0
+    char passedIn = 'c';
+    MyUSART_Read_ExpectAndReturn(MY_USART, &readData, ECODE_OK);
+    MyUSART_Read_ReturnThruPtr_readData(&passedIn);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
+
+    err = MyReceiver_Receive();
     TEST_ASSERT_EQUAL_INT(RCVR_DONE, err);
 
-    char* buf = MyReceiver_GetBuffer();
-    TEST_ASSERT_EQUAL_STRING("0123456789", buf);
+    // Buffer shall not have expanded
+    buf = MyReceiver_GetBuffer();
+    TEST_ASSERT_EQUAL_STRING(FULL_STRING, buf);
 }
 
 void test_MyReceiver_Returns_RECEIVED_EvenIfErrorAsLongAsReceivedOnce(void)
@@ -131,10 +149,6 @@ void test_MyReceiver_ReceivingAfterClearing(void)
     TEST_ASSERT_EQUAL_STRING("NextWord", MyReceiver_GetBuffer());
 }
 
-void test_MyReceiver_ReceiveShallEcho(void)
-{
-    receiveFromUsart('a');
-}
 
 /******************************** Helper Functions *****************/
 
@@ -152,14 +166,14 @@ void initMyReceiverNoExpectations(void)
 
 ReceiverEcode_e receiveFromUsart(char byte)
 {
-    return expectReceive(&byte, ECODE_OK);
+    return expectReceiveAndEcho(&byte, ECODE_OK);
 }
 
 // Useful as it shouldn't change what MyReceiver_Receive() will return
 ReceiverEcode_e receiveFromUsartButUsartNotReady(void)
 {
     char byte = 0;
-    return expectReceive(&byte, ECODE_NOT_READY);
+    return expectReceiveAndEcho(&byte, ECODE_NOT_READY);
 }
 
 ReceiverEcode_e receiveFromUsart_String(char* string)
@@ -177,7 +191,7 @@ ReceiverEcode_e receiveFromUsart_String(char* string)
     return err;
 }
 
-ReceiverEcode_e expectReceive(char* receivedByte, Error_Code_e willReturn)
+ReceiverEcode_e expectReceiveAndEcho(char* receivedByte, Error_Code_e willReturn)
 {
     char readData = 0;  // should pass in a 0
     MyUSART_Read_ExpectAndReturn(MY_USART, &readData, willReturn);
@@ -192,5 +206,6 @@ ReceiverEcode_e expectReceive(char* receivedByte, Error_Code_e willReturn)
 - [x] MyReceiver_Receive will return 0 if received 0 and buffer is empty
 - [x] MyReceiver_Receive will continue to rreturn RECEIVED even if uart fails
 - [x] MyRerceiver clear shall clear the input buffer and reset state to NOT_RECEIVED
-- [ ] Shall echo back to terminal [ ] Also shall write \n when full
+- [x] Shall echo back to terminal 
+- [ ] Also shall write \n when full
 */
