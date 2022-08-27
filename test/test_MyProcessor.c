@@ -24,6 +24,7 @@ void test_strchr(void)
     const char str2[] = "allCmds";
     const char str3[] = "";
     const char str4[] = "\n";
+
     int len = strcspn(str, " ");
     TEST_ASSERT_EQUAL_INT(4, len);
     TEST_ASSERT_EQUAL_STRING("help say", str);
@@ -41,6 +42,15 @@ void test_strchr(void)
     int compare = strncmp("hello one", "hello", 2);
     TEST_ASSERT_EQUAL_INT(0, compare);
 
+    // strlen ignores null terminator
+    size_t mylen = strlen("hello");
+    TEST_ASSERT_EQUAL_INT(5, mylen);
+
+    mylen = strlen("");
+    TEST_ASSERT_EQUAL_INT(0, mylen);
+
+
+
     // cspn could be used. where it returns is = 0.
     // if it returns 0, an empty string must have been passed in
     // if it's non 0, it will be the end of the first word.
@@ -55,12 +65,31 @@ void test_MyProcessor_SeeAllCommands(void)
     TEST_ASSERT_EQUAL_STRING(LIST_OF_CMDS, resp);
 }
 
-void test_MyProcessor_SeeHelp(void)
+void test_MyProcessor_SeeHelp_ShowsHelpMessageForCommands(void)
 {
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " say");
     char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: say <string>", resp);
+
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP" "CMD_STR_SEE_ALL);
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: seeAll", resp);
 }
+
+void test_MyProcessor_SeeHelp_ShowsItsOwnHelpWhenNoParams(void)
+{
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP);
+    char* response = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: help <command>", response);
+}
+
+void test_MyProcessor_SeeHelp_ReturnsErrorMessageWhenCmdNotFound(void)
+{
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP" badcommand");
+    char* response = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("No such command exists: badcommand", response);
+}
+
 #if 0
 #endif
 
