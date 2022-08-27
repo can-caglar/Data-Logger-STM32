@@ -2,7 +2,7 @@
 #include "MyProcessor.h"
 #include <string.h>
 
-#define LIST_OF_CMDS "say"
+#define LIST_OF_CMDS "help say seeAll"
 
 void setUp()
 {
@@ -49,6 +49,10 @@ void test_strchr(void)
     mylen = strlen("");
     TEST_ASSERT_EQUAL_INT(0, mylen);
 
+    char myword[] = "hello mate";
+    myword[2] = 0;
+    strcat(myword, "??");
+    TEST_ASSERT_EQUAL_STRING("he??", myword);
 
 
     // cspn could be used. where it returns is = 0.
@@ -58,37 +62,67 @@ void test_strchr(void)
 
 }
 
-void test_MyProcessor_SeeAllCommands(void)
+void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
 {
-    MyProcessor_HandleCommandWithString(CMD_STR_SEE_ALL);
-    char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING(LIST_OF_CMDS, resp);
-}
-
-void test_MyProcessor_SeeHelp_ShowsHelpMessageForCommands(void)
-{
+    // "help say"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " say");
-    char* resp = MyProcessor_GetResponseMessage();
+    const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: say <string>", resp);
 
+    // "help seeAll"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP" "CMD_STR_SEE_ALL);
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: seeAll", resp);
 }
 
-void test_MyProcessor_SeeHelp_ShowsItsOwnHelpWhenNoParams(void)
+void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
 {
     MyProcessor_HandleCommandWithString(CMD_STR_HELP);
-    char* response = MyProcessor_GetResponseMessage();
+    const char* response = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: help <command>", response);
 }
 
-void test_MyProcessor_SeeHelp_ReturnsErrorMessageWhenCmdNotFound(void)
+void test_MyProcessor_help_ReturnsErrorMessageWhenCmdNotFound(void)
 {
     MyProcessor_HandleCommandWithString(CMD_STR_HELP" badcommand");
-    char* response = MyProcessor_GetResponseMessage();
+    const char* response = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("No such command exists: badcommand", response);
 }
+
+void test_MyProcessor_seeAll_ShowsAListOfAllCommands(void)
+{
+    MyProcessor_HandleCommandWithString(CMD_STR_SEE_ALL);
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING(LIST_OF_CMDS, resp);
+}
+
+void test_MyProcessor_sendingBadCommand(void)
+{
+    MyProcessor_HandleCommandWithString("badcmd");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Command doesn't exist: badcmd", resp);
+}
+
+void test_MyProcessor_sendingWeirdChars(void)
+{
+    MyProcessor_HandleCommandWithString("");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Received no commands.", resp);
+}
+
+void test_MyProcessor_sendingVeryLongString(void)
+{
+    MyProcessor_HandleCommandWithString(
+        "0123456789" "0123456789" "0123456789"
+        "0123456789" "0123456789" "0123456789"
+        "0123456789" "0123456789" "0123456789"
+        "0123456789" "0123456789" "0123456789"
+    );
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Command too long!", resp);
+}
+
+// TODO, refactor!
 
 #if 0
 #endif
@@ -113,6 +147,11 @@ and also depending on whether or not any failures happened.
 The function can provide a reply in the char* argument)
 
 This module can be asked to return the latest reply.
+
+---
+
+Implementation todos:
+- [ ] TODO - Function for writing to output buffer. make sure it clips the output.
 
 ---
 

@@ -1,16 +1,22 @@
 #include "MyProcessor.h"
 #include <string.h>
 
+#ifdef TEST
+#include <stdio.h>
+#endif
+
 typedef void(*CommandPtr)(void);
-static char cmdResponse[20] = "say";
+static char cmdResponse[50] = "say";
 static char* cmdParameters;
 
-static char cmdScratchpad[20];
+// Used for string manipulation
+static char scratchpad[20];
 
 // Forward declarations
 // Commands
 static void cmdHelp(void);
 static void cmdSay(void);
+static void cmdSeeAll(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -33,21 +39,24 @@ static struct
 {
     [CMD_HELP] = {"help", cmdHelp, "Usage: help <command>"},
     [CMD_SAY] = {"say", cmdSay, "Usage: say <string>"},
-    [CMD_SEE_ALL] = {"seeAll", cmdSay, "Usage: seeAll"},
+    [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
 };
 
 //
 void MyProcessor_HandleCommandWithString(char* str)
 {
     size_t inputStrLen = strlen(str);
-    strcpy(cmdScratchpad, str);
+    if (inputStrLen >= MAX_COMMAND_LEN)
+    {
+        strcpy(cmdResponse, "Command too long!");
+        return;
+    }
+    strcpy(scratchpad, str);
     
-    char* token = strtok(cmdScratchpad, " ");
-
+    char* token = strtok(scratchpad, " ");
     if (inputStrLen != 0)   // we got some command...
     {
         size_t lenCmd = strcspn(str, " ");
-        cmdParameters = strchr(str, ' ');
         
         // invoke it...
         int cmdIndex = findCommand(token);
@@ -55,22 +64,30 @@ void MyProcessor_HandleCommandWithString(char* str)
         {
             commands[cmdIndex].fn();
         }
+        else
+        {
+            char ret[50] = "Command doesn't exist: ";
+            strcat(ret, token);
+            strcpy(cmdResponse, ret);
+        }
     }
-
+    else
+    {
+        char ret[50] = "Received no commands.";
+        strcpy(cmdResponse, ret);
+    }
 }
 
-char* MyProcessor_GetResponseMessage(void)
+const char* MyProcessor_GetResponseMessage(void)
 {
     return cmdResponse;
 }
-
-
 
 /************** The commands ***************/
 
 static void cmdHelp(void)
 {
-    char* token = strtok(cmdParameters, " ");
+    char* token = strtok(NULL, " ");
     if (token != NULL)
     {
         // help for some command
@@ -97,6 +114,20 @@ static void cmdHelp(void)
 static void cmdSay(void)
 {
     // strcpy(cmdResponse, "")
+}
+
+static void cmdSeeAll(void)
+{
+    scratchpad[0] = 0;
+    for (int i = 0; i < CMD_COUNT; i++)
+    {
+        strcat(scratchpad, commands[i].str);
+        if (i < CMD_COUNT - 1)
+        {
+            strcat(scratchpad, " ");
+        }
+    }
+    strcpy(cmdResponse, scratchpad);
 }
 
 /********************* helper functions **************/
