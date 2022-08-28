@@ -40,7 +40,7 @@ void MySM_Run(void)
         {
             char* rcvBuf = MyReceiver_GetBuffer();
             MyProcessor_HandleCommandWithString(rcvBuf);
-            char* xmitBuf = MyProcessor_GetResponseMessage();
+            const char* xmitBuf = MyProcessor_GetResponseMessage();
             MyTransmitter_Transmit(xmitBuf);
             MyReceiver_Clear(); // processing done, clear it
             SM = IDLE;

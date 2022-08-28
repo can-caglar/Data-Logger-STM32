@@ -436,6 +436,21 @@
               <FileType>1</FileType>
               <FilePath>.\src\MyGPIO.c</FilePath>
             </File>
+            <File>
+              <FileName>MyProcessor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyProcessor.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyProcessor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyProcessor.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyTransmitter.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyTransmitter.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

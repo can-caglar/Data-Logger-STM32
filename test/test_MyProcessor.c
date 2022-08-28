@@ -54,6 +54,9 @@ void test_strchr(void)
     strcat(myword, "??");
     TEST_ASSERT_EQUAL_STRING("he??", myword);
 
+    char myStr[50] = "hello";
+    strcpy(myStr, "hi");
+    TEST_ASSERT_EQUAL_STRING("hi", myStr);
 
     // cspn could be used. where it returns is = 0.
     // if it returns 0, an empty string must have been passed in
@@ -77,6 +80,7 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
 {
+    // "help"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP);
     const char* response = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: help <command>", response);
@@ -98,19 +102,19 @@ void test_MyProcessor_seeAll_ShowsAListOfAllCommands(void)
 
 void test_MyProcessor_sendingBadCommand(void)
 {
-    MyProcessor_HandleCommandWithString("badcmd");
+    MyProcessor_HandleCommandWithString("randomCmd");
     const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Command doesn't exist: badcmd", resp);
+    TEST_ASSERT_EQUAL_STRING("Command doesn't exist: randomCmd", resp);
 }
 
-void test_MyProcessor_sendingWeirdChars(void)
+void test_MyProcessor_sendingEmptyStringGivesUniqueResponse(void)
 {
     MyProcessor_HandleCommandWithString("");
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Received no commands.", resp);
 }
 
-void test_MyProcessor_sendingVeryLongString(void)
+void test_MyProcessor_sendingVeryLongStringGivesUniqueResponse(void)
 {
     MyProcessor_HandleCommandWithString(
         "0123456789" "0123456789" "0123456789"

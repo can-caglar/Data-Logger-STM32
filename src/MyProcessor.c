@@ -5,14 +5,18 @@
 #include <stdio.h>
 #endif
 
-typedef void(*CommandPtr)(void);
-static char cmdResponse[50] = "say";
-static char* cmdParameters;
+// preprocessor
+#define MAX_RESPONSE_LEN 50
 
-// Used for string manipulation
-static char scratchpad[20];
+// typedefs
+typedef void(*CommandPtr)(void);
+
+// Static globals
+static char cmdResponse[MAX_RESPONSE_LEN];
+static char scratchpad[MAX_RESPONSE_LEN]; // Used for string manipulation
 
 // Forward declarations
+
 // Commands
 static void cmdHelp(void);
 static void cmdSay(void);
@@ -20,7 +24,9 @@ static void cmdSeeAll(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
+void updateResponse(char* newResponse);
 
+// Command count
 typedef enum
 {
     CMD_HELP,
@@ -29,12 +35,14 @@ typedef enum
     CMD_COUNT   // must be last
 } AllCommands_e;
 
+//
 // The command table
+//
 static struct
 {
     char str[MAX_COMMAND_LEN];
     CommandPtr fn;
-    char help[50];
+    char help[MAX_RESPONSE_LEN];
 } commands[CMD_COUNT] =
 {
     [CMD_HELP] = {"help", cmdHelp, "Usage: help <command>"},
@@ -48,33 +56,33 @@ void MyProcessor_HandleCommandWithString(char* str)
     size_t inputStrLen = strlen(str);
     if (inputStrLen >= MAX_COMMAND_LEN)
     {
-        strcpy(cmdResponse, "Command too long!");
+        updateResponse("Command too long!");
         return;
     }
-    strcpy(scratchpad, str);
     
-    char* token = strtok(scratchpad, " ");
-    if (inputStrLen != 0)   // we got some command...
+    if (inputStrLen != 0)   
     {
-        size_t lenCmd = strcspn(str, " ");
+        // we received a potential command...
+
+        // break it down
+        strcpy(scratchpad, str);
+        char* token = strtok(scratchpad, " ");
         
-        // invoke it...
+        // look for it...
         int cmdIndex = findCommand(token);
         if (cmdIndex != -1)
         {
+            // invoke it...
             commands[cmdIndex].fn();
         }
         else
         {
-            char ret[50] = "Command doesn't exist: ";
-            strcat(ret, token);
-            strcpy(cmdResponse, ret);
+            sprintf(cmdResponse, "Command doesn't exist: %s", token);
         }
     }
     else
     {
-        char ret[50] = "Received no commands.";
-        strcpy(cmdResponse, ret);
+        updateResponse("Received no commands.");
     }
 }
 
@@ -94,26 +102,23 @@ static void cmdHelp(void)
         int cmdIndex = findCommand(token);
         if (cmdIndex != -1)
         {
-            strcpy(cmdResponse, commands[cmdIndex].help);
+            updateResponse(commands[cmdIndex].help);
         }
         else
         {
             // command not found
-            char errMessage[40] = "No such command exists: ";
-            strcat(errMessage, token);
-            strcpy(cmdResponse, errMessage);
+            sprintf(cmdResponse, "No such command exists: %s", token);
         }
     }
     else
     {
         // help for the "help" command
-        strcpy(cmdResponse, commands[CMD_HELP].help);
+        updateResponse(commands[CMD_HELP].help);
     }
 }
 
 static void cmdSay(void)
 {
-    // strcpy(cmdResponse, "")
 }
 
 static void cmdSeeAll(void)
@@ -127,7 +132,7 @@ static void cmdSeeAll(void)
             strcat(scratchpad, " ");
         }
     }
-    strcpy(cmdResponse, scratchpad);
+    updateResponse(scratchpad);
 }
 
 /********************* helper functions **************/
@@ -142,4 +147,10 @@ int findCommand(char* cmdStr)
         }
     }
     return -1;
+}
+
+void updateResponse(char* newResponse)
+{
+    // TODO, cut response if it's too long?
+    strcpy(cmdResponse, newResponse);
 }
