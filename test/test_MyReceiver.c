@@ -136,7 +136,7 @@ void test_MyReceiver_Clear_WillEmptyTheInbufAndSetStateToNOTRECEIVED(void)
     TEST_ASSERT_EQUAL_INT(RCVR_NOT_RECEIVED, err);
 }
 
-void test_MyReceiver_ReceivingAfterClearing(void)
+void test_MyReceiver_AbleToContinueReceivingAfterClearing(void)
 {
     initMyReceiverNoExpectations();
 
@@ -204,8 +204,11 @@ ReceiverEcode_e expectReceiveAndEcho(char* receivedByte, Error_Code_e willReturn
 
 /*
 - [x] MyReceiver_Receive will return 0 if received 0 and buffer is empty
-- [x] MyReceiver_Receive will continue to rreturn RECEIVED even if uart fails
-- [x] MyRerceiver clear shall clear the input buffer and reset state to NOT_RECEIVED
+- [x] MyReceiver_Receive will continue to return RECEIVED even if uart fails
+- [x] MyReceiver clear shall clear the input buffer and reset state to NOT_RECEIVED
 - [x] Shall echo back to terminal 
-- [ ] Also shall write \n when full
+- [x] Also shall write \n automatically when full
+
+- [ ] TODO, no longer use UART. Use the a "singleton" for USART6. Have the transmission
+and reception go through that module instead. Let it have unique transmit ability
 */
