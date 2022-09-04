@@ -13,6 +13,7 @@ static ReceiverEcode_e receiveState = RCVR_NOT_RECEIVED;
 static void resetGlobals(void);
 
 #define MAX_CHARACTERS 11
+#define RETURN_KEY  '\r'
 
 static struct
 {
@@ -33,14 +34,14 @@ ReceiverEcode_e MyReceiver_Receive(void)
     if (data != 0)
     {
         if (inbuf.index < (MAX_CHARACTERS - 1)
-            && data != '\n')
+            && data != RETURN_KEY)
         {
             inbuf.character[inbuf.index++] = data;
             receiveState = RCVR_RECEIVED;
         }
         else
         {
-            data = '\n';
+            data = RETURN_KEY;
             receiveState = RCVR_DONE;
         }
     }

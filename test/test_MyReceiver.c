@@ -106,7 +106,7 @@ void test_MyReceiver_GetBuffer_FillsUpAfterReceivingReturn(void)
 {
     initMyReceiverNoExpectations();
 
-    ReceiverEcode_e err = receiveFromUsart_String("012\n345");
+    ReceiverEcode_e err = receiveFromUsart_String("012\r345");
     TEST_ASSERT_EQUAL_INT(RCVR_DONE, err);
 
     char* buf = MyReceiver_GetBuffer();

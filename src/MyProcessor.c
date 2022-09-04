@@ -1,9 +1,6 @@
 #include "MyProcessor.h"
 #include <string.h>
-
-#ifdef TEST
 #include <stdio.h>
-#endif
 
 // preprocessor
 #define MAX_RESPONSE_LEN 50

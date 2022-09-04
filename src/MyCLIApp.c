@@ -2,7 +2,11 @@
 #include "MySM.h"
 #include "Loop.h"
 
-void runCLI(void)
+#ifndef TEST
+#define runCLI main
+#endif
+
+int runCLI(void)
 {
     MySM_Init();
     

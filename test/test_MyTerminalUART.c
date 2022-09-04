@@ -2,6 +2,7 @@
 #include "MyCommon.h"
 #include "mock_MyGPIO.h"
 #include "mock_MyUSART.h"
+#include "mock_MyRCC.h"
 #include "unity_helper.h"
 #include "MyTerminalUART.h"
 
@@ -26,6 +27,10 @@ void test_MyTerminalUART_Init_InitialisationInitsKnownPins(void)
         .output_type = GPIO_PUSH_PULL,
         .pupd = GPIO_PUPD_UP
     };
+    
+    // TODO, find out why user_stm32f407xx can't be included instead
+    MyRCC_GPIOClockEnable_ExpectAndReturn(&(RCC->AHB1ENR), GPIO_PORT_C_e, ECODE_OK);
+    MyRCC_USARTClockEnable_ExpectAndReturn(&(RCC->APB2ENR), USART6_Mask, ECODE_OK);
 
     MyGPIO_Init_ExpectAndReturn(&expectedStruct, ECODE_OK);
     MyUSART_Init_ExpectAndReturn(MY_USART, USART_BR_19200, ECODE_OK);
@@ -72,11 +77,11 @@ void test_MyTerminalUART_Write_String(void)
 void test_MyTerminalUART_Write_EndlineWillAutoWriteNewlineDenoter(void)
 {
     // newline denoter here could be something like "> "
-    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\r', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, '>', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, ' ', ECODE_OK);
 
-    MyTerminalUART_Write('\n');
+    MyTerminalUART_Write('\r');
 }
 
 void test_MyTerminalUART_WriteString_EndlineWillAutoWriteNewlineDenoter(void)
@@ -84,13 +89,13 @@ void test_MyTerminalUART_WriteString_EndlineWillAutoWriteNewlineDenoter(void)
     // newline denoter here could be something like "> "
     MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'i', ECODE_OK);
-    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\r', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, '>', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, ' ', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'o', ECODE_OK);
 
-    MyTerminalUART_WriteString("hi\nho");
+    MyTerminalUART_WriteString("hi\rho");
 }
 
 /*

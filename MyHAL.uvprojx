@@ -335,9 +335,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>ON_TARGET TEST</Define>
+              <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>C:\DEV\Unity\src;.\test\support;.\test;.\test\helper;C:\DEV\CMock\src;C:\DEV\Unity\test\testdata;.\build\test\mocks;.\src</IncludePath>
+              <IncludePath>.\test\support</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -456,6 +456,26 @@
               <FileType>5</FileType>
               <FilePath>.\src\MyTerminalUART.h</FilePath>
             </File>
+            <File>
+              <FileName>MyCLIApp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyCLIApp.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyCLIApp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyCLIApp.c</FilePath>
+            </File>
+            <File>
+              <FileName>Loop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\Loop.c</FilePath>
+            </File>
+            <File>
+              <FileName>Loop.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\Loop.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -479,13 +499,6 @@
         </Group>
         <Group>
           <GroupName>CMock</GroupName>
-          <Files>
-            <File>
-              <FileName>cmock.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>C:\DEV\CMock\src\cmock.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
