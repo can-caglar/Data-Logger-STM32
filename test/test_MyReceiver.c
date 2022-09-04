@@ -3,6 +3,7 @@
 #include "MyCommon.h"
 #include "mock_MyUSART.h"
 #include "mock_MyGPIO.h"
+#include "mock_MyTerminalUART.h"
 #include "unity_helper.h"
 #include <stdio.h>
 
@@ -30,26 +31,16 @@ void tearDown(void)
 
 void test_MyReceiver_Init_WillInitialiseUSARTAndGPIOProperly(void)
 {
-    MyGPIO expectedStruct =
-    {
-        .gpio_register = MY_USART_GPIO,
-        .pin_mask = (MY_USART_RX | MY_USART_TX),
-        .mode = GPIO_ALT,
-        .alt_func = MY_USART_ALT,
-        .output_type = GPIO_PUSH_PULL,
-        .pupd = GPIO_PUPD_UP
-    };
-
-    MyGPIO_Init_ExpectAndReturn(&expectedStruct, ECODE_OK);
-    MyUSART_Init_ExpectAndReturn(MY_USART, USART_BR_19200, ECODE_OK);
+    MyTerminalUART_Init_Expect();
 
     initMyReceiver();
 }
 
 void test_MyReceiver_Receive_WillReadFromUSARTEvenIfNotInitialised(void)
 {
-    char received = 0;
-    expectReceiveAndEcho(&received, ECODE_OK);
+    MyTerminalUART_Read_ExpectAndReturn(0);
+    
+    MyReceiver_Receive();
 }
 
 void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
@@ -61,8 +52,10 @@ void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
     TEST_ASSERT_EQUAL_STRING("", buf);
 
     // not empty after receiving
-    ReceiverEcode_e err = receiveFromUsart('a');
+    MyTerminalUART_Read_ExpectAndReturn('a');
+    ReceiverEcode_e err = MyReceiver_Receive();
     TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
+
     buf = MyReceiver_GetBuffer();
     TEST_ASSERT_EQUAL_STRING("a", buf);
 
@@ -78,16 +71,16 @@ void test_MyReceiver_GetBuffer_FillsUpAfter10CharactersAndWillEchoNewline(void)
 
     // receive a full string
     ReceiverEcode_e err = receiveFromUsart_String(FULL_STRING);
+
     TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
+
     char* buf = MyReceiver_GetBuffer();
+
     TEST_ASSERT_EQUAL_STRING(FULL_STRING, buf);
 
-    // receive 1 more character. should echo '\n' now
-    char readData = 0;  // should pass in a 0
+    // receive 1 more character.
     char passedIn = 'c';
-    MyUSART_Read_ExpectAndReturn(MY_USART, &readData, ECODE_OK);
-    MyUSART_Read_ReturnThruPtr_readData(&passedIn);
-    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
+    MyTerminalUART_Read_ExpectAndReturn(passedIn);
 
     err = MyReceiver_Receive();
     TEST_ASSERT_EQUAL_INT(RCVR_DONE, err);
@@ -102,14 +95,18 @@ void test_MyReceiver_Returns_RECEIVED_EvenIfErrorAsLongAsReceivedOnce(void)
     initMyReceiverNoExpectations();
 
     ReceiverEcode_e err = receiveFromUsartButUsartNotReady();
+
     TEST_ASSERT_EQUAL_INT(RCVR_NOT_RECEIVED, err);
 
-    err = receiveFromUsart('a');
+    MyTerminalUART_Read_ExpectAndReturn('a');
+    err = MyReceiver_Receive();
+
     TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
 
-    err = receiveFromUsartButUsartNotReady();
-    TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
+    MyTerminalUART_Read_ExpectAndReturn(0);
+    err = MyReceiver_Receive();
 
+    TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);  // still "rcvr_received"
 }
 
 void test_MyReceiver_GetBuffer_FillsUpAfterReceivingReturn(void)
@@ -133,6 +130,7 @@ void test_MyReceiver_Clear_WillEmptyTheInbufAndSetStateToNOTRECEIVED(void)
     TEST_ASSERT_EQUAL_STRING("", buf);
 
     ReceiverEcode_e err = receiveFromUsartButUsartNotReady();
+
     TEST_ASSERT_EQUAL_INT(RCVR_NOT_RECEIVED, err);
 }
 
@@ -154,14 +152,13 @@ void test_MyReceiver_AbleToContinueReceivingAfterClearing(void)
 
 void initMyReceiver(void)
 {
-    MyReceiver_Init(MY_USART, MY_USART_GPIO, MY_USART_ALT, MY_USART_RX, MY_USART_TX);
+    MyReceiver_Init();
 }
 
 void initMyReceiverNoExpectations(void)
 {
-    MyGPIO_Init_IgnoreAndReturn(ECODE_OK);
-    MyUSART_Init_IgnoreAndReturn(ECODE_OK);
-    MyReceiver_Init(MY_USART, MY_USART_GPIO, MY_USART_ALT, MY_USART_RX, MY_USART_TX);
+    MyTerminalUART_Init_Ignore();
+    MyReceiver_Init();
 }
 
 ReceiverEcode_e receiveFromUsart(char byte)
@@ -172,16 +169,18 @@ ReceiverEcode_e receiveFromUsart(char byte)
 // Useful as it shouldn't change what MyReceiver_Receive() will return
 ReceiverEcode_e receiveFromUsartButUsartNotReady(void)
 {
-    char byte = 0;
-    return expectReceiveAndEcho(&byte, ECODE_NOT_READY);
+    MyTerminalUART_Read_ExpectAndReturn(0);
+    ReceiverEcode_e err = MyReceiver_Receive();
 }
 
+// TODO, simplify this?
 ReceiverEcode_e receiveFromUsart_String(char* string)
 {
     ReceiverEcode_e err = RCVR_NOT_RECEIVED;
     while (*string)
     {
-        err = receiveFromUsart(*string);
+        MyTerminalUART_Read_ExpectAndReturn(*string);
+        err = MyReceiver_Receive();
         if (err != RCVR_RECEIVED)
         {
             break;

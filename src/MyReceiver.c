@@ -6,12 +6,9 @@
  * It will echo the command back on the USART.
 */
 #include "MyReceiver.h"
-#include "MyGPIO.h"
-#include "MyUSART.h"
+#include "MyTerminalUART.h"
 #include <string.h>
 
-static MyGPIO uartGpio;
-static USART_TypeDef* rcvrUsart;
 static ReceiverEcode_e receiveState = RCVR_NOT_RECEIVED;
 static void resetGlobals(void);
 
@@ -23,30 +20,17 @@ static struct
     unsigned int index;
 } inbuf;
 
-void MyReceiver_Init(USART_TypeDef* usart,
-                     GPIO_TypeDef* gpio, 
-                     GPIO_ALTF_e altf,
-                     GPIO_Pin_Mask_t rx,
-                     GPIO_Pin_Mask_t tx)
+void MyReceiver_Init(void)
 {
     resetGlobals();
-
-    uartGpio.gpio_register = gpio;
-    uartGpio.pin_mask = (rx | tx);
-    uartGpio.mode = GPIO_ALT;
-    uartGpio.alt_func = altf;
-    uartGpio.output_type = GPIO_PUSH_PULL;
-    uartGpio.pupd = GPIO_PUPD_UP;
-    MyGPIO_Init(&uartGpio);
-    MyUSART_Init(usart, USART_BR_19200);
-
-    rcvrUsart = usart;
+    MyTerminalUART_Init();
 }
 
 ReceiverEcode_e MyReceiver_Receive(void)
 {
     unsigned char data = 0;
-    if (MyUSART_Read(rcvrUsart, &data) == ECODE_OK)
+    data = MyTerminalUART_Read();
+    if (data != 0)
     {
         if (inbuf.index < (MAX_CHARACTERS - 1)
             && data != '\n')
@@ -60,7 +44,6 @@ ReceiverEcode_e MyReceiver_Receive(void)
             receiveState = RCVR_DONE;
         }
     }
-    MyUSART_Write(rcvrUsart, data);
     return receiveState;
 }
 
