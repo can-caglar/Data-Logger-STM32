@@ -28,7 +28,7 @@ void MyTerminalUART_Init(void)
 
 char MyTerminalUART_Read(void)
 {
-    char val = 0;
+    unsigned char val = 0;
     MyUSART_Read(MY_USART, &val);
     MyUSART_Write(MY_USART, val);
     return val;

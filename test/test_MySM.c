@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "mock_MyReceiver.h"
 #include "mock_MyProcessor.h"
-#include "mock_MyTransmitter.h"
 #include "MyCommon.h"
 
 static void remainsInIdleStateWhenNotReceiving(void);
@@ -18,11 +17,7 @@ static void expectToDoTransmit(void);
 void setUp(void)
 {
     // init shall initialise MyReceiver
-    MyReceiver_Init_Expect(USART6,
-        MY_USART_GPIO,
-        MY_USART_ALT,
-        MY_USART_RX,
-        MY_USART_TX);
+    MyReceiver_Init_Expect();
     MySM_Init();    // starts off at IDLE state
 }
 
@@ -119,7 +114,7 @@ static void expectToDoProcessing(void)
     MyReceiver_GetBuffer_ExpectAndReturn(fakeStr);
     MyProcessor_HandleCommandWithString_Expect(fakeStr);
     MyProcessor_GetResponseMessage_ExpectAndReturn(fakeResponse);
-    MyTransmitter_Transmit_Expect(fakeResponse);
+    MyReceiver_Transmit_Expect(fakeResponse);
     MyReceiver_Clear_Expect();
     MySM_Run();
 }

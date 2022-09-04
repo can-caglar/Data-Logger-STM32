@@ -36,13 +36,6 @@ void test_MyReceiver_Init_WillInitialiseUSARTAndGPIOProperly(void)
     initMyReceiver();
 }
 
-void test_MyReceiver_Receive_WillReadFromUSARTEvenIfNotInitialised(void)
-{
-    MyTerminalUART_Read_ExpectAndReturn(0);
-    
-    MyReceiver_Receive();
-}
-
 void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
 {
     initMyReceiverNoExpectations();
@@ -147,6 +140,22 @@ void test_MyReceiver_AbleToContinueReceivingAfterClearing(void)
     TEST_ASSERT_EQUAL_STRING("NextWord", MyReceiver_GetBuffer());
 }
 
+void test_MyReceiver_Transmit_DoesntTransferIfNullptr(void)
+{
+    MyReceiver_Transmit(0);
+}
+
+void test_MyReceiver_Transmit_WillSendStringsViaUART(void)
+{
+    MyTerminalUART_Write_Expect('h');
+    MyTerminalUART_Write_Expect('e');
+    MyTerminalUART_Write_Expect('l');
+    MyTerminalUART_Write_Expect('l');
+    MyTerminalUART_Write_Expect('o');
+    MyTerminalUART_Write_Expect('!');
+
+    MyReceiver_Transmit("hello!");
+}
 
 /******************************** Helper Functions *****************/
 

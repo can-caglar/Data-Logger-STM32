@@ -4,8 +4,6 @@
 #endif
 #include "MyReceiver.h"
 #include "MyProcessor.h"
-#include "MyTransmitter.h"
-// #include "MyCommon.h"
 
 typedef enum MySMState
 {
@@ -41,7 +39,7 @@ void MySM_Run(void)
             char* rcvBuf = MyReceiver_GetBuffer();
             MyProcessor_HandleCommandWithString(rcvBuf);
             const char* xmitBuf = MyProcessor_GetResponseMessage();
-            MyTransmitter_Transmit(xmitBuf);
+            MyReceiver_Transmit(xmitBuf);
             MyReceiver_Clear(); // processing done, clear it
             SM = IDLE;
         }
@@ -52,6 +50,6 @@ void MySM_Run(void)
 void MySM_Init(void)
 {
     SM = IDLE;
-    MyReceiver_Init(USART6, MY_USART_GPIO, MY_USART_ALT, MY_USART_RX, MY_USART_TX);
+    MyReceiver_Init();
 }
 

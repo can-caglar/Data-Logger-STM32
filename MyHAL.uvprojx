@@ -447,9 +447,14 @@
               <FilePath>.\src\MyProcessor.h</FilePath>
             </File>
             <File>
-              <FileName>MyTransmitter.h</FileName>
+              <FileName>MyTerminalUART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyTerminalUART.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyTerminalUART.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\src\MyTransmitter.h</FilePath>
+              <FilePath>.\src\MyTerminalUART.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -12,6 +12,7 @@ typedef enum
 #include "stm32f407xx.h"
 
 ReceiverEcode_e MyReceiver_Receive(void);
+void MyReceiver_Transmit(const char* buf);
 void MyReceiver_Clear(void);
 char* MyReceiver_GetBuffer(void);
 void MyReceiver_Init(void);

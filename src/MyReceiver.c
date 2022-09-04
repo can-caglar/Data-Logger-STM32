@@ -47,6 +47,18 @@ ReceiverEcode_e MyReceiver_Receive(void)
     return receiveState;
 }
 
+void MyReceiver_Transmit(const char* buf)
+{
+    if (buf)
+    {
+        while (*buf)
+        {
+            MyTerminalUART_Write(*buf);
+            buf++;
+        }
+    }
+}
+
 char* MyReceiver_GetBuffer(void)
 {
     return inbuf.character;
