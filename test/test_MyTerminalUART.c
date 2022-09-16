@@ -47,6 +47,8 @@ void test_MyTerminalUART_Read_CallsUARTReadAlsoEchoesAndReturnsChar(void)
     char receivedByte = 'a';
     MyUSART_Read_ExpectAndReturn(MY_USART, &readData, ECODE_OK);
     MyUSART_Read_ReturnThruPtr_readData(&receivedByte);
+
+    MyUSART_Write_ExpectAndReturn(MY_USART, receivedByte, ECODE_NOT_READY);
     MyUSART_Write_ExpectAndReturn(MY_USART, receivedByte, ECODE_OK);
 
     char value = MyTerminalUART_Read();
@@ -54,17 +56,48 @@ void test_MyTerminalUART_Read_CallsUARTReadAlsoEchoesAndReturnsChar(void)
     TEST_ASSERT_EQUAL_INT('a', value);
 }
 
-void test_MyTerminalUART_Write_SingleByteCallsUARTWrite(void)
+void test_MyTerminalUART_Read_WhatHappensWhenWeReadCarriageReturn(void)
+{
+    char readData = 0;  // should pass in a 0
+    char receivedByte = '\r';
+    MyUSART_Read_ExpectAndReturn(MY_USART, &readData, ECODE_OK);
+    MyUSART_Read_ReturnThruPtr_readData(&receivedByte);
+
+    MyUSART_Write_ExpectAndReturn(MY_USART, receivedByte, ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '>', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, ' ', ECODE_OK);
+
+    char value = MyTerminalUART_Read();
+}
+
+
+void test_MyTerminalUART_Write_SingleByteCallsUARTWriteUntilReady(void)
 {
     char byteToWrite = 'z';
+    MyUSART_Write_ExpectAndReturn(MY_USART, byteToWrite, ECODE_NOT_READY);
+    MyUSART_Write_ExpectAndReturn(MY_USART, byteToWrite, ECODE_NOT_READY);
     MyUSART_Write_ExpectAndReturn(MY_USART, byteToWrite, ECODE_OK);
 
     MyTerminalUART_Write(byteToWrite);
 }
 
-void test_MyTerminalUART_Write_String(void)
+void test_MyTerminalUART_WriteStringRespectsNotReady(void)
+{
+    char* stringToWrite = "hi";
+    MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_NOT_READY);
+    MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_NOT_READY);
+    MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_NOT_READY);
+    MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, 'i', ECODE_OK);
+
+    MyTerminalUART_WriteString("hi");
+}
+
+void test_MyTerminalUART_WriteStringWillAppendNewline(void)
 {
     char* stringToWrite = "hello";
+
     MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'e', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'l', ECODE_OK);
@@ -78,6 +111,7 @@ void test_MyTerminalUART_Write_EndlineWillAutoWriteNewlineDenoter(void)
 {
     // newline denoter here could be something like "> "
     MyUSART_Write_ExpectAndReturn(MY_USART, '\r', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, '>', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, ' ', ECODE_OK);
 
@@ -90,6 +124,7 @@ void test_MyTerminalUART_WriteString_EndlineWillAutoWriteNewlineDenoter(void)
     MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'i', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, '\r', ECODE_OK);
+    MyUSART_Write_ExpectAndReturn(MY_USART, '\n', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, '>', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, ' ', ECODE_OK);
     MyUSART_Write_ExpectAndReturn(MY_USART, 'h', ECODE_OK);

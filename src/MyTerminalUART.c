@@ -32,31 +32,26 @@ void MyTerminalUART_Init(void)
     }
 }
 
-
-// TODO: Writing needs to keep trying until it is OK to write
-// TODO: maybe make the \r a global?
-// TODO: say command doesn't seem to be working
-// TODO: help seeAll doesn't work, it's too short but tests are passing?
-// TODO: don't make input send a newline if buffer full. just cap the message instead. it's annoying to do something on terminal I didn't intend!
-// TODO: do a new line after writing a string to terminal
 char MyTerminalUART_Read(void)
 {
     unsigned char val = 0;
     MyUSART_Read(MY_USART, &val);
-    MyUSART_Write(MY_USART, val);
+    MyTerminalUART_Write(val);
     return val;
 }
 
 void MyTerminalUART_Write(char value)
 {
-    MyUSART_Write(MY_USART, value);
-    if (value == '\r')
+    while (MyUSART_Write(MY_USART, value) != ECODE_OK);
+
+    if (value == '\r')  // treat \r uniquely. write a bunch more stuff than \r
     {
+        MyTerminalUART_Write('\n');
         MyTerminalUART_WriteString(NEW_LINE_DENOTER);
     }
 }
 
-void MyTerminalUART_WriteString(char* str)
+void MyTerminalUART_WriteString(const char* str)
 {
     while (*str)
     {

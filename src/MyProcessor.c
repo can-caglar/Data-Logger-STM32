@@ -116,6 +116,15 @@ static void cmdHelp(void)
 
 static void cmdSay(void)
 {
+    char* token = strtok(NULL, " ");
+    if (token != NULL)
+    {
+        sprintf(cmdResponse, "STM32 would like to say %s", token);
+    }
+    else
+    {
+        updateResponse("Missing parameter!");
+    }
 }
 
 static void cmdSeeAll(void)

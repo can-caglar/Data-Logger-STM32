@@ -12,7 +12,7 @@
 static ReceiverEcode_e receiveState = RCVR_NOT_RECEIVED;
 static void resetGlobals(void);
 
-#define MAX_CHARACTERS 11
+#define MAX_CHARACTERS 21
 #define RETURN_KEY  '\r'
 
 static struct
@@ -31,18 +31,20 @@ ReceiverEcode_e MyReceiver_Receive(void)
 {
     unsigned char data = 0;
     data = MyTerminalUART_Read();
-    if (data != 0)
+    if (data != 0)  // received data
     {
-        if (inbuf.index < (MAX_CHARACTERS - 1)
-            && data != RETURN_KEY)
+        if (data == RETURN_KEY)
         {
-            inbuf.character[inbuf.index++] = data;
-            receiveState = RCVR_RECEIVED;
+            receiveState = RCVR_DONE;
         }
         else
         {
-            data = RETURN_KEY;
-            receiveState = RCVR_DONE;
+            if (inbuf.index < (MAX_CHARACTERS - 1))
+            {
+                // max char limit not reached
+                inbuf.character[inbuf.index++] = data;
+                receiveState = RCVR_RECEIVED;
+            }
         }
     }
     return receiveState;
@@ -52,11 +54,8 @@ void MyReceiver_Transmit(const char* buf)
 {
     if (buf)
     {
-        while (*buf)
-        {
-            MyTerminalUART_Write(*buf);
-            buf++;
-        }
+        MyTerminalUART_WriteString(buf);
+        MyTerminalUART_Write('\r');
     }
 }
 

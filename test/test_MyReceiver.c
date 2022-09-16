@@ -15,9 +15,7 @@ ReceiverEcode_e receiveFromUsartButUsartNotReady(void);
 ReceiverEcode_e initAndReceive(char* string);
 ReceiverEcode_e expectReceiveAndEcho(char* receivedByte, Error_Code_e willReturn);
 
-// 10 characters
-#define FULL_STRING     "0123456789"
-#define EXCESS_STRING   "0123456789abc"
+#define FULL_STRING     "01234567890123456789"
 
 void setUp(void)
 {
@@ -58,7 +56,7 @@ void test_MyReceiver_GetBuffer_ReceivedCharsAndEmptiedAfterInit(void)
     TEST_ASSERT_EQUAL_STRING("", buf);
 }
 
-void test_MyReceiver_GetBuffer_FillsUpAfter10CharactersAndWillEchoNewline(void)
+void test_MyReceiver_GetBuffer_FillsUpAfter20Characters(void)
 {
     initMyReceiverNoExpectations();
 
@@ -72,15 +70,21 @@ void test_MyReceiver_GetBuffer_FillsUpAfter10CharactersAndWillEchoNewline(void)
     TEST_ASSERT_EQUAL_STRING(FULL_STRING, buf);
 
     // receive 1 more character.
-    char passedIn = 'c';
-    MyTerminalUART_Read_ExpectAndReturn(passedIn);
+    MyTerminalUART_Read_ExpectAndReturn('c');
 
     err = MyReceiver_Receive();
-    TEST_ASSERT_EQUAL_INT(RCVR_DONE, err);
+    TEST_ASSERT_EQUAL_INT(RCVR_RECEIVED, err);
 
     // Buffer shall not have expanded
     buf = MyReceiver_GetBuffer();
     TEST_ASSERT_EQUAL_STRING(FULL_STRING, buf);
+
+    // receive \r character.
+    MyTerminalUART_Read_ExpectAndReturn('\r');
+
+    // shall be done
+    err = MyReceiver_Receive();
+    TEST_ASSERT_EQUAL_INT(RCVR_DONE, err);
 }
 
 void test_MyReceiver_Returns_RECEIVED_EvenIfErrorAsLongAsReceivedOnce(void)
@@ -147,12 +151,8 @@ void test_MyReceiver_Transmit_DoesntTransferIfNullptr(void)
 
 void test_MyReceiver_Transmit_WillSendStringsViaUART(void)
 {
-    MyTerminalUART_Write_Expect('h');
-    MyTerminalUART_Write_Expect('e');
-    MyTerminalUART_Write_Expect('l');
-    MyTerminalUART_Write_Expect('l');
-    MyTerminalUART_Write_Expect('o');
-    MyTerminalUART_Write_Expect('!');
+    MyTerminalUART_WriteString_Expect("hello!");
+    MyTerminalUART_Write_Expect('\r');
 
     MyReceiver_Transmit("hello!");
 }

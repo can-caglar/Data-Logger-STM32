@@ -18,53 +18,6 @@ void test_MyProcessor_Init(void)
 {
 }
 
-void test_strchr(void)
-{
-    const char str[] = "help say";
-    const char str2[] = "allCmds";
-    const char str3[] = "";
-    const char str4[] = "\n";
-
-    int len = strcspn(str, " ");
-    TEST_ASSERT_EQUAL_INT(4, len);
-    TEST_ASSERT_EQUAL_STRING("help say", str);
-
-    len = strcspn(str2, " ");
-    TEST_ASSERT_EQUAL_INT(7, len);
-    TEST_ASSERT_EQUAL_CHAR('\0', str2[len]);
-
-    len = strcspn(str3, " ");
-    TEST_ASSERT_EQUAL_INT(0, len);
-
-    len = strcspn(str4, " ");
-    TEST_ASSERT_EQUAL_INT(1, len);
-
-    int compare = strncmp("hello one", "hello", 2);
-    TEST_ASSERT_EQUAL_INT(0, compare);
-
-    // strlen ignores null terminator
-    size_t mylen = strlen("hello");
-    TEST_ASSERT_EQUAL_INT(5, mylen);
-
-    mylen = strlen("");
-    TEST_ASSERT_EQUAL_INT(0, mylen);
-
-    char myword[] = "hello mate";
-    myword[2] = 0;
-    strcat(myword, "??");
-    TEST_ASSERT_EQUAL_STRING("he??", myword);
-
-    char myStr[50] = "hello";
-    strcpy(myStr, "hi");
-    TEST_ASSERT_EQUAL_STRING("hi", myStr);
-
-    // cspn could be used. where it returns is = 0.
-    // if it returns 0, an empty string must have been passed in
-    // if it's non 0, it will be the end of the first word.
-    // 
-
-}
-
 void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
 {
     // "help say"
@@ -116,20 +69,38 @@ void test_MyProcessor_sendingEmptyStringGivesUniqueResponse(void)
 
 void test_MyProcessor_sendingVeryLongStringGivesUniqueResponse(void)
 {
-    MyProcessor_HandleCommandWithString(
-        "0123456789" "0123456789" "0123456789"
-        "0123456789" "0123456789" "0123456789"
-        "0123456789" "0123456789" "0123456789"
-        "0123456789" "0123456789" "0123456789"
-    );
+    MyProcessor_HandleCommandWithString("01234567890123456789");
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Command too long!", resp);
 }
 
+void test_MyProcessor_sayCommand(void)
+{
+    // 1 param
+    MyProcessor_HandleCommandWithString("say hello");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("STM32 would like to say hello", resp);
+
+    // 0 params
+    MyProcessor_HandleCommandWithString("say");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Missing parameter!", resp);
+
+    // Multiple params
+    MyProcessor_HandleCommandWithString("say hi hi");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("STM32 would like to say hi", resp);
+}
+
+
 // TODO, refactor!
 
-#if 0
-#endif
+// TODO: maybe make the \r a global? a string literal?
+// x: say command doesn't seem to be working
+// x: help seeAll doesn't work, it's too short but tests are passing?
+// x: don't make input send a newline if buffer full. just cap the message instead. it's annoying to do something on terminal I didn't intend!
+// x: do a new line after writing a string to terminal
+
 
 /*
 [ ] The commands shall not be changed at runtime, instead, this module shall include all commands
