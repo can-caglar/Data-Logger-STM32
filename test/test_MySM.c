@@ -51,17 +51,12 @@ void test_RECV(void)
 
 void test_RCV_to_PROCESSING_then_IDLE(void)
 {
-    // The expectations essentially tell us which state we
-    // are in.
-
     // receiving
     MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
     MySM_Run();
 
-    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
-    MySM_Run();
-
     // processing
+    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
     char* fakeStr = "doBadCmd";
     char* fakeResponse = "doBadCmd Failed";
     MyReceiver_GetBuffer_ExpectAndReturn(fakeStr);
