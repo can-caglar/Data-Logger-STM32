@@ -18,14 +18,6 @@ void MySM_Run(void)
 {
     switch (SM)
     {
-        case IDLE:  // this feels a bit unnecessary now!
-        {
-            if (MyReceiver_Receive() == RCVR_RECEIVED)
-            {
-                SM = RECEIVING;
-            }
-        }
-        break;
         case RECEIVING:
         {
             if (MyReceiver_Receive() == RCVR_DONE)
@@ -41,7 +33,7 @@ void MySM_Run(void)
             const char* xmitBuf = MyProcessor_GetResponseMessage();
             MyReceiver_Transmit(xmitBuf);
             MyReceiver_Clear(); // processing done, clear it
-            SM = IDLE;
+            SM = RECEIVING;
         }
         break;
     }
@@ -49,7 +41,7 @@ void MySM_Run(void)
 
 void MySM_Init(void)
 {
-    SM = IDLE;
+    SM = RECEIVING;
     MyReceiver_Init();
 }
 

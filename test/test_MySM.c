@@ -25,6 +25,7 @@ void tearDown(void)
 {
 }
 
+#if 0
 void test_IDLE(void)
 {
     remainsInIdleStateWhenNotReceiving();
@@ -39,16 +40,6 @@ void test_IDLE_to_RECV(void)
     remainsInReceivingStateWhilstNOTReceiving();
 }
 
-void test_IDLE_to_PROCESSING_shouldntHappen(void)
-{
-    // Currently in IDLE
-    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
-    MySM_Run();
-
-    remainsInIdleStateWhenNotReceiving();
-    remainsInIdleStateWhenNotReceiving();
-}
-
 void test_RECV(void)
 {
     moveFromIdleToReceivingOnceReceived();
@@ -56,56 +47,37 @@ void test_RECV(void)
     remainsInReceivingStateWHILSTReceiving();
     remainsInReceivingStateWHILSTReceiving();
 }
+#endif
 
 void test_RCV_to_PROCESSING_then_IDLE(void)
 {
-    moveFromIdleToReceivingOnceReceived();
+    // The expectations essentially tell us which state we
+    // are in.
 
-    moveFromReceivingToProcessingOnceReceiveDone();
-    expectToDoProcessing();
+    // receiving
+    MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
+    MySM_Run();
 
-    // should auto go to IDLE when done
-    remainsInIdleStateWhenNotReceiving();
+    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
+    MySM_Run();
+
+    // processing
+    char* fakeStr = "doBadCmd";
+    char* fakeResponse = "doBadCmd Failed";
+    MyReceiver_GetBuffer_ExpectAndReturn(fakeStr);
+    MyProcessor_HandleCommandWithString_Expect(fakeStr);
+    MyProcessor_GetResponseMessage_ExpectAndReturn(fakeResponse);
+    MyReceiver_Transmit_Expect(fakeResponse);
+    MyReceiver_Clear_Expect();
+    MySM_Run();
+
+    // receiving
+    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
+    MySM_Run();
 }
 
 
 /******************************* Helper functions ****************************/
-
-static void remainsInIdleStateWhenNotReceiving(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
-    MySM_Run();
-}
-
-static void moveFromIdleToReceivingOnceReceived(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
-    MySM_Run();
-}
-
-static void expectMyReceiver_NotReceive(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
-    MySM_Run();
-}
-
-static void remainsInReceivingStateWhilstNOTReceiving(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
-    MySM_Run();
-}
-
-static void remainsInReceivingStateWHILSTReceiving(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
-    MySM_Run();
-}
-
-static void moveFromReceivingToProcessingOnceReceiveDone(void)
-{
-    MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
-    MySM_Run();
-}
 
 static void expectToDoProcessing(void)
 {
@@ -118,19 +90,3 @@ static void expectToDoProcessing(void)
     MyReceiver_Clear_Expect();
     MySM_Run();
 }
-
-
-/*
-
-[ ] Write to terminal and get board to do stuff, i.e. turn on an LED
-[ ] The board writes back whetever we sent, to terminal
-[ ] The board returns original cmd + "success" or "fail" to terminal
-
-[ ] State machine:
-[x] Initial state is: IDLE (where the buffer is cleared and waiting to receive)
-[ ] If start receiving, go to: RECEIVING (where buf size is checked etc)
-[ ] If received or buffer full, go to: PROCESSING
-[ ] If found function, go to: INVOKING, if not found go to TRANSMIT
-[ ] Invoke function in INVOKING, then go to TRANSMIT
-[ ] TRANSMIT a message depending on if invoke was called or not
-*/
