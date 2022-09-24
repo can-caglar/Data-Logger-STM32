@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "MySM.h"
+#include "MyCLI.h"
 #include <stdio.h>
 #include "mock_MyReceiver.h"
 #include "mock_MyProcessor.h"
@@ -18,7 +18,7 @@ void setUp(void)
 {
     // init shall initialise MyReceiver
     MyReceiver_Init_Expect();
-    MySM_Init();    // starts off at IDLE state
+    MyCLI_Init();    // starts off at IDLE state
 }
 
 void tearDown(void)
@@ -53,7 +53,7 @@ void test_RCV_to_PROCESSING_then_IDLE(void)
 {
     // receiving
     MyReceiver_Receive_ExpectAndReturn(RCVR_RECEIVED);
-    MySM_Run();
+    MyCLI_Run();
 
     // processing
     MyReceiver_Receive_ExpectAndReturn(RCVR_DONE);
@@ -64,11 +64,11 @@ void test_RCV_to_PROCESSING_then_IDLE(void)
     MyProcessor_GetResponseMessage_ExpectAndReturn(fakeResponse);
     MyReceiver_Transmit_Expect(fakeResponse);
     MyReceiver_Clear_Expect();
-    MySM_Run();
+    MyCLI_Run();
 
     // receiving
     MyReceiver_Receive_ExpectAndReturn(RCVR_NOT_RECEIVED);
-    MySM_Run();
+    MyCLI_Run();
 }
 
 
@@ -83,5 +83,5 @@ static void expectToDoProcessing(void)
     MyProcessor_GetResponseMessage_ExpectAndReturn(fakeResponse);
     MyReceiver_Transmit_Expect(fakeResponse);
     MyReceiver_Clear_Expect();
-    MySM_Run();
+    MyCLI_Run();
 }

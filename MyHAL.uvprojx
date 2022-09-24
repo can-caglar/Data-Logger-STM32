@@ -422,11 +422,6 @@
               <FilePath>.\src\MyReceiver.h</FilePath>
             </File>
             <File>
-              <FileName>MySM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\MySM.c</FilePath>
-            </File>
-            <File>
               <FileName>MyUSART.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyUSART.c</FilePath>
@@ -457,14 +452,14 @@
               <FilePath>.\src\MyTerminalUART.h</FilePath>
             </File>
             <File>
-              <FileName>MyCLIApp.h</FileName>
+              <FileName>MyApp.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\src\MyCLIApp.h</FilePath>
+              <FilePath>.\src\MyApp.h</FilePath>
             </File>
             <File>
-              <FileName>MyCLIApp.c</FileName>
+              <FileName>MyApp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyCLIApp.c</FilePath>
+              <FilePath>.\src\MyApp.c</FilePath>
             </File>
             <File>
               <FileName>Loop.c</FileName>
@@ -475,6 +470,16 @@
               <FileName>Loop.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\Loop.h</FilePath>
+            </File>
+            <File>
+              <FileName>MyCLI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyCLI.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyCLI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\MyCLI.h</FilePath>
             </File>
           </Files>
         </Group>

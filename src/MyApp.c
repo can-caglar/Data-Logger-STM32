@@ -1,5 +1,5 @@
-#include "MyCLIApp.h"
-#include "MySM.h"
+#include "MyApp.h"
+#include "MyCLI.h"
 #include "Loop.h"
 
 #ifndef TEST
@@ -8,10 +8,10 @@
 
 int runCLI(void)
 {
-    MySM_Init();
+    MyCLI_Init();
     
     LOOP
     {
-        MySM_Run();
+        MyCLI_Run();
     }
 }

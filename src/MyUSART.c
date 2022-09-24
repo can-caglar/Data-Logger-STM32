@@ -11,6 +11,7 @@ static io_register calculateBRR(unsigned long fclk, USART_BR_e baud);
 unsigned char isNullPtr(void* ptr);
 
 // Public functions
+
 Error_Code_e MyUSART_Init(USART_TypeDef* USART, const USART_BR_e baud)
 {
     USART->CR1 |= USART_CR1_UE;    // enable USART
@@ -32,6 +33,9 @@ Error_Code_e MyUSART_Write(USART_TypeDef* usart, const unsigned char byte)
     return ECODE_NOT_READY;
 }
 
+// todo: MyUSART_Read shall just read (and pop) from a circular buffer
+// we shall initialise an interrupt to fire whenever we have new data and
+// push it to the circular buffer
 Error_Code_e MyUSART_Read(USART_TypeDef* usart, unsigned char* outchar)
 {
     if (isNullPtr(outchar))

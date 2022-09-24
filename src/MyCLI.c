@@ -1,26 +1,26 @@
-#include "MySM.h"
+#include "MyCLI.h"
 #include "MyReceiver.h"
 #include "MyProcessor.h"
 
-typedef enum MySMState
+void MyCLI_Run(void)
 {
-    RECEIVING,
-    PROCESSING,
-} MySMState;
-
-void MySM_Run(void)
-{
+    // Receive characters
     if (MyReceiver_Receive() == RCVR_DONE)
     {
+        // finishing receiving a complete line
         char* rcvBuf = MyReceiver_GetBuffer();
+        // invoke this line
         MyProcessor_HandleCommandWithString(rcvBuf);
+        // get response message
         const char* xmitBuf = MyProcessor_GetResponseMessage();
+        // transmit the response message
         MyReceiver_Transmit(xmitBuf);
-        MyReceiver_Clear(); // processing done, clear it
+        // clear internal string buffer, ready for next time
+        MyReceiver_Clear();
     }
 }
 
-void MySM_Init(void)
+void MyCLI_Init(void)
 {
     MyReceiver_Init();
 }
