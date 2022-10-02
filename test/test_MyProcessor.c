@@ -96,23 +96,15 @@ void test_MyProcessor_sayCommand(void)
 // TODO, refactor!
 
 // TODO: maybe make the \r a global? a string literal?
-// x: say command doesn't seem to be working
-// x: help seeAll doesn't work, it's too short but tests are passing?
-// x: don't make input send a newline if buffer full. just cap the message instead. it's annoying to do something on terminal I didn't intend!
-// x: do a new line after writing a string to terminal
-
 
 /*
-[ ] The commands shall not be changed at runtime, instead, this module shall include all commands
+[x] The commands shall not be changed at runtime, instead, this module shall include all commands
 
-[ ] I would like to be able to see all commands registered
+[x] I would like to be able to see all commands registered
 
-[ ] I would like to see a "help" section for each command, i.e. 'help ledOn'
+[x] I would like to see a "help" section for each command, i.e. 'help ledOn'
 
-[?] I would like to know if the function and command string was able to be registered 
-and should respond with fail or pass (use Error_Code_e)
-
-[ ] I would like to be able to pass in a command string and this module shall
+[x] I would like to be able to pass in a command string and this module shall
 invoke the function, if it exists, along with arguments, e.g. "ledOn 1 2 3"
 
 [ ] I would like to get a response from the command, depending on the command
@@ -126,16 +118,8 @@ This module can be asked to return the latest reply.
 ---
 
 Implementation todos:
-- [ ] TODO - Function for writing to output buffer. make sure it clips the output.
+- [x] Function for writing to output buffer. make sure it clips the output.
 
 ---
-
-Commands:
-
-0. Fail response is: "<command> failed. See "help <command>"
-
-1. "say"
-    help: "Usage: say <string>"
-    response: "You asked me to say: <string>!""
 
 */
