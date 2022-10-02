@@ -26,6 +26,9 @@
  extern "C" {
 #endif
 
+// CC
+#include "fake_define_config.h"
+
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal_conf.h"
 

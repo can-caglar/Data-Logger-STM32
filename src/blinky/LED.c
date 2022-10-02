@@ -1,8 +1,7 @@
 #include "LED.h"
-#include "gpio_hal.h"
-#include "rcc_hal.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_rcc.h"
 
 /*
 ORANGE  PD13
@@ -11,7 +10,7 @@ GREEN   PD12
 
 void led_init(void)
 {
-    rcc_gpiod_clk_enable();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
 
     GPIO_InitTypeDef my_gpio = 
     {
@@ -25,15 +24,15 @@ void led_init(void)
 
 void led_on(void)
 {
-    gpio_write(GH_PORT_D, GH_PIN_13, GH_STATE_SET);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 }
 
 void led_off(void)
 {
-    gpio_write(GH_PORT_D, GH_PIN_13, GH_STATE_RESET);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
 void led_toggle(void)
 {
-    gpio_toggle(GH_PORT_D, GH_PIN_13);
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
 }

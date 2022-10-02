@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "C:/Users/canca/OneDrive/Study/Embedded/tdd_embedded_systems/on_target_3/test/fakes",
                 "C:/Users/canca/OneDrive/Study/Embedded/tdd_embedded_systems/on_target_3/src/**",
                 "C:/Keil_v5/ARM/PACK/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
                 "C:/Keil_v5/ARM/PACK/ARM/CMSIS/5.3.0/CMSIS/Include",
@@ -13,7 +14,8 @@
                 "C:/DEV/Unity/src/**",
                 "C:/Users/canca/OneDrive/Study/Embedded/tdd_embedded_systems/on_target_3/RTE/Device/STM32F407VGTx/**",
                 "C:/MinGW/lib/gcc/mingw32/9.2.0/include/**",
-                "C:/Users/canca/OneDrive/Study/Embedded/tdd_embedded_systems/on_target_3/test/fakes"
+                "C:/Users/canca/OneDrive/Study/Embedded/tdd_embedded_systems/on_target_3/test/fakes",
+                "C:/Keil_v5/ARM/PACK/Keil/STM32F4xx_DFP/2.14.0/Drivers/STM32F4xx_HAL_Driver/Inc"
             ],
             "defines": [
                 "_DEBUG",
