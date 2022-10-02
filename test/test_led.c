@@ -30,6 +30,14 @@ void test_LedInitWillInitialiseCorrectPort(void)
 
     gpio_init_Expect(GH_PORT_D, &gpio);
 
+    GPIO_InitTypeDef my_gpio = 
+    {
+        .Pin = GPIO_PIN_13,
+        .Mode = GPIO_MODE_OUTPUT_PP,
+        .Pull = GPIO_NOPULL
+    };
+    HAL_GPIO_Init_Expect(GPIOD, &my_gpio);
+
     led_init();
 }
 
