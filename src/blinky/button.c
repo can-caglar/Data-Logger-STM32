@@ -1,9 +1,11 @@
 #include "button.h"
 #include "nvic_hal.h"
-#include "rcc_hal.h"
 #include "gpio_hal.h"
 #include "system_hal.h"
 #include "global.h"
+
+#include "stm32f4xx_hal_rcc.h"
+#include "stm32f4xx_hal_gpio.h"
 
 // Dev board specific vars
 static GH_Init_s _gpio = 
@@ -13,6 +15,13 @@ static GH_Init_s _gpio =
     .mode = GH_MODE_IT_RISING,
 };
 static const GPIOPort_e _port = GH_PORT_A;
+
+static GPIO_InitTypeDef _btnGpio = 
+{
+    .Pin = GPIO_PIN_0,
+    .Mode = GPIO_MODE_IT_RISING,
+    .Pull = GPIO_NOPULL
+};
 
 // Debounce vars
 static const uint32_t debounceTime = 50; // ms
@@ -38,8 +47,9 @@ void button_init(void)
     buttonPressed = 0;
     observer = 0;
 
-    rcc_gpioa_clk_enable();
-    gpio_init(_port, &_gpio);
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    HAL_GPIO_Init(GPIOA, &_btnGpio);
     gpio_register_interrupt_callback(_gpio.pin, button_irq);
     nvic_enable_irq(NVIC_EXTI0);
 }

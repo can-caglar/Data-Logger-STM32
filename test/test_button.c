@@ -6,6 +6,9 @@
 #include "mock_system_hal.h"
 #include "unity_helper.h"
 
+#include "mock_stm32f4xx_hal_rcc_ex.h"
+#include "mock_stm32f4xx_hal_gpio.h"
+
 extern void button_irq(void);
 
 // helpers
@@ -25,13 +28,22 @@ void tearDown(void)
 
 void test_buttonInit(void)
 {
-    GH_Init_s gpio = { 0 };
-    gpio.mode = GH_MODE_IT_RISING;
-    gpio.pin = GH_PIN_0;
-    gpio.pull = GH_PULL_NONE;
+    // GH_Init_s gpio = { 0 };
+    // gpio.mode = GH_MODE_IT_RISING;
+    // gpio.pin = GH_PIN_0;
+    // gpio.pull = GH_PULL_NONE;
 
-    rcc_gpioa_clk_enable_Expect();
-    gpio_init_Expect(GH_PORT_A, &gpio);
+    GPIO_InitTypeDef gpio = 
+    {
+        .Pin = GPIO_PIN_0,
+        .Mode = GPIO_MODE_IT_RISING,
+        .Pull = GPIO_NOPULL,
+    };
+
+    MY_HAL_RCC_GPIOA_CLK_ENABLE_Expect();
+    
+    HAL_GPIO_Init_Expect(GPIOA, &gpio);
+
     gpio_register_interrupt_callback_Expect(GH_PIN_0, button_irq);
     nvic_enable_irq_Expect(NVIC_EXTI0);
     button_init();
