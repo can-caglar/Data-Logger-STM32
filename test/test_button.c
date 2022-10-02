@@ -8,6 +8,7 @@
 
 #include "mock_stm32f4xx_hal_rcc_ex.h"
 #include "mock_stm32f4xx_hal_gpio.h"
+#include "mock_stm32f4xx_hal_cortex.h"
 
 extern void button_irq(void);
 
@@ -45,7 +46,10 @@ void test_buttonInit(void)
     HAL_GPIO_Init_Expect(GPIOA, &gpio);
 
     gpio_register_interrupt_callback_Expect(GH_PIN_0, button_irq);
-    nvic_enable_irq_Expect(NVIC_EXTI0);
+    
+    // nvic_enable_irq_Expect(NVIC_EXTI0);
+    HAL_NVIC_EnableIRQ_Expect(EXTI0_IRQn);
+
     button_init();
     TEST_ASSERT_EQUAL_INT(0, button_pressed());
 }

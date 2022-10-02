@@ -6,6 +6,7 @@
 
 #include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal.h"
 
 // Dev board specific vars
 static GH_Init_s _gpio = 
@@ -51,7 +52,7 @@ void button_init(void)
 
     HAL_GPIO_Init(GPIOA, &_btnGpio);
     gpio_register_interrupt_callback(_gpio.pin, button_irq);
-    nvic_enable_irq(NVIC_EXTI0);
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 void button_close(void)
