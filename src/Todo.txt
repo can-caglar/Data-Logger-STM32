@@ -6,7 +6,7 @@ Snooping application:
 leave the CLI one as it is for now. we can refactor the CLI module
 to use the new UART handler if required.
 
-- [...] Write a test app to use the SD card device w/SPI
+- [blocked] Write a test app to use the SD card device w/SPI
 - [ ] Write circular buffer module
 - [ ] Write UART interface which uses HAL uart with interrupt
 where it pushes to circular buffer each interrupt (turn off interrupts here?)
@@ -14,7 +14,7 @@ where it pushes to circular buffer each interrupt (turn off interrupts here?)
 - [ ] OR, the circular buffer will be handled by the DMA?
 
 Baud rate / Application Decider
-- [ ] Make use of the blinky module, remove the adapters, make tests work
+- [...] Make use of the blinky module, remove the adapters, make tests work
 - [ ] Rewrite the button module so it is a DIP switch module instead
 
 Possible Refactorings:
