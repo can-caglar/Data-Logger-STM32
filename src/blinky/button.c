@@ -1,5 +1,4 @@
 #include "button.h"
-#include "nvic_hal.h"
 #include "MyInterrupts.h"
 #include "system_hal.h"
 #include "global.h"

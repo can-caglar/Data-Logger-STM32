@@ -1,8 +1,6 @@
 #include "unity.h"
 #include "button.h"
 #include "mock_MyInterrupts.h"
-#include "mock_rcc_hal.h"
-#include "mock_nvic_hal.h"
 #include "mock_system_hal.h"
 #include "unity_helper.h"
 
