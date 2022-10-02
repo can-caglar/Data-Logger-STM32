@@ -11,15 +11,16 @@ GREEN   PD12
 
 void led_init(void)
 {
-    GPIOPort_e port = GH_PORT_D;
-    GH_Init_s gpio;
-
-    gpio.mode = GH_MODE_OUTPUT_PP;
-    gpio.pin = GH_PIN_13;
-    gpio.pull = GH_PULL_NONE;
-
     rcc_gpiod_clk_enable();
-    gpio_init(port, &gpio);
+
+    GPIO_InitTypeDef my_gpio = 
+    {
+        .Pin = GPIO_PIN_13,
+        .Mode = GPIO_MODE_OUTPUT_PP,
+        .Pull = GPIO_NOPULL
+    };
+
+    HAL_GPIO_Init(GPIOD, &my_gpio);
 }
 
 void led_on(void)

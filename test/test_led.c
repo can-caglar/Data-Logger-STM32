@@ -19,16 +19,7 @@ void tearDown(void)
 
 void test_LedInitWillInitialiseCorrectPort(void)
 {
-    GPIOPort_e port = GH_PORT_D;
-    GH_Init_s gpio;
-
-    gpio.mode = GH_MODE_OUTPUT_PP;
-    gpio.pull = GH_PULL_NONE;
-    gpio.pin = GH_PIN_13;
-
     rcc_gpiod_clk_enable_Expect();
-
-    gpio_init_Expect(GH_PORT_D, &gpio);
 
     GPIO_InitTypeDef my_gpio = 
     {
