@@ -1,6 +1,6 @@
 #include "button.h"
 #include "nvic_hal.h"
-#include "gpio_hal.h"
+#include "MyInterrupts.h"
 #include "system_hal.h"
 #include "global.h"
 
@@ -8,18 +8,12 @@
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal.h"
 
-// Dev board specific vars
-static GH_Init_s _gpio = 
-{
-    .pin = GH_PIN_0,
-    .pull = GH_PULL_NONE,
-    .mode = GH_MODE_IT_RISING,
-};
-static const GPIOPort_e _port = GH_PORT_A;
-
+// Dev board specific parameters
+static const uint16_t _btnPin = GPIO_PIN_0;
+static GPIO_TypeDef* const _btnPort = GPIOA;
 static GPIO_InitTypeDef _btnGpio = 
 {
-    .Pin = GPIO_PIN_0,
+    .Pin = _btnPin,
     .Mode = GPIO_MODE_IT_RISING,
     .Pull = GPIO_NOPULL
 };
@@ -36,7 +30,7 @@ STATIC void button_irq(void)
     uint32_t t_now = get_tick();
     if (t_now - lastIrq >= debounceTime)
     {
-        buttonPressed = gpio_read(_port, _gpio.pin);
+        buttonPressed = HAL_GPIO_ReadPin(_btnPort, GPIO_PIN_0); // gpio_read(_port, _gpio.pin);
         observer();
     }
     lastIrq = t_now;
@@ -51,7 +45,7 @@ void button_init(void)
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     HAL_GPIO_Init(GPIOA, &_btnGpio);
-    gpio_register_interrupt_callback(_gpio.pin, button_irq);
+    gpio_register_interrupt_callback(_btnPin, button_irq);
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 

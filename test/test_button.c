@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "button.h"
-#include "mock_gpio_hal.h"
+#include "mock_MyInterrupts.h"
 #include "mock_rcc_hal.h"
 #include "mock_nvic_hal.h"
 #include "mock_system_hal.h"
@@ -29,11 +29,6 @@ void tearDown(void)
 
 void test_buttonInit(void)
 {
-    // GH_Init_s gpio = { 0 };
-    // gpio.mode = GH_MODE_IT_RISING;
-    // gpio.pin = GH_PIN_0;
-    // gpio.pull = GH_PULL_NONE;
-
     GPIO_InitTypeDef gpio = 
     {
         .Pin = GPIO_PIN_0,
@@ -45,12 +40,12 @@ void test_buttonInit(void)
     
     HAL_GPIO_Init_Expect(GPIOA, &gpio);
 
-    gpio_register_interrupt_callback_Expect(GH_PIN_0, button_irq);
+    gpio_register_interrupt_callback_Expect(GPIO_PIN_0, button_irq);
     
-    // nvic_enable_irq_Expect(NVIC_EXTI0);
     HAL_NVIC_EnableIRQ_Expect(EXTI0_IRQn);
 
     button_init();
+
     TEST_ASSERT_EQUAL_INT(0, button_pressed());
 }
 
@@ -71,7 +66,8 @@ void test_button_pressed_debounce(void)
     // 50 ms later, press shall go through
     TEST_ASSERT_EQUAL_INT(0, testVar);
     get_tick_ExpectAndReturn(60);
-    gpio_read_ExpectAndReturn(GH_PORT_A, GH_PIN_0, 1);
+    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+    // gpio_read_ExpectAndReturn(GH_PORT_A, GH_PIN_0, 1);
     button_irq();
     TEST_ASSERT_EQUAL_INT(1, button_pressed());
     TEST_ASSERT_EQUAL_INT(1, testVar);
@@ -102,7 +98,7 @@ void fake_press_button(void)
     TEST_ASSERT_EQUAL_INT(0, button_pressed());
 
     get_tick_ExpectAndReturn(50);
-    gpio_read_ExpectAndReturn(GH_PORT_A, GH_PIN_0, 1);
+    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
     button_irq();
     TEST_ASSERT_EQUAL_INT(1, button_pressed());
 }
