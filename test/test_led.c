@@ -3,6 +3,7 @@
 #include "mock_gpio_hal.h"
 #include "mock_rcc_hal.h"
 #include "unity_helper.h"
+#include "mock_stm32f4xx_hal_gpio.h"
 
 #if 0
 void setUp(void)
@@ -26,6 +27,7 @@ void test_LedInitWillInitialiseCorrectPort(void)
     gpio.pin = GH_PIN_13;
 
     rcc_gpiod_clk_enable_Expect();
+
     gpio_init_Expect(GH_PORT_D, &gpio);
 
     led_init();
