@@ -7,11 +7,11 @@
 #include "gpio_interrupts.h"
 
 // Dev board specific parameters
-static const uint16_t _btnPin = GPIO_PIN_0;
+#define BUTTON_PIN GPIO_PIN_0
 static GPIO_TypeDef* const _btnPort = GPIOA;
 static GPIO_InitTypeDef _btnGpio = 
 {
-    .Pin = _btnPin,
+    .Pin = BUTTON_PIN,
     .Mode = GPIO_MODE_IT_RISING,
     .Pull = GPIO_NOPULL
 };
@@ -43,7 +43,7 @@ void button_init(void)
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     HAL_GPIO_Init(GPIOA, &_btnGpio);
-    gpio_register_interrupt_callback(_btnPin, button_irq);
+    gpio_register_interrupt_callback(BUTTON_PIN, button_irq);
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
