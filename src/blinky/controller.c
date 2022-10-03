@@ -1,5 +1,5 @@
+#include "stm32f4xx_hal.h"
 #include "controller.h"
-#include "system_hal.h"
 #include "button.h"
 #include "LED.h"
 #include "global.h"
@@ -26,7 +26,7 @@ STATIC void handleButton(void)
 
 void run_controller(void)
 {
-    system_init();
+    HAL_Init();
     led_init();
     button_init();
     button_register_observer(handleButton);

@@ -16,7 +16,7 @@ where it pushes to circular buffer each interrupt (turn off interrupts here?)
 Baud rate / Application Decider
 - [...] Make use of the blinky module, remove the adapters, make tests work
     - [ ] Mock the "system" HAL and eventually remove "system_hal.h/c"
-    - [ ] Re-develop the "MyInterrupts" module via TDD.
+    - [ ] Re-develop the "gpio_interrupts" module via TDD.
 - [ ] Rewrite the button module so it is a DIP switch module instead
 
 Possible Refactorings:

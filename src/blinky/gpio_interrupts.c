@@ -1,9 +1,7 @@
-#include "MyInterrupts.h"
+#include "gpio_interrupts.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio.h"
 #include <stdint.h>
-
-/* Translate from adapter to ST HAL */
 
 #define PIN_COUNT 16
 

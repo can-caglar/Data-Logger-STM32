@@ -1,11 +1,10 @@
-#include "button.h"
-#include "MyInterrupts.h"
-#include "system_hal.h"
-#include "global.h"
-
 #include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal.h"
+
+#include "global.h"
+#include "button.h"
+#include "gpio_interrupts.h"
 
 // Dev board specific parameters
 static const uint16_t _btnPin = GPIO_PIN_0;
@@ -26,7 +25,7 @@ static obs_func observer; // just 1 observer for now
 
 STATIC void button_irq(void)
 {
-    uint32_t t_now = get_tick();
+    uint32_t t_now = HAL_GetTick();
     if (t_now - lastIrq >= debounceTime)
     {
         buttonPressed = HAL_GPIO_ReadPin(_btnPort, GPIO_PIN_0); // gpio_read(_port, _gpio.pin);

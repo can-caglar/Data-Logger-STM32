@@ -2,7 +2,7 @@
 #define _UNITY_HELPER
 
 #include "MyGPIO.h"
-#include "MyInterrupts.h"
+#include "gpio_interrupts.h"
 
 void AssertEqualMyGPIO(MyGPIO expected, MyGPIO actual, unsigned short line);
 

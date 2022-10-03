@@ -1,14 +1,15 @@
 #include "unity.h"
 #include "controller.h"
-#include "mock_system_hal.h"
 #include "mock_button.h"
 #include "mock_LED.h"
+
+#include "mock_stm32f4xx_hal.h"
 
 extern void handleButton(void);
 
 void test_controllerInit()
 {
-    system_init_Expect();
+    HAL_Init_ExpectAndReturn(HAL_OK);
     led_init_Expect();
     button_init_Expect();
     button_register_observer_Expect(handleButton);

@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "LED.h"
-#include "mock_MyInterrupts.h"
+#include "mock_gpio_interrupts.h"
 #include "unity_helper.h"  // TODO: update me?
 #include "mock_stm32f4xx_hal_gpio.h"
 #include "mock_stm32f4xx_hal_rcc_ex.h"
