@@ -1,6 +1,6 @@
 ---
 
-Snooping application:
+Data logger:
 
 - [ ] Perhaps write a new UART handler module,
 leave the CLI one as it is for now. we can refactor the CLI module
@@ -21,6 +21,9 @@ Baud rate / Application Decider
 
 Possible Refactorings:
 - [ ] The CLI to use the same UART module with circular buffer?
+
+Files:
+- [ ] Tidy file / folder structure in Keil and in the src folder
 
 Future:
 - [ ] Add small OLED(?) screen
