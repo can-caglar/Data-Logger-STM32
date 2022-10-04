@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support</IncludePath>
+              <IncludePath>.\test\support;.\src\blinky</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
