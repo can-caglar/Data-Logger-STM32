@@ -6,10 +6,16 @@
 leave the CLI one as it is for now. we can refactor the CLI module
 to use the new UART handler if required.
 
+CLI:
+- [ ] Print a welcome message at start which tells users how to navigate
+
 SD card:
-- [blocked] Write a test app to use the SD card device w/SPI
+- [x] Write a test app to use the SD card device w/SPI
+    - [x] Try another SD card breakout
+        - [-] Try on an Ardunio
+- [...] Treat the SD driver as a black box and add it to our current system.
 - [ ] Write a UART module with DMA that continuously 
-writes to the circular buffer will be handled by the DMA.
+writes to the circular buffer which will be handled by the DMA.
 
 Baud rate / Application Decider
 - [...] Make use of the blinky module, remove the adapters, make tests work
@@ -23,5 +29,9 @@ Possible Refactors:
 Files:
 - [ ] Tidy file / folder structure in Keil and in the src folder
 
+Realtime clock:
+- [ ] Add realtime clock for SD card saving and logging
+
 Future:
 - [ ] Add small OLED(?) screen
+- [ ] Add external realtime clock with battery
