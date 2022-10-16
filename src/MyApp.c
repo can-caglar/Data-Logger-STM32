@@ -3,10 +3,15 @@
 #include "Loop.h"
 #include "controller.h"
 
+#include "main.h"
+
 #ifndef TEST
 #define runCLI main
 #endif
 
+/*
+int main(void)
+*/
 int runCLI(void)
 {
     MyCLI_Init();

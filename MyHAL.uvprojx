@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support;.\src\blinky</IncludePath>
+              <IncludePath>.\test\support;.\src\blinky;.\src\fatFs;.\src\fatFs\App;.\src\fatFs\core;.\src\fatFs\middlewares;.\src\fatFs\middlewares\option;.\src\fatFs\Target</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -529,12 +529,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Tests</GroupName>
-        </Group>
-        <Group>
-          <GroupName>Unity</GroupName>
-        </Group>
-        <Group>
           <GroupName>Debug</GroupName>
           <Files>
             <File>
@@ -545,10 +539,99 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Mocks</GroupName>
-        </Group>
-        <Group>
-          <GroupName>CMock</GroupName>
+          <GroupName>FatFs</GroupName>
+          <Files>
+            <File>
+              <FileName>user_diskio_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\user_diskio_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\Target\user_diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\middlewares\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\middlewares\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff_gen_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\middlewares\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>syscall.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\middlewares\option\syscall.c</FilePath>
+            </File>
+            <File>
+              <FileName>unicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\middlewares\option\unicode.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\core\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\App\fatfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\core\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>diskio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\middlewares\diskio.h</FilePath>
+            </File>
+            <File>
+              <FileName>ff.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\middlewares\ff.h</FilePath>
+            </File>
+            <File>
+              <FileName>ff_gen_drv.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\middlewares\ff_gen_drv.h</FilePath>
+            </File>
+            <File>
+              <FileName>ffconf_template.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\middlewares\ffconf_template.h</FilePath>
+            </File>
+            <File>
+              <FileName>integer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\middlewares\integer.h</FilePath>
+            </File>
+            <File>
+              <FileName>user_diskio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\Target\user_diskio.h</FilePath>
+            </File>
+            <File>
+              <FileName>user_diskio_spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\user_diskio_spi.h</FilePath>
+            </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\fatFs\Target\ffconf.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -594,6 +677,12 @@
           <targetInfo name="Target_test"/>
         </targetInfos>
       </component>
+      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="DMA" Cvendor="Keil" Cversion="1.7.6" condition="STM32F4 HAL">
+        <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
+        <targetInfos>
+          <targetInfo name="Target_test"/>
+        </targetInfos>
+      </component>
       <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="GPIO" Cvendor="Keil" Cversion="1.7.6" condition="STM32F4 HAL">
         <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
         <targetInfos>
@@ -607,6 +696,12 @@
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="RCC" Cvendor="Keil" Cversion="1.7.6" condition="STM32F4 HAL GPIO">
+        <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
+        <targetInfos>
+          <targetInfo name="Target_test"/>
+        </targetInfos>
+      </component>
+      <component Cclass="Device" Cgroup="STM32Cube HAL" Csub="SPI" Cvendor="Keil" Cversion="1.7.6" condition="STM32F4 HAL DMA">
         <package name="STM32F4xx_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.14.0"/>
         <targetInfos>
           <targetInfo name="Target_test"/>
