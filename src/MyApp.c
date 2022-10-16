@@ -6,7 +6,7 @@
 #include "main.h"
 
 #ifndef TEST
-#define runCLI main
+#define runCLI main2    // TODO, change back to main
 #endif
 
 /*

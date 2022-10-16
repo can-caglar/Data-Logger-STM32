@@ -387,26 +387,6 @@
               <FilePath>.\src\MyRCC.c</FilePath>
             </File>
             <File>
-              <FileName>MyCommon.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyCommon.h</FilePath>
-            </File>
-            <File>
-              <FileName>MyGPIO.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyGPIO.h</FilePath>
-            </File>
-            <File>
-              <FileName>MyRCC.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyRCC.h</FilePath>
-            </File>
-            <File>
-              <FileName>MyUSART.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyUSART.h</FilePath>
-            </File>
-            <File>
               <FileName>MyCommon.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyCommon.c</FilePath>
@@ -415,11 +395,6 @@
               <FileName>MyReceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyReceiver.c</FilePath>
-            </File>
-            <File>
-              <FileName>MyReceiver.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyReceiver.h</FilePath>
             </File>
             <File>
               <FileName>MyUSART.c</FileName>
@@ -437,24 +412,9 @@
               <FilePath>.\src\MyProcessor.c</FilePath>
             </File>
             <File>
-              <FileName>MyProcessor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyProcessor.h</FilePath>
-            </File>
-            <File>
               <FileName>MyTerminalUART.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyTerminalUART.c</FilePath>
-            </File>
-            <File>
-              <FileName>MyTerminalUART.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyTerminalUART.h</FilePath>
-            </File>
-            <File>
-              <FileName>MyApp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyApp.h</FilePath>
             </File>
             <File>
               <FileName>MyApp.c</FileName>
@@ -467,19 +427,9 @@
               <FilePath>.\src\Loop.c</FilePath>
             </File>
             <File>
-              <FileName>Loop.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\Loop.h</FilePath>
-            </File>
-            <File>
               <FileName>MyCLI.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\MyCLI.c</FilePath>
-            </File>
-            <File>
-              <FileName>MyCLI.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\MyCLI.h</FilePath>
             </File>
             <File>
               <FileName>button.c</FileName>
@@ -500,31 +450,6 @@
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\blinky\LED.c</FilePath>
-            </File>
-            <File>
-              <FileName>button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\blinky\button.h</FilePath>
-            </File>
-            <File>
-              <FileName>controller.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\blinky\controller.h</FilePath>
-            </File>
-            <File>
-              <FileName>global.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\blinky\global.h</FilePath>
-            </File>
-            <File>
-              <FileName>gpio_interrupts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\blinky\gpio_interrupts.h</FilePath>
-            </File>
-            <File>
-              <FileName>LED.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\blinky\LED.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -587,49 +512,14 @@
               <FilePath>.\src\fatFs\App\fatfs.c</FilePath>
             </File>
             <File>
-              <FileName>main.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\core\main.h</FilePath>
+              <FileName>stm32f4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\core\stm32f4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\middlewares\diskio.h</FilePath>
-            </File>
-            <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\middlewares\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ff_gen_drv.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\middlewares\ff_gen_drv.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\middlewares\ffconf_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>integer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\middlewares\integer.h</FilePath>
-            </File>
-            <File>
-              <FileName>user_diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\Target\user_diskio.h</FilePath>
-            </File>
-            <File>
-              <FileName>user_diskio_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\user_diskio_spi.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\fatFs\Target\ffconf.h</FilePath>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\core\stm32f4xx_it.c</FilePath>
             </File>
           </Files>
         </Group>

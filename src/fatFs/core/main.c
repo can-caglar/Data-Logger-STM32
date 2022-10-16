@@ -66,7 +66,7 @@ static void MX_SPI2_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-#if 1
+#if 1 // just for now
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -175,7 +175,7 @@ int main(void)
    for (unsigned long i = 0; i < 10; i++)
    {
        char write[50];
-       sprintf(write, "%lu:hi\n", i);
+       sprintf(write, "%lu:hi, is this working?\n", i);
        fres = f_write(&fil, write, strlen(write), &bytesWrote);
    }
    
