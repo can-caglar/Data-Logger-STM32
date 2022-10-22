@@ -13,7 +13,8 @@ SD card:
 - [x] Write a test app to use the SD card device w/SPI
     - [x] Try another SD card breakout
         - [-] Try on an Ardunio
-- [...] Treat the SD driver as a black box and add it to our current system.
+- [x] Treat the SD driver as a black box and add it to our current system.
+- [...] Add SD card functions to the CLI
 - [ ] Write a UART module with DMA that continuously 
 writes to the circular buffer which will be handled by the DMA.
 

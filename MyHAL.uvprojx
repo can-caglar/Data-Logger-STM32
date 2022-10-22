@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support;.\src\blinky;.\src\fatFs;.\src\fatFs\App;.\src\fatFs\core;.\src\fatFs\middlewares;.\src\fatFs\middlewares\option;.\src\fatFs\Target</IncludePath>
+              <IncludePath>.\test\support;.\src\blinky;.\src\fatFs;.\src\fatFs\App;.\src\fatFs\core;.\src\fatFs\middlewares;.\src\fatFs\middlewares\option;.\src\fatFs\Target;.\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -450,6 +450,11 @@
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\blinky\LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>MySD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MySD.c</FilePath>
             </File>
           </Files>
         </Group>

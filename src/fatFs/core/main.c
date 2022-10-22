@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
+#include "MySD.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,7 +84,7 @@ int main(void)
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config();
+  // SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -101,86 +102,11 @@ int main(void)
    FIL fil; // file handle
    FRESULT fres; // result after ops
    
-   fres = f_mount(&FatFs, "", 1);   // 1 = mount now
-   if (fres != FR_OK)
-   {
-       while(1)
-       {
-           volatile int a = 5;
-           while(1);
-       }
-   }
-   
-  //Let's get some statistics from the SD card
-  DWORD free_clusters, free_sectors, total_sectors;
-
-  FATFS* getFreeFs;
-
-  fres = f_getfree("", &free_clusters, &getFreeFs);
-  if (fres != FR_OK) 
-  {
-	while(1);
-  }
-  
-  //Formula comes from ChaN's documentation
-  total_sectors = (getFreeFs->n_fatent - 2) * getFreeFs->csize;
-  free_sectors = free_clusters * getFreeFs->csize;
-
-   //Now let's try to open file "test.txt"
-  fres = f_open(&fil, "test.txt", FA_READ);
-  if (fres != FR_OK) 
-  {
-	while(1);
-  }
-  
-  //Read 30 bytes from "test.txt" on the SD card
-  BYTE readBuf[30];
-
-  //We can either use f_read OR f_gets to get data out of files
-  //f_gets is a wrapper on f_read that does some string formatting for us
-  TCHAR* rres = f_gets((TCHAR*)readBuf, 30, &fil);
-  if(rres != 0) 
-  {
-	volatile int a = 5;
-  } 
-  else 
-  {
-	volatile int a = 5;
-  }
-  
-  f_close(&fil);
-  
-   fres = f_open(&fil, "write4.txt", FA_WRITE | FA_OPEN_APPEND | FA_CREATE_ALWAYS);
-   if (fres == FR_OK)
-   {
-       volatile int a = 5;
-   }
-   else
-   {
-       volatile int a = 5;
-   }
-   
-   char writeBuf[] = "this came from the stm32!";
-   UINT bytesWrote;
-   fres = f_write(&fil, writeBuf, strlen(writeBuf), &bytesWrote);
-   if (fres == FR_OK)
-   {
-       volatile int a = 5;
-   }
-   else
-   {
-       volatile int a = 5;
-   }
-   
-   for (unsigned long i = 0; i < 10; i++)
-   {
-       char write[50];
-       sprintf(write, "%lu:hi, is this working?\n", i);
-       fres = f_write(&fil, write, strlen(write), &bytesWrote);
-   }
-   
-   f_close(&fil);
-   f_mount(NULL, "", 0);
+   FRESULT err = MySD_Init("test2210.txt");
+   err = MySD_Write("hello world");
+   err = MySD_Init("test2.txt");
+   err = MySD_Write("helloWorld2");
+   MySD_Close();
 
   /* USER CODE END 2 */
 

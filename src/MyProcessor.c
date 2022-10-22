@@ -29,6 +29,7 @@ typedef enum
     CMD_HELP,
     CMD_SAY,
     CMD_SEE_ALL,
+    CMD_WRITESD,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -45,6 +46,7 @@ static struct
     [CMD_HELP] = {"help", cmdHelp, "Usage: help <command>"},
     [CMD_SAY] = {"say", cmdSay, "Usage: say <string>"},
     [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
+    [CMD_WRITESD] = {"writeSD", cmdSeeAll, "Usage: writeSD <text>"},
 };
 
 //
