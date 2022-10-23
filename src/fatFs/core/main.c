@@ -25,6 +25,12 @@
 #include <string.h>
 #include <stdio.h>
 #include "MySD.h"
+
+#include "MyApp.h"
+#include "MyCLI.h"
+#include "Loop.h"
+#include "controller.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,26 +104,22 @@ int main(void)
   /* USER CODE BEGIN 2 */
   
    HAL_Delay(1000); //a short delay is important to let the SD card settle
-   FATFS FatFs; // fats handle
-   FIL fil; // file handle
-   FRESULT fres; // result after ops
-   
-   FRESULT err = MySD_Init("test2210.txt");
-   err = MySD_Write("hello world");
-   err = MySD_Init("test2.txt");
-   err = MySD_Write("helloWorld2");
-   MySD_Close();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+  
+    MyCLI_Init();
+    run_controller();
+ 
   while (1)
   {
+      /* USER CODE BEGIN WHILE */
+      MyCLI_Run();
+  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
 #endif

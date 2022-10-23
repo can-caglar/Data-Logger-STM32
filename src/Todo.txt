@@ -8,21 +8,23 @@ to use the new UART handler if required.
 
 CLI:
 - [ ] Print a welcome message at start which tells users how to navigate
+- [ ] Refactor the string manipulation for the "MyProcessor" module
+- [ ] Handle malicious input - add a \0 to the incoming strings to limit size
 
 SD card:
 - [x] Write a test app to use the SD card device w/SPI
     - [x] Try another SD card breakout
         - [-] Try on an Ardunio
 - [x] Treat the SD driver as a black box and add it to our current system.
-- [...] Add SD card functions to the CLI
+- [x] Add SD card functions to the CLI
 - [ ] Write a UART module with DMA that continuously 
 writes to the circular buffer which will be handled by the DMA.
 
 Baud rate / Application Decider
-- [...] Make use of the blinky module, remove the adapters, make tests work
+- [x] Make use of the blinky module, remove the adapters, make tests work
     - [x] Mock the "system" HAL and eventually remove "system_hal.h/c"
-    - [ ] Re-develop the "gpio_interrupts" module via TDD.
-- [ ] Rewrite the button module so it is a DIP switch module instead
+    - [ ] Re-develop the "gpio_interrupts" module via TDD (currently not done with TDD)
+- [...] Rewrite the button module so it is a DIP switch module instead
 
 Possible Refactors:
 - [ ] The CLI to use the same UART module with circular buffer?

@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "MyProcessor.h"
+#include "mock_MySD.h"
 #include <string.h>
 
 #define LIST_OF_CMDS "help say seeAll writeSD"
@@ -102,15 +103,37 @@ void test_MyProcessor_sayCommand(void)
 
 // ******************** 'writeSD' command ********************
 
-#if 0
-void test_MyProcessor_writeSDCommand(void)
+void test_MyProcessor_writeSDCommandSuccess(void)
 {
-    MyProcessor_HandleCommandWithString("writeSD hello");
-    const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("\"hello\" has been written to SD card.", resp);
+    MySD_Init_ExpectAndReturn("cli.txt", FR_OK);
+    MySD_Write_ExpectAndReturn("hello there", FR_OK);
 
+    MyProcessor_HandleCommandWithString("writeSD hello there");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("\"hello there\" has been written to SD card.", resp);
 }
-#endif
+
+void test_MyProcessor_writeSDCommandFailInit(void)
+{
+    MySD_Init_ExpectAndReturn("cli.txt", FR_NOT_READY);
+
+    MyProcessor_HandleCommandWithString("writeSD hello there");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Could not initialise SD card.", resp);
+}
+
+void test_MyProcessor_writeSDCommandFailWrite(void)
+{
+    MySD_Init_ExpectAndReturn("cli.txt", FR_OK);
+    MySD_Write_ExpectAndReturn("hello there", FR_NOT_READY);
+
+    MyProcessor_HandleCommandWithString("writeSD hello there");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Failed to write to SD card.", resp);
+}
 
 // TODO, refactor!
 
