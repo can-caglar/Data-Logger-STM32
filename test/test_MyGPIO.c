@@ -506,8 +506,8 @@ static void enablePeripheralClocks(void)
     if (!enabled)
     {
         enabled = 1;
-        MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_C_e);
-        MyRCC_GPIOClockEnable(&(RCC->AHB1ENR), GPIO_PORT_D_e);
+        MyRCC_GPIOClockEnable(&(RCC->AHBENR), GPIO_PORT_C_e);
+        MyRCC_GPIOClockEnable(&(RCC->AHBENR), GPIO_PORT_D_e);
     }
 }
 

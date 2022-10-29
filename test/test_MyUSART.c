@@ -28,7 +28,7 @@ void setUp(void)
     SystemCoreClockUpdate(); // will set clock to 16Mhz
 
     // enable USART and GPIO clocks
-    MyRCC_USARTClockEnable(RCC_USART6_EN_REG, USART6_Mask);
+    MyRCC_USARTClockEnable(RCC_USART1_EN_REG, MY_USART_UART_RCC_MASK);
     MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, GPIO_PORT_C_e);
 
     // Configure GPIO pins used in USART
@@ -43,64 +43,64 @@ void setUp(void)
 
 void tearDown(void)
 {
-    memset(USART6, 0, sizeof(*USART6));
+    memset(USART1, 0, sizeof(*USART1));
 }
 
 void test_UsartInit(void)
 {
     // Put registers in some state so we know they are really being changed by code under test
-    CLR_BIT(USART_CR1_UE_Pos, USART6->CR1);
-    SET_BIT(USART_CR1_M_Pos, USART6->CR1);
-    CONF_BITS(USART_CR2_STOP_Msk, USART6->CR2, 0x3UL << 12);
-    USART6->BRR = 0;
-    CLR_BIT(USART_CR1_TE_Pos, USART6->CR1);
+    CLR_BIT(USART_CR1_UE_Pos, USART1->CR1);
+    SET_BIT(USART_CR1_M_Pos, USART1->CR1);
+    CONF_BITS(USART_CR2_STOP_Msk, USART1->CR2, 0x3UL << 12);
+    USART1->BRR = 0;
+    CLR_BIT(USART_CR1_TE_Pos, USART1->CR1);
 
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
 
-    TEST_ASSERT_BIT_HIGH(USART_CR1_UE_Pos, USART6->CR1);  // UE bit high
-    TEST_ASSERT_BIT_LOW(USART_CR1_M_Pos, USART6->CR1);   // M bit low (8 data bits)
-    TEST_ASSERT_BITS_LOW(USART_CR2_STOP_Msk, USART6->CR2);  // stop bits 0
-    TEST_ASSERT_EQUAL_HEX(0x341, USART6->BRR);  // 19200 BR at 16MHz
-    TEST_ASSERT_BIT_HIGH(USART_CR1_TE_Pos, USART6->CR1);  // send idle frame, enable transmitter
-    TEST_ASSERT_BIT_HIGH(USART_CR1_RE_Pos, USART6->CR1);  // receive enable
+    TEST_ASSERT_BIT_HIGH(USART_CR1_UE_Pos, USART1->CR1);  // UE bit high
+    TEST_ASSERT_BIT_LOW(USART_CR1_M_Pos, USART1->CR1);   // M bit low (8 data bits)
+    TEST_ASSERT_BITS_LOW(USART_CR2_STOP_Msk, USART1->CR2);  // stop bits 0
+    TEST_ASSERT_EQUAL_HEX(0x341, USART1->BRR);  // 19200 BR at 16MHz
+    TEST_ASSERT_BIT_HIGH(USART_CR1_TE_Pos, USART1->CR1);  // send idle frame, enable transmitter
+    TEST_ASSERT_BIT_HIGH(USART_CR1_RE_Pos, USART1->CR1);  // receive enable
 }
 
 void test_UsartWriteReturnsSucessIfTXEReady(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
 
-    testUsartWrite(USART6, READY);
+    testUsartWrite(USART1, READY);
 }
 
 void test_UsartWriteReturnsErrorIfTXENotReady(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
 
-    testUsartWrite(USART6, NOT_READY);
+    testUsartWrite(USART1, NOT_READY);
 }
 
 void test_UsartReadReturnsSuccessIfRXNE(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
-    testUsartRead(USART6, READY);
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
+    testUsartRead(USART1, READY);
 }
 
 void test_UsartReadRetursBadParamIfNullptrPassed(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyUSART_Read(USART6, 0));
+    TEST_ASSERT_EQUAL(ECODE_BAD_PARAM, MyUSART_Read(USART1, 0));
 }
 
 // TODO, add test to ensure we only read back an unsigned byte?
 
 void test_UsartReadReturnsErrorIfRXNENotReady(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
-    testUsartRead(USART6, NOT_READY);
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
+    testUsartRead(USART1, NOT_READY);
 }
 
 void test_LoopBack(void)
 {
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART6, USART_BR_19200));
+    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
 
     int count = 10000;
     while (count--);    // hw needs this delay. not sure why!
@@ -117,8 +117,8 @@ void test_WriteString(void)
 void test_UsartFunctionsShouldReturnErrorIfNotInitialised(void)
 {
     // Let TXE be ready
-    TXE(USART6, 1);
-    TEST_ASSERT_EQUAL(ECODE_NOT_INITIALISED, MyUSART_Write(USART6, 'A'));
+    TXE(USART1, 1);
+    TEST_ASSERT_EQUAL(ECODE_NOT_INITIALISED, MyUSART_Write(USART1, 'A'));
 }
 #endif
 
@@ -131,8 +131,8 @@ void test_UsartFunctionsShouldReturnErrorIfNotInitialised(void)
 // Does nothing on target
 static void TXE(USART_TypeDef* usart, unsigned char val)
 {
-    val = (val == 0) ? 0 : USART_SR_TXE;
-    CONF_BITS(USART_SR_TXE, usart->SR, val);
+    val = (val == 0) ? 0 : USART_ISR_TXE;
+    CONF_BITS(USART_ISR_TXE, usart->ISR, val);
 }
 
 // Enables or disables the RXNE bit in USART SR
@@ -140,27 +140,27 @@ static void TXE(USART_TypeDef* usart, unsigned char val)
 // Ends up clearing on target even if we write 1?
 static void RXNE(USART_TypeDef* usart, unsigned char val)
 {
-    val = (val == 0) ? 0 : USART_SR_RXNE;
-    CONF_BITS(USART_SR_RXNE, usart->SR, val);
+    val = (val == 0) ? 0 : USART_ISR_RXNE;
+    CONF_BITS(USART_ISR_RXNE, usart->ISR, val);
 }
 
 // Helps void fails in hardware tests by checking the value of TXE before making decision
 static void testUsartWrite(USART_TypeDef* usart, unsigned char txeVal)
 {
     // set or reset TXE
-    TXE(USART6, txeVal);    // TODO, change USART6 -> usart 
+    TXE(USART1, txeVal);    // TODO, change USART1 -> usart 
 
     // checking TXE as on hardware this register is readonly,
     // but on dev pc it will be whatever we set passed in
-    if (USART6->SR & USART_SR_TXE)
+    if (USART1->ISR & USART_ISR_TXE)
     {
         // TXE ready
-        TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Write(USART6, 0));
+        TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Write(USART1, 0));
     }
     else
     {
         // TXE not ready
-        TEST_ASSERT_EQUAL(ECODE_NOT_READY, MyUSART_Write(USART6, 0));
+        TEST_ASSERT_EQUAL(ECODE_NOT_READY, MyUSART_Write(USART1, 0));
     }
 }
 
@@ -173,7 +173,7 @@ static void testUsartRead(USART_TypeDef* usart, unsigned char rxneVal)
 
     // checking RXNE as on hardware this register is readonly,
     // but on dev pc it will be whatever we set passed in
-    if (usart->SR & USART_SR_RXNE)
+    if (usart->ISR & USART_ISR_RXNE)
     {
         // RXNE ready
         TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Read(usart, &output));
@@ -188,11 +188,11 @@ static void testUsartRead(USART_TypeDef* usart, unsigned char rxneVal)
 static inline void WAIT_FOR(USART_TypeDef* usart, io_register mask)
 {
     uint32_t countdown = 200000;
-    while (!(usart->SR & mask))
+    while (!(usart->ISR & mask))
     {
         if (countdown-- <= 0)
         {
-            TEST_FAIL_MESSAGE("Failed waiting for usart->SR mask!");
+            TEST_FAIL_MESSAGE("Failed waiting for usart->ISR mask!");
         }
     }
 }
@@ -205,16 +205,16 @@ static void doLoopbackTest(unsigned char transmitByte)
     // when testing on hardware, requires the RX/TX lines
     // to be wired together
 
-    TXE(USART6, READY);
-    WAIT_FOR(USART6, USART_SR_TXE);  // only waits on target
+    TXE(USART1, READY);
+    WAIT_FOR(USART1, USART_ISR_TXE);  // only waits on target
 
-    err =  MyUSART_Write(USART6, transmitByte);
+    err =  MyUSART_Write(USART1, transmitByte);
     TEST_ASSERT_EQUAL(ECODE_OK, err);
 
-    RXNE(USART6, READY);
-    WAIT_FOR(USART6, USART_SR_RXNE);  // only waits on target
+    RXNE(USART1, READY);
+    WAIT_FOR(USART1, USART_ISR_RXNE);  // only waits on target
 
-    err = MyUSART_Read(USART6, &receivedByte);
+    err = MyUSART_Read(USART1, &receivedByte);
     TEST_ASSERT_EQUAL(ECODE_OK, err);
     TEST_ASSERT_EQUAL(transmitByte, receivedByte);  // the loopback test
 }
@@ -229,7 +229,7 @@ static void doLoopbackTest(unsigned char transmitByte)
 
 Requirements:
 - [ ] Word size is fixed at 8
-- [ ] Only two USARTs allowed for now, USART6 and USART1?
+- [ ] Only two USARTs allowed for now, USART1 and USART1?
 - [ ] No DMA
 - [ ] Baud rate can be configured
 - [ ] Always over sampling 16 (0)

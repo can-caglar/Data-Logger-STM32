@@ -33,8 +33,9 @@
   :test:
     - +:test/**
   :include:
-    - C:/Keil_v5/ARM/PACK/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    - C:/Keil_v5/ARM/PACK/Keil/STM32F0xx_DFP/2.1.1/Drivers/CMSIS/Device/ST/STM32F0xx/Include
     - C:/Keil_v5/ARM/PACK/ARM/CMSIS/5.3.0/CMSIS/Include
+    - C:/Keil_v5/ARM/PACK/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Inc
   :source:
     - src/**
   :support:
@@ -47,7 +48,8 @@
   # in order to add common defines:
   #  1) remove the trailing [] from the :common: section
   #  2) add entries to the :common: section (e.g. :test: has TEST defined)
-  :common: &common_defines []
+  :common: &common_defines
+    - STM32F031x6
   :test:
     - *common_defines
     - TEST

@@ -72,6 +72,8 @@ typedef enum
     MAX_GPIO_PINS
 } GPIO_Pin_Number_e;
 
+// TODO, this information happens to be in two places
+// see MY_USART
 typedef enum
 {
     USART1_Mask = (0x1U << 14),
@@ -106,6 +108,8 @@ typedef volatile uint32_t io_register;
 
 #define MY_USART        USART1  
 #define MY_USART_GPIO   GPIOA
+#define MY_USART_GPIO_RCC_MASK  (0x1UL << 17)
+#define MY_USART_UART_RCC_MASK  (0x1UL << 14)
 #define MY_USART_TX     pin2_mask 
 #define MY_USART_RX     pin3_mask 
 #define MY_USART_ALT    GPIO_ALTF_1
