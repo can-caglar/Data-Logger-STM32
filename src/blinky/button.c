@@ -1,13 +1,13 @@
-#include "stm32f4xx_hal_rcc.h"
-#include "stm32f4xx_hal_gpio.h"
-#include "stm32f4xx_hal.h"
+#include "stm32f0xx_hal_rcc.h"
+#include "stm32f0xx_hal_gpio.h"
+#include "stm32f0xx_hal.h"
 
 #include "global.h"
 #include "button.h"
 #include "gpio_interrupts.h"
 
 // Dev board specific parameters
-#define BUTTON_PIN GPIO_PIN_0
+#define BUTTON_PIN GPIO_PIN_8
 static GPIO_TypeDef* const _btnPort = GPIOA;
 static GPIO_InitTypeDef _btnGpio = 
 {
@@ -44,7 +44,7 @@ void button_init(void)
 
     HAL_GPIO_Init(GPIOA, &_btnGpio);
     gpio_register_interrupt_callback(BUTTON_PIN, button_irq);
-    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+    HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 
 void button_close(void)

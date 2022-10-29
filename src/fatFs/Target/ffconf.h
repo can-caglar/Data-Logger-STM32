@@ -23,7 +23,7 @@
 / Additional user header to be used
 /-----------------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32f4xx_hal.h"
+#include "stm32f0xx_hal.h"
 
 /*-----------------------------------------------------------------------------/
 / Function Configurations

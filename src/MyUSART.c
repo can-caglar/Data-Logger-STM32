@@ -25,9 +25,9 @@ Error_Code_e MyUSART_Init(USART_TypeDef* USART, const USART_BR_e baud)
 
 Error_Code_e MyUSART_Write(USART_TypeDef* usart, const unsigned char byte)
 {
-    if (usart->SR & USART_SR_TXE)
+    if (usart->ISR & USART_ISR_TXE)
     {
-        usart->DR = byte;
+        usart->TDR = byte;
         return ECODE_OK;
     }
     return ECODE_NOT_READY;
@@ -42,9 +42,9 @@ Error_Code_e MyUSART_Read(USART_TypeDef* usart, unsigned char* outchar)
     {
         return ECODE_BAD_PARAM;
     }
-    if (usart->SR & USART_SR_RXNE)
+    if (usart->ISR & USART_ISR_RXNE)
     {
-        *outchar = usart->DR;
+        *outchar = usart->RDR;
         return ECODE_OK;
     }
     return ECODE_NOT_READY;

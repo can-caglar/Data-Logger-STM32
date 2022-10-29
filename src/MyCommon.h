@@ -74,8 +74,7 @@ typedef enum
 
 typedef enum
 {
-    USART1_Mask = (0x1U << 4),
-    USART6_Mask = (0x1U << 5),
+    USART1_Mask = (0x1U << 14),
 } USART_Mask_e;
 
 typedef enum
@@ -105,10 +104,10 @@ typedef enum
 
 typedef volatile uint32_t io_register;
 
-#define MY_USART        USART6  
-#define MY_USART_GPIO   GPIOC
-#define MY_USART_TX     pin6_mask 
-#define MY_USART_RX     pin7_mask 
-#define MY_USART_ALT    GPIO_ALTF_8 
+#define MY_USART        USART1  
+#define MY_USART_GPIO   GPIOA
+#define MY_USART_TX     pin2_mask 
+#define MY_USART_RX     pin3_mask 
+#define MY_USART_ALT    GPIO_ALTF_1
 
 #endif

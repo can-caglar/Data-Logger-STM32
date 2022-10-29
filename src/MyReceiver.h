@@ -9,7 +9,7 @@ typedef enum
 } ReceiverEcode_e;
 
 #include "MyCommon.h"
-#include "stm32f407xx.h"
+#include "stm32f031x6.h"
 
 ReceiverEcode_e MyReceiver_Receive(void);
 void MyReceiver_Transmit(const char* buf);

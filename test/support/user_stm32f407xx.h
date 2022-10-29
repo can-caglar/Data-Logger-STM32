@@ -1,7 +1,7 @@
 #ifndef FAKE_STM32F4XX_H_INCLUDED
 #define FAKE_STM32F4XX_H_INCLUDED
 
-#include <stm32f407xx.h>
+#include <stm32f031x6.h>
 
 // Target shall use actual registers. Dev machine will use fake ones in RAM.
 // To use actual registers, peripheral clocks have to be enabled.
