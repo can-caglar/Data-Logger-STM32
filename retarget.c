@@ -32,6 +32,8 @@
 
 #include <stm32f0xx.h> 
 
+#include "MyUSART.h"
+
 #pragma import(__use_no_semihosting_swi) 
 
 struct __FILE { int handle; /* Add whatever you need here */ }; 
@@ -42,11 +44,8 @@ FILE __stdin;
 
 int fputc(int c, FILE *f) { 
 
-   // put char 
-
-  //usart_send_byte(c); 
-
-  return ITM_SendChar(c); 
+  // put char 
+  return MyUSART_Write(MY_USART, c); 
 } 
 
 int fgetc(FILE *f) { 

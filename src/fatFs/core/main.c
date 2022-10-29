@@ -59,7 +59,6 @@ SPI_HandleTypeDef hspi2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_SPI2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -100,7 +99,6 @@ int main(void)
   MX_GPIO_Init();
   MX_FATFS_Init();
   MX_SPI1_Init();
-  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   
    HAL_Delay(1000); //a short delay is important to let the SD card settle
