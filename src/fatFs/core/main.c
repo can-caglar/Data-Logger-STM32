@@ -30,6 +30,7 @@
 #include "MyCLI.h"
 #include "Loop.h"
 #include "controller.h"
+#include "MyDIPSwitch.h"
 
 /* USER CODE END Includes */
 
@@ -108,6 +109,7 @@ int main(void)
   /* Infinite loop */
   
    MyCLI_Init();
+   MyDIP_Init();
    run_controller();
  
   while (1)

@@ -1,9 +1,10 @@
 #include "unity.h"
 #include "MyProcessor.h"
 #include "mock_MySD.h"
+#include "mock_MyDipSwitch.h"
 #include <string.h>
 
-#define LIST_OF_CMDS "help say seeAll writeSD"
+#define LIST_OF_CMDS "help say seeAll writeSD readDip"
 
 void setUp()
 {
@@ -133,6 +134,19 @@ void test_MyProcessor_writeSDCommandFailWrite(void)
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Failed to write to SD card.", resp);
+}
+
+// ******************** 'readDip' command ********************
+
+void test_MyProcessor_readDip(void)
+{
+    MyDIP_Init_Expect();
+    MyDIP_Read_ExpectAndReturn(5);
+    
+    MyProcessor_HandleCommandWithString("readDip");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("DIP Switch: 5", resp);
 }
 
 // TODO, refactor!

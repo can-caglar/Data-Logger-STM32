@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "MySD.h"
+#include "MyDipSwitch.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 50
@@ -20,11 +21,12 @@ static char* commandPhrase;
 
 // Forward declarations
 
-// Commands
+// Command handlers
 static void cmdHelp(void);
 static void cmdSay(void);
 static void cmdSeeAll(void);
 static void cmdWriteSD(void);
+static void cmdReadDip(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -37,6 +39,7 @@ typedef enum
     CMD_SAY,
     CMD_SEE_ALL,
     CMD_WRITESD,
+    CMD_READDIP,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -53,6 +56,7 @@ static struct
     [CMD_HELP] = {"help", cmdHelp, "Usage: help <command>"},
     [CMD_SAY] = {"say", cmdSay, "Usage: say <string>"},
     [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
+    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage:"},
     [CMD_WRITESD] = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
 };
 
@@ -172,6 +176,13 @@ static void cmdWriteSD(void)
     {
         sprintf(cmdResponse, "Could not initialise SD card.");
     }
+}
+
+static void cmdReadDip(void)
+{
+    MyDIP_Init();
+    uint8_t res = MyDIP_Read();
+    sprintf(cmdResponse, "DIP Switch: %d", res);
 }
 
 /********************* helper functions **************/
