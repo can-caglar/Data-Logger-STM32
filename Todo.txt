@@ -25,13 +25,14 @@ Baud rate / Application Decider
 - [x] Make use of the blinky module, remove the adapters, make tests work
     - [x] Mock the "system" HAL and eventually remove "system_hal.h/c"
     - [ ] Re-develop the "gpio_interrupts" module via TDD (currently not done with TDD)
-- [...] Rewrite the button module so it is a DIP switch module instead
+- [x] Create a 4-way DIP switch module
 
 Possible Refactors:
 - [ ] The CLI to use the same UART module with circular buffer?
 
-Files:
+Files / folders:
 - [ ] Tidy file / folder structure in Keil and in the src folder
+- [ ] Rename modules (MySM is no longer a state machine, and DIP module uses both Dip and DIP )
 
 Realtime clock:
 - [ ] Add realtime clock for SD card saving and logging
