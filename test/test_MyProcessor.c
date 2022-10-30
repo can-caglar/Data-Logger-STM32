@@ -1,10 +1,11 @@
+#include <string.h>
 #include "unity.h"
 #include "MyProcessor.h"
 #include "mock_MySD.h"
 #include "mock_MyDipSwitch.h"
-#include <string.h>
+#include "mock_LED.h"
 
-#define LIST_OF_CMDS "help say seeAll writeSD readDip"
+#define LIST_OF_CMDS "help say seeAll writeSD readDip led"
 
 void setUp()
 {
@@ -66,6 +67,11 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " readDip");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: readDip", resp);
+
+    // "help led"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " led");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: led <on/off>", resp);
 }
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
@@ -169,6 +175,41 @@ void test_MyProcessor_readDip(void)
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("DIP Switch: 5", resp);
+}
+
+// ******************** 'led' command ********************
+void test_MyProcessor_led_on(void)
+{
+    led_init_Expect();
+    led_on_Expect();
+
+    MyProcessor_HandleCommandWithString("led on");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("LED is now ON.", resp);
+}
+
+void test_MyProcessor_led_off(void)
+{
+    led_init_Expect();
+    led_off_Expect();
+
+    MyProcessor_HandleCommandWithString("led off");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("LED is now OFF.", resp);
+}
+
+void test_MyProcessor_led_0_param(void)
+{
+    MyProcessor_HandleCommandWithString("led");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Missing parameter!", resp);
+}
+
+void test_MyProcessor_led_wrong_param(void)
+{
+    MyProcessor_HandleCommandWithString("led onn");
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Invalid parameter: \"onn\".", resp);
 }
 
 // TODO, refactor!

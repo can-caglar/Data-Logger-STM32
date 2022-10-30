@@ -4,6 +4,7 @@
 
 #include "MySD.h"
 #include "MyDipSwitch.h"
+#include "LED.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 50
@@ -27,6 +28,7 @@ static void cmdSay(void);
 static void cmdSeeAll(void);
 static void cmdWriteSD(void);
 static void cmdReadDip(void);
+static void cmdLed(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -40,6 +42,7 @@ typedef enum
     CMD_SEE_ALL,
     CMD_WRITESD,
     CMD_READDIP,
+    CMD_LED,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -56,8 +59,9 @@ static struct
     [CMD_HELP]    = {"help", cmdHelp, "Usage: help <command>"},
     [CMD_SAY]     = {"say", cmdSay, "Usage: say <string>"},
     [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
-    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage: readDip"},
     [CMD_WRITESD] = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
+    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage: readDip"},
+    [CMD_LED]     = {"led", cmdLed, "Usage: led <on/off>"},
 };
 
 //
@@ -185,6 +189,34 @@ static void cmdReadDip(void)
     MyDIP_Init();
     uint8_t res = MyDIP_Read();
     sprintf(cmdResponse, "DIP Switch: %d", res);
+}
+
+static void cmdLed(void)
+{
+    char* token = strtok(NULL, " ");
+    if (token != NULL)
+    {
+        if (strcmp(token, "on") == 0)
+        {
+            led_init();
+            led_on();
+            updateResponse("LED is now ON.");
+        }
+        else if (strcmp(token, "off") == 0)
+        {
+            led_init();
+            led_off();
+            updateResponse("LED is now OFF.");
+        }
+        else
+        {
+            sprintf(cmdResponse, "Invalid parameter: \"%s\".", token);
+        }
+    }
+    else
+    {
+        updateResponse("Missing parameter!");
+    }
 }
 
 /********************* helper functions **************/
