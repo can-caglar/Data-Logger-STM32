@@ -461,6 +461,16 @@
               <FileType>1</FileType>
               <FilePath>.\src\MyDipSwitch.c</FilePath>
             </File>
+            <File>
+              <FileName>AppDecider.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\AppDecider.c</FilePath>
+            </File>
+            <File>
+              <FileName>SerialSnooper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\SerialSnooper.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

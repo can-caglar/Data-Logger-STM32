@@ -2,23 +2,35 @@
 #include "MyCLI.h"
 #include "Loop.h"
 #include "controller.h"
+#include "AppDecider.h"
+#include "SerialSnooper.h"
 
 #include "main.h"
 
 #ifndef TEST
-#define runCLI main2    // TODO, change back to main
+#define runApp main2    // TODO, change back to main
 #endif
 
 /*
 int main(void)
 */
-int runCLI(void)
+int runApp(void)
 {
-    MyCLI_Init();
-    run_controller();
+    AppDecider_Init();
     
-    LOOP
+    if (AppDecider_Decide() == APP_CLI)
     {
-        MyCLI_Run();
+        MyCLI_Init();
+        LOOP
+        {
+            MyCLI_Run();
+        }
+    }
+    else
+    {
+        LOOP
+        {
+            SerialSnooper_Run();
+        } 
     }
 }

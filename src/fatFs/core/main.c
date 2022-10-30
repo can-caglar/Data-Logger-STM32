@@ -50,7 +50,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
-SPI_HandleTypeDef hspi2;
 
 /* USER CODE BEGIN PV */
 
@@ -73,7 +72,7 @@ static void MX_SPI1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-#if 1 // just for now
+#ifndef runApp // just for now
 int main(void)
 {
   /* USER CODE BEGIN 1 */

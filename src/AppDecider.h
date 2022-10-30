@@ -7,7 +7,7 @@ typedef enum Applications
     APP_SNOOPING
 } Applications;
 
-void AppDecider_Init();
-Applications AppDecider_Decide();
+void AppDecider_Init(void);
+Applications AppDecider_Decide(void);
 
 #endif
