@@ -11,8 +11,8 @@
 static GPIO_InitTypeDef _btnGpio = 
 {
     .Pin = BUTTON_PIN,
-    .Mode = GPIO_MODE_IT_RISING,
-    .Pull = GPIO_NOPULL
+    .Mode = GPIO_MODE_IT_FALLING,
+    .Pull = GPIO_PULLUP
 };
 
 // Debounce vars

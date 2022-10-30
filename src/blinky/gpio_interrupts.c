@@ -21,7 +21,7 @@ void gpio_register_interrupt_callback(uint16_t pin, irq_func func)
 }
 
 // For pin 0s
-void EXTI0_IRQHandler(void)
+void EXTI0_1_IRQHandler(void)
 {
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }

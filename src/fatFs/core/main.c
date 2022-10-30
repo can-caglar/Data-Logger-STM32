@@ -107,8 +107,8 @@ int main(void)
 
   /* Infinite loop */
   
-    MyCLI_Init();
-    run_controller();
+   MyCLI_Init();
+   run_controller();
  
   while (1)
   {

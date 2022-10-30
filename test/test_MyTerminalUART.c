@@ -29,7 +29,7 @@ void test_MyTerminalUART_Init_InitialisationInitsKnownPins(void)
     };
     
     // TODO, find out why user_stm32f407xx can't be included instead
-    MyRCC_GPIOClockEnable_ExpectAndReturn(&(RCC->AHBENR), MY_USART_GPIO_RCC_MASK, ECODE_OK);
+    MyRCC_GPIOClockEnable_ExpectAndReturn(&(RCC->AHBENR), 17, ECODE_OK);
     MyRCC_USARTClockEnable_ExpectAndReturn(&(RCC->APB2ENR), MY_USART_UART_RCC_MASK, ECODE_OK);
 
     MyGPIO_Init_ExpectAndReturn(&expectedStruct, ECODE_OK);

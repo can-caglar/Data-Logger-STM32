@@ -31,8 +31,8 @@ void test_buttonInit(void)
     GPIO_InitTypeDef gpio = 
     {
         .Pin = GPIO_PIN_0,
-        .Mode = GPIO_MODE_IT_RISING,
-        .Pull = GPIO_NOPULL,
+        .Mode = GPIO_MODE_IT_FALLING,
+        .Pull = GPIO_PULLUP,
     };
 
     MY_HAL_RCC_GPIOB_CLK_ENABLE_Expect();
