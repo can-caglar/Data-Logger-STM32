@@ -40,11 +40,13 @@ char MyTerminalUART_Read(void)
     return val;
 }
 
+// Writing carriage return will write newline automatically
+// as well as the newline denoter
 void MyTerminalUART_Write(char value)
 {
     while (MyUSART_Write(MY_USART, value) != ECODE_OK);
 
-    if (value == '\r')  // treat \r uniquely. write a bunch more stuff than \r
+    if (value == '\r')  // treat \r uniquely and write more things to terminal.
     {
         MyTerminalUART_Write('\n');
         MyTerminalUART_WriteString(NEW_LINE_DENOTER);

@@ -1,6 +1,12 @@
 #include "MyCLI.h"
 #include "MyReceiver.h"
 #include "MyProcessor.h"
+#include "MyCommon.h"
+
+#define INTRO_STR \
+    "\r"\
+    "********* SERIAL SNOOPER V1.0 *********\r"\
+    "Enter \"seeAll\" to see list of commands"
 
 void MyCLI_Run(void)
 {
@@ -23,5 +29,6 @@ void MyCLI_Run(void)
 void MyCLI_Init(void)
 {
     MyReceiver_Init();
+    MyReceiver_Transmit(INTRO_STR);
 }
 

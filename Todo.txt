@@ -1,13 +1,14 @@
 ---
 
-# Data logger:
+# Data Logger Tasks:
 
 - [ ] Perhaps write a new UART handler module,
 leave the CLI one as it is for now. we can refactor the CLI module
 to use the new UART handler if required.
 
 CLI:
-- [ ] Print a welcome message at start which tells users how to navigate
+- [x] Print a welcome message at start which tells users how to navigate
+    - [ ] Build the welcome message using variables in modules
 - [ ] Refactor the string manipulation for the "MyProcessor" module
 - [ ] Handle malicious input - add a \0 to the incoming strings to limit size
 
@@ -34,6 +35,9 @@ Files:
 
 Realtime clock:
 - [ ] Add realtime clock for SD card saving and logging
+
+Misc:
+- [ ] Add versioning which displays on UART
 
 Future:
 - [ ] Add small OLED(?) screen

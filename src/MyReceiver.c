@@ -50,6 +50,7 @@ ReceiverEcode_e MyReceiver_Receive(void)
     return receiveState;
 }
 
+// Writes a line to the terminal
 void MyReceiver_Transmit(const char* buf)
 {
     if (buf)
