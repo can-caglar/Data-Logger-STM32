@@ -10,10 +10,10 @@ void test_init(void)
 
 void test_read(void)
 {
-    MyDIP_Read_ExpectAndReturn(0);
+    MyDIP_Read_ExpectAndReturn(0xF);
     TEST_ASSERT_EQUAL(APP_CLI, AppDecider_Decide());
 
-    for (int i = 1; i < 16; i++)
+    for (int i = 0; i < 0xF; i++)
     {
         MyDIP_Read_ExpectAndReturn(i);
         TEST_ASSERT_EQUAL(APP_SNOOPING, AppDecider_Decide());

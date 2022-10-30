@@ -4,12 +4,14 @@
 #include "mock_controller.h"
 #include "mock_AppDecider.h"
 #include "mock_SerialSnooper.h"
+#include "mock_main.h"
 #include "Loop.h"
 
 void test_App_CLI(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
+    Fatfs_Init_Expect();
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_CLI);
 
@@ -26,9 +28,11 @@ void test_App_Snooping(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
+    Fatfs_Init_Expect();
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
 
+    SerialSnooper_Init_Expect();
     // expecting 3 calls
     SerialSnooper_Run_Expect();
     SerialSnooper_Run_Expect();

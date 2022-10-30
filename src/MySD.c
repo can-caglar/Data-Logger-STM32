@@ -5,7 +5,7 @@
 static FATFS FatFs; // fats handle
 static FIL file; // fats handle
 static const BYTE writeMode = FA_WRITE | FA_OPEN_APPEND;
-uint8_t mounted;
+static uint8_t mounted;
 
 FRESULT MySD_Init(const char* filename)
 {

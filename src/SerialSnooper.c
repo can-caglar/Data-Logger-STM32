@@ -1,6 +1,11 @@
 #include "SerialSnooper.h"
 
-void SerialSnooper_Run()
+void SerialSnooper_Init(void)
 {
     
+}
+
+void SerialSnooper_Run()
+{
+
 }

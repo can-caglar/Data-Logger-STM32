@@ -8,7 +8,7 @@
 #include "main.h"
 
 #ifndef TEST
-#define runApp main2    // TODO, change back to main
+#define runApp main    // TODO, change back to main
 #endif
 
 /*
@@ -16,6 +16,7 @@ int main(void)
 */
 int runApp(void)
 {
+    Fatfs_Init();
     AppDecider_Init();
     
     if (AppDecider_Decide() == APP_CLI)
@@ -28,9 +29,11 @@ int runApp(void)
     }
     else
     {
+        SerialSnooper_Init();
         LOOP
         {
             SerialSnooper_Run();
         } 
     }
+    // never returns
 }

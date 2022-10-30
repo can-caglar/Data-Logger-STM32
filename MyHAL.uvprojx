@@ -522,11 +522,6 @@
               <FilePath>.\src\fatFs\middlewares\option\unicode.c</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\fatFs\core\main.c</FilePath>
-            </File>
-            <File>
               <FileName>fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\fatFs\App\fatfs.c</FilePath>
@@ -540,6 +535,11 @@
               <FileName>stm32f0xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\fatFs\core\stm32f0xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>main_fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\fatFs\core\main_fatfs.c</FilePath>
             </File>
           </Files>
         </Group>
