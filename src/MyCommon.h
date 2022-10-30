@@ -106,6 +106,7 @@ typedef enum
 
 typedef volatile uint32_t io_register;
 
+// USART
 #define MY_USART        USART1  
 #define MY_USART_GPIO   GPIOA
 #define MY_USART_GPIO_RCC_MASK  (0x1UL << 17)
@@ -113,5 +114,15 @@ typedef volatile uint32_t io_register;
 #define MY_USART_TX     pin2_mask 
 #define MY_USART_RX     pin3_mask 
 #define MY_USART_ALT    GPIO_ALTF_1
+
+// LED
+#define LED_GPIO_PORT   GPIOB
+#define LED_GPIO_PIN    GPIO_PIN_3
+#define LED_GPIO_CLK_ENABLE __HAL_RCC_GPIOB_CLK_ENABLE
+
+// Button
+#define BUTTON_PIN GPIO_PIN_0
+#define BUTTON_PORT GPIOB
+#define BUTTON_CLK_ENABLE __HAL_RCC_GPIOB_CLK_ENABLE
 
 #endif

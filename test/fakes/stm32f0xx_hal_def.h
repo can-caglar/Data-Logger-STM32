@@ -1,7 +1,7 @@
 #ifndef MY_FAKE_STM32F4xx_HAL_DEF
 #define MY_FAKE_STM32F4xx_HAL_DEF
 
-#include "stm32f4xx.h"
+#include "stm32f031x6.h"
 #include <stddef.h>
 
 typedef enum 

@@ -3,6 +3,7 @@
         "*.c": "c",
         "string.h": "c",
         "unity_helper.h": "c",
-        "stm32f4xx_hal_rcc.h": "c"
+        "stm32f4xx_hal_rcc.h": "c",
+        "led.h": "c"
     }
 }

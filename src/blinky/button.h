@@ -1,8 +1,6 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-// Button is on PA0
-
 typedef void(*obs_func)(void);
 
 void button_init(void);

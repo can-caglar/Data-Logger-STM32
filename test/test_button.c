@@ -3,10 +3,11 @@
 #include "mock_gpio_interrupts.h"
 #include "unity_helper.h"
 
-#include "mock_stm32f4xx_hal_rcc_ex.h"
-#include "mock_stm32f4xx_hal_gpio.h"
-#include "mock_stm32f4xx_hal_cortex.h"
-#include "mock_stm32f4xx_hal.h"
+#include "mock_stm32f0xx_hal_rcc_ex.h"
+#include "mock_stm32f0xx_hal_rcc.h"
+#include "mock_stm32f0xx_hal_gpio.h"
+#include "mock_stm32f0xx_hal_cortex.h"
+#include "mock_stm32f0xx_hal.h"
 
 extern void button_irq(void);
 
@@ -34,13 +35,13 @@ void test_buttonInit(void)
         .Pull = GPIO_NOPULL,
     };
 
-    MY_HAL_RCC_GPIOA_CLK_ENABLE_Expect();
+    MY_HAL_RCC_GPIOB_CLK_ENABLE_Expect();
     
-    HAL_GPIO_Init_Expect(GPIOA, &gpio);
+    HAL_GPIO_Init_Expect(GPIOB, &gpio);
 
     gpio_register_interrupt_callback_Expect(GPIO_PIN_0, button_irq);
     
-    HAL_NVIC_EnableIRQ_Expect(EXTI0_IRQn);
+    HAL_NVIC_EnableIRQ_Expect(EXTI0_1_IRQn);
 
     button_init();
 
@@ -64,7 +65,7 @@ void test_button_pressed_debounce(void)
     // 50 ms later, press shall go through
     TEST_ASSERT_EQUAL_INT(0, testVar);
     HAL_GetTick_ExpectAndReturn(60);
-    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
     // gpio_read_ExpectAndReturn(GH_PORT_A, GH_PIN_0, 1);
     button_irq();
     TEST_ASSERT_EQUAL_INT(1, button_pressed());
@@ -96,7 +97,7 @@ void fake_press_button(void)
     TEST_ASSERT_EQUAL_INT(0, button_pressed());
 
     HAL_GetTick_ExpectAndReturn(50);
-    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_GPIO_ReadPin_ExpectAndReturn(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
     button_irq();
     TEST_ASSERT_EQUAL_INT(1, button_pressed());
 }

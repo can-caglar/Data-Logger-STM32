@@ -24,7 +24,7 @@ void MyTerminalUART_Init(void)
         terminalUartGpio.pin_mask = (MY_USART_RX | MY_USART_TX);
 
         // enable clocks
-        MyRCC_GPIOClockEnable(&(RCC->AHBENR), (1UL << 17)); // TODO, magic numbers
+        MyRCC_GPIOClockEnable(&(RCC->AHBENR), 17); // TODO, magic numbers
         MyRCC_USARTClockEnable(&(RCC->APB2ENR), (0x1UL << 14)); // TODO, magic numbers
 
         MyGPIO_Init(&terminalUartGpio);

@@ -2,8 +2,7 @@
 #include "controller.h"
 #include "mock_button.h"
 #include "mock_LED.h"
-
-#include "mock_stm32f4xx_hal.h"
+#include "mock_stm32f0xx_hal.h"
 
 extern void handleButton(void);
 

@@ -12,17 +12,15 @@
 
 #include <stdint.h>
 
-// GPIOA and GPIOB uses pins used for debugging/jtag, so skipping those
-// GPIOA for SWDIO, and GPIOB for jtag (used in printf)
-extern GPIO_TypeDef FakeGPIOD;
-extern GPIO_TypeDef FakeGPIOC;
+extern GPIO_TypeDef FakeGPIOA;
+extern GPIO_TypeDef FakeGPIOB;
 extern RCC_TypeDef  FakeRCC;
-extern USART_TypeDef FakeUSART6;
+extern USART_TypeDef FakeUSART1;
 
-#define GPIOD (&FakeGPIOD)
-#define GPIOC (&FakeGPIOC)
+#define GPIOA (&FakeGPIOA)
+#define GPIOB (&FakeGPIOB)
 #define RCC   (&FakeRCC)
-#define USART6 (&FakeUSART6)
+#define USART1 (&FakeUSART1)
 
 extern uint32_t SystemCoreClock;
 void SystemCoreClockUpdate(void);
@@ -34,6 +32,5 @@ void SystemCoreClockUpdate(void);
 // Common to all
 #define RCC_GPIO_EN_REG (&(RCC->AHBENR))
 #define RCC_USART1_EN_REG (&(RCC->APB2ENR))
-#define RCC_USART6_EN_REG (&(RCC->APB2ENR))
 
 #endif

@@ -14,8 +14,6 @@ static void TXE(USART_TypeDef* usart, unsigned char val);
 static void RXNE(USART_TypeDef* usart, unsigned char val);
 static void testUsartWrite(USART_TypeDef* usart, unsigned char txeVal);
 static void testUsartRead(USART_TypeDef* usart, unsigned char rxneVal);
-static inline void WAIT_FOR(USART_TypeDef* usart, io_register mask);
-static void doLoopbackTest(unsigned char transmitByte);
 
 enum
 {
@@ -28,11 +26,11 @@ void setUp(void)
     SystemCoreClockUpdate(); // will set clock to 16Mhz
 
     // enable USART and GPIO clocks
-    MyRCC_USARTClockEnable(RCC_USART1_EN_REG, MY_USART_UART_RCC_MASK);
+    MyRCC_USARTClockEnable(RCC_USART1_EN_REG, USART1_Mask);
     MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, GPIO_PORT_C_e);
 
     // Configure GPIO pins used in USART
-    UARTGPIO.gpio_register = MY_USART_GPIO;
+    UARTGPIO.gpio_register = GPIOA;
     UARTGPIO.mode = GPIO_ALT;
     UARTGPIO.alt_func = MY_USART_ALT;
     UARTGPIO.output_type = GPIO_PUSH_PULL;
@@ -96,21 +94,6 @@ void test_UsartReadReturnsErrorIfRXNENotReady(void)
 {
     TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
     testUsartRead(USART1, NOT_READY);
-}
-
-void test_LoopBack(void)
-{
-    TEST_ASSERT_EQUAL(ECODE_OK, MyUSART_Init(USART1, USART_BR_19200));
-
-    int count = 10000;
-    while (count--);    // hw needs this delay. not sure why!
-    doLoopbackTest('C');
-    doLoopbackTest(255);
-}
-
-void test_WriteString(void)
-{
-    
 }
 
 #if 0
@@ -185,53 +168,20 @@ static void testUsartRead(USART_TypeDef* usart, unsigned char rxneVal)
     }
 }
 
-static inline void WAIT_FOR(USART_TypeDef* usart, io_register mask)
-{
-    uint32_t countdown = 200000;
-    while (!(usart->ISR & mask))
-    {
-        if (countdown-- <= 0)
-        {
-            TEST_FAIL_MESSAGE("Failed waiting for usart->ISR mask!");
-        }
-    }
-}
-
-static void doLoopbackTest(unsigned char transmitByte)
-{
-    Error_Code_e err = (Error_Code_e)0xFF;
-    unsigned char receivedByte = ~transmitByte;
-
-    // when testing on hardware, requires the RX/TX lines
-    // to be wired together
-
-    TXE(USART1, READY);
-    WAIT_FOR(USART1, USART_ISR_TXE);  // only waits on target
-
-    err =  MyUSART_Write(USART1, transmitByte);
-    TEST_ASSERT_EQUAL(ECODE_OK, err);
-
-    RXNE(USART1, READY);
-    WAIT_FOR(USART1, USART_ISR_RXNE);  // only waits on target
-
-    err = MyUSART_Read(USART1, &receivedByte);
-    TEST_ASSERT_EQUAL(ECODE_OK, err);
-    TEST_ASSERT_EQUAL(transmitByte, receivedByte);  // the loopback test
-}
-
 /*
-- [ ] Word length can be set with M bit in USART_CR1 (set = 9 bit word, reset = 8 bit word)
-- [ ] Transmission and reception are driven by common baud rate generator. Clock for each generated when enable bit set for xmitter and receiver.
-- [ ] Data shifts out LSB firt on the TX pin from USART_DR
-- [ ] The TE bit shall not be reset during transmission of data, or corruption may occur
-- [ ] USART_CR2 may configure stop bits, 1, 2, 0.5 or 1.5 stop bits.
-- [ ] it is mandatory to wait for TC=1 before disabling the USART
+Notes
+-Word length can be set with M bit in USART_CR1 (set = 9 bit word, reset = 8 bit word)
+-Transmission and reception are driven by common baud rate generator. Clock for each generated when enable bit set for xmitter and receiver.
+-Data shifts out LSB firt on the TX pin from USART_DR
+-The TE bit shall not be reset during transmission of data, or corruption may occur
+-USART_CR2 may configure stop bits, 1, 2, 0.5 or 1.5 stop bits.
+-it is mandatory to wait for TC=1 before disabling the USART
 
 Requirements:
-- [ ] Word size is fixed at 8
-- [ ] Only two USARTs allowed for now, USART1 and USART1?
-- [ ] No DMA
-- [ ] Baud rate can be configured
-- [ ] Always over sampling 16 (0)
+- [x] Word size is fixed at 8
+- [x] Only one USART
+- [x] No DMA
+- [x] Baud rate can be configured
+- [x] Always over sampling 16 (0)
 
 */

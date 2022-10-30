@@ -2,40 +2,40 @@
 #include "LED.h"
 #include "mock_gpio_interrupts.h"
 #include "unity_helper.h"  // TODO: update me?
-#include "mock_stm32f4xx_hal_gpio.h"
-#include "mock_stm32f4xx_hal_rcc_ex.h"
+#include "mock_stm32f0xx_hal_gpio.h"
+#include "mock_stm32f0xx_hal_rcc.h"
 
 void test_LedInitWillInitialiseCorrectPort(void)
 {
-    MY_HAL_RCC_GPIOD_CLK_ENABLE_Expect();
+    MY_HAL_RCC_GPIOB_CLK_ENABLE_Expect();
 
     GPIO_InitTypeDef my_gpio = 
     {
-        .Pin = GPIO_PIN_13,
+        .Pin = GPIO_PIN_3,
         .Mode = GPIO_MODE_OUTPUT_PP,
         .Pull = GPIO_NOPULL
     };
 
-    HAL_GPIO_Init_Expect(GPIOD, &my_gpio);
+    HAL_GPIO_Init_Expect(GPIOB, &my_gpio);
 
     led_init();
 }
 
 void test_LedOnTest(void)
 {
-    HAL_GPIO_WritePin_Expect(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+    HAL_GPIO_WritePin_Expect(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
     led_on();
 }
 
 void test_LedOffTest(void)
 {
-    HAL_GPIO_WritePin_Expect(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin_Expect(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
     led_off();
 }
 
 void test_LedToggle(void)
 {
-    HAL_GPIO_TogglePin_Expect(GPIOD, GPIO_PIN_13);
+    HAL_GPIO_TogglePin_Expect(GPIOB, GPIO_PIN_3);
     led_toggle();
 }
 

@@ -165,12 +165,12 @@ static void cmdWriteSD(void)
         }
         else
         {
-            sprintf(cmdResponse, "Failed to write to SD card.", commandPhrase);
+            sprintf(cmdResponse, "Failed to write to SD card.");
         }
     }
     else
     {
-        sprintf(cmdResponse, "Could not initialise SD card.", commandPhrase);
+        sprintf(cmdResponse, "Could not initialise SD card.");
     }
 }
 

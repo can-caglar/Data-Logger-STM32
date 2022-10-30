@@ -4,12 +4,10 @@
 #include "stm32f0xx_hal_cortex.h"
 
 #include "global.h"
+#include "MyCommon.h"
 #include "button.h"
 #include "gpio_interrupts.h"
 
-// Dev board specific parameters
-#define BUTTON_PIN GPIO_PIN_8
-static GPIO_TypeDef* const _btnPort = GPIOA;
 static GPIO_InitTypeDef _btnGpio = 
 {
     .Pin = BUTTON_PIN,
@@ -29,7 +27,7 @@ STATIC void button_irq(void)
     uint32_t t_now = HAL_GetTick();
     if (t_now - lastIrq >= debounceTime)
     {
-        buttonPressed = HAL_GPIO_ReadPin(_btnPort, GPIO_PIN_0); // gpio_read(_port, _gpio.pin);
+        buttonPressed = HAL_GPIO_ReadPin(BUTTON_PORT, GPIO_PIN_0); // gpio_read(_port, _gpio.pin);
         observer();
     }
     lastIrq = t_now;
@@ -41,9 +39,9 @@ void button_init(void)
     buttonPressed = 0;
     observer = 0;
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-    HAL_GPIO_Init(GPIOA, &_btnGpio);
+    HAL_GPIO_Init(BUTTON_PORT, &_btnGpio);
     gpio_register_interrupt_callback(BUTTON_PIN, button_irq);
     HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
 }

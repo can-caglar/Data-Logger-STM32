@@ -1,0 +1,12 @@
+#ifndef MY_STM32_HAL_RCC_H
+#define MY_STM32_HAL_RCC_H
+
+#include "stm32f0xx_hal_rcc_ex.h"
+
+void MY_HAL_RCC_GPIOA_CLK_ENABLE(void);
+void MY_HAL_RCC_GPIOB_CLK_ENABLE(void);
+
+#define __HAL_RCC_GPIOA_CLK_ENABLE() MY_HAL_RCC_GPIOA_CLK_ENABLE()
+#define __HAL_RCC_GPIOB_CLK_ENABLE() MY_HAL_RCC_GPIOB_CLK_ENABLE()
+
+#endif
