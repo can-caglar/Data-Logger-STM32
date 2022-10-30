@@ -53,9 +53,19 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     TEST_ASSERT_EQUAL_STRING("Usage: say <string>", resp);
 
     // "help seeAll"
-    MyProcessor_HandleCommandWithString(CMD_STR_HELP" "CMD_STR_SEE_ALL);
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " seeAll");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: seeAll", resp);
+
+    // "help writeSD"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " writeSD");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: writeSD <text>", resp);
+
+    // "help readDip"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " readDip");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: readDip", resp);
 }
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
@@ -77,7 +87,7 @@ void test_MyProcessor_help_ReturnsErrorMessageWhenCmdNotFound(void)
 
 void test_MyProcessor_seeAll_ShowsAListOfAllCommands(void)
 {
-    MyProcessor_HandleCommandWithString(CMD_STR_SEE_ALL);
+    MyProcessor_HandleCommandWithString("seeAll");
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING(LIST_OF_CMDS, resp);
 }
@@ -134,6 +144,18 @@ void test_MyProcessor_writeSDCommandFailWrite(void)
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Failed to write to SD card.", resp);
+}
+
+
+void test_MyProcessor_writeSDCommand0Params(void)
+{
+    MySD_Init_IgnoreAndReturn(FR_OK);
+    MySD_Write_IgnoreAndReturn(FR_OK);
+
+    MyProcessor_HandleCommandWithString("writeSD");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("\"\" has been written to SD card.", resp);
 }
 
 // ******************** 'readDip' command ********************

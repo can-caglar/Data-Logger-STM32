@@ -53,10 +53,10 @@ static struct
     char help[MAX_RESPONSE_LEN];
 } commands[CMD_COUNT] =
 {
-    [CMD_HELP] = {"help", cmdHelp, "Usage: help <command>"},
-    [CMD_SAY] = {"say", cmdSay, "Usage: say <string>"},
+    [CMD_HELP]    = {"help", cmdHelp, "Usage: help <command>"},
+    [CMD_SAY]     = {"say", cmdSay, "Usage: say <string>"},
     [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
-    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage:"},
+    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage: readDip"},
     [CMD_WRITESD] = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
 };
 
@@ -75,8 +75,10 @@ void MyProcessor_HandleCommandWithString(char* str)
         // we received a potential command...
 
         // break it down
+        memset(scratchpad, 0, MAX_RESPONSE_LEN);
+        memset(scratchpad2, 0, MAX_RESPONSE_LEN);
         strcpy(scratchpad, str);
-        strcpy(scratchpad2, scratchpad);
+        strcpy(scratchpad2, str);
         char* token = strtok(scratchpad, " ");
         commandPhrase = scratchpad2;
         commandPhrase += strlen(scratchpad) + 1;
