@@ -19,14 +19,11 @@ static io_register posToBits(GPIO_Pin_Number_e pin);
 static void assertOnlyTheseBitsHigh(const io_register mask, const io_register reg);
 static void assertBitsAreLOW(const io_register mask, const io_register reg);
 static io_register MODERfromPinAndMode_OutAllPins(void);
-static void enablePeripheralClocks(void);
 
 MyGPIO testGPIO;
 
 void setUp(void)
 {
-    enablePeripheralClocks();
-
     memset(GPIOA, 0, sizeof *GPIOB);
     memset(GPIOB, 0, sizeof *GPIOA);
     memset(&testGPIO, 0, sizeof(testGPIO));
@@ -498,17 +495,6 @@ static void assertOnlyTheseBitsHigh(const io_register mask, const io_register re
 static void assertBitsAreLOW(const io_register mask, const io_register reg)
 {
     TEST_ASSERT_BITS_LOW(mask, reg);
-}
-
-static void enablePeripheralClocks(void)
-{
-    static int enabled = 0;
-    if (!enabled)
-    {
-        enabled = 1;
-        MyRCC_GPIOClockEnable(&(RCC->AHBENR), GPIO_PORT_C_e);
-        MyRCC_GPIOClockEnable(&(RCC->AHBENR), GPIO_PORT_D_e);
-    }
 }
 
 #endif // TEST

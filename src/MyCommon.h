@@ -109,8 +109,8 @@ typedef volatile uint32_t io_register;
 // USART
 #define MY_USART        USART1  
 #define MY_USART_GPIO   GPIOA
-#define MY_USART_GPIO_RCC_MASK  (0x1UL << 17)
-#define MY_USART_UART_RCC_MASK  (0x1UL << 14)
+#define MY_USART_GPIO_RCC_POS  17
+#define MY_USART_UART_RCC_POS  14
 #define MY_USART_TX     pin2_mask 
 #define MY_USART_RX     pin3_mask 
 #define MY_USART_ALT    GPIO_ALTF_1

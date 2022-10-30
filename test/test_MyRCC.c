@@ -25,17 +25,11 @@ void tearDown(void)
 
 void test_MyRCC_GpioClockEnableWorksForAllPorts(void)
 {
-   for (int i = GPIO_PORT_A_e; i < GPIO_PORT_COUNT_e; i++)
+   for (int i = 0; i < 32; i++)
    {
-       TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, i));
+       TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_ClockEnable(RCC_GPIO_EN_REG, i));
        TEST_ASSERT_BIT_HIGH(i, RCC->AHBENR);
    }
-}
-
-void test_MyRCC_USARTClockEnable(void)
-{
-   TEST_ASSERT_EQUAL_INT(ECODE_OK, MyRCC_USARTClockEnable(RCC_USART1_EN_REG, MY_USART_UART_RCC_MASK));
-   TEST_ASSERT_BIT_HIGH(14, RCC->APB2ENR);
 }
 
 #endif // TEST

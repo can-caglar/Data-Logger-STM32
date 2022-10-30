@@ -24,19 +24,6 @@ enum
 void setUp(void)
 {
     SystemCoreClockUpdate(); // will set clock to 16Mhz
-
-    // enable USART and GPIO clocks
-    MyRCC_USARTClockEnable(RCC_USART1_EN_REG, USART1_Mask);
-    MyRCC_GPIOClockEnable(RCC_GPIO_EN_REG, GPIO_PORT_C_e);
-
-    // Configure GPIO pins used in USART
-    UARTGPIO.gpio_register = GPIOA;
-    UARTGPIO.mode = GPIO_ALT;
-    UARTGPIO.alt_func = MY_USART_ALT;
-    UARTGPIO.output_type = GPIO_PUSH_PULL;
-    UARTGPIO.pupd = GPIO_PUPD_UP;
-    UARTGPIO.pin_mask = (MY_USART_TX | MY_USART_RX);
-    TEST_ASSERT_EQUAL(ECODE_OK, MyGPIO_Init(&UARTGPIO));
 }
 
 void tearDown(void)

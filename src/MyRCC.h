@@ -1,3 +1,5 @@
+// This module shall be removed in favour of using CMSIS RCC functions.
+// Made it for exercise, and refactored it down to essentially not needing it anymore.
 #ifndef MYRCC_H
 #define MYRCC_H
 
@@ -7,7 +9,6 @@
 typedef volatile unsigned int rcc_register;
 
 // Enables clocks
-Error_Code_e MyRCC_GPIOClockEnable(rcc_register* reg, GPIO_Port_e gpio_port);
-Error_Code_e MyRCC_USARTClockEnable(rcc_register* reg, USART_Mask_e usart_periph);
+Error_Code_e MyRCC_ClockEnable(rcc_register* reg, unsigned int position);
 
 #endif // MYRCC_H
