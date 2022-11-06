@@ -1,3 +1,4 @@
+// TODO: Should include "stm32f0xx_hal.h" ONLY!""
 #include "LED.h"
 #include "MyCommon.h"
 #include "stm32f0xx_hal.h"

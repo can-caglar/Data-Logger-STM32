@@ -1,7 +1,7 @@
 #ifndef __STM32F0xx_HAL_DEF
 #define __STM32F0xx_HAL_DEF
 
-#include "stm32f031x6.h"
+#include "stm32f0xx.h"
 #include <stddef.h>
 
 typedef enum 
