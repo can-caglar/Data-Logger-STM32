@@ -1,5 +1,5 @@
-#ifndef MY_FAKE_STM32F4xx_HAL_DEF
-#define MY_FAKE_STM32F4xx_HAL_DEF
+#ifndef __STM32F0xx_HAL_DEF
+#define __STM32F0xx_HAL_DEF
 
 #include "stm32f031x6.h"
 #include <stddef.h>
