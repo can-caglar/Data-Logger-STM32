@@ -28,8 +28,9 @@ Baud rate / Application Decider
 - [x] Create a 4-way DIP switch module
 
 Snooping application
+- [...] Write UART library using STM32 HAL,
+    - [ ] Experiment with it. Make it use DMA and fill RAM?
 - [ ] When receiving, toggle the LED
-- [ ] Receive to a buffer (dma?) and write to SD card buffer? 
 - [ ] Timestamp each line (\n) of message
 
 Possible Refactors:
