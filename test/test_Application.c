@@ -11,7 +11,7 @@ void test_App_CLI(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    Fatfs_Init_Expect();
+    System_Init_Expect();
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_CLI);
 
@@ -28,7 +28,7 @@ void test_App_Snooping(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    Fatfs_Init_Expect();
+    System_Init_Expect();
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
 

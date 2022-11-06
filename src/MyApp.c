@@ -16,7 +16,7 @@ int main(void)
 */
 int runApp(void)
 {
-    Fatfs_Init();
+    System_Init();
     AppDecider_Init();
     
     if (AppDecider_Decide() == APP_CLI)

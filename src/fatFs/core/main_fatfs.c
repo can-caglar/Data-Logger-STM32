@@ -22,7 +22,10 @@ static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 
-void Fatfs_Init(void)
+/*
+Initialises CubeMX code: HAL, FatFS and UART.
+*/
+void System_Init(void)
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();

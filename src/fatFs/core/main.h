@@ -54,7 +54,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void SystemClock_Config(void);
-void Fatfs_Init(void);
+void System_Init(void);
 
 /* USER CODE END EFP */
 
