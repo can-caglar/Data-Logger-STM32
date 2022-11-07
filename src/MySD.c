@@ -38,10 +38,17 @@ void MySD_Close(void)
     mounted = 0;
 }
 
-FRESULT MySD_Write(char* buf)
+// Pass in a c-string, the function will calculate length
+FRESULT MySD_WriteString(char* buf)
 {
     int sizeOfBuf = strlen(buf);
     unsigned int bytesWrote = 0;
     FRESULT err = f_write(&file, buf, sizeOfBuf, &bytesWrote);
     return err;
+}
+
+FRESULT MySD_Write(char* buf, uint32_t len)
+{
+    unsigned int bytesWrote = 0;
+    return f_write(&file, buf, len, &bytesWrote);
 }

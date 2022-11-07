@@ -75,7 +75,7 @@ void test_close_sd(void)
     MySD_Close();
 }
 
-void test_write_sd_all_bytes_written(void)
+void test_write_sd_string_all_bytes_written_correctly(void)
 {
     FIL file = { 0 };
     char buf[] = "test buffer";
@@ -83,9 +83,21 @@ void test_write_sd_all_bytes_written(void)
     unsigned int bytesWrote = 0;
 
     f_write_ExpectAndReturn(&file, buf, len, &bytesWrote, FR_OK);
-    f_write_ReturnThruPtr_bw(&len);
 
-    FRESULT err = MySD_Write(buf);
+    FRESULT err = MySD_WriteString(buf);
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+}
+
+void test_write_sd_calls_fats(void)
+{
+    const uint8_t buflen = 6;
+    FIL file = { 0 };
+    char buf[6] = {0, 5, 6, 7, 8, 1};
+    unsigned int bytesWrote = 0;
+
+    f_write_ExpectAndReturn(&file, buf, buflen, &bytesWrote, FR_OK);
+
+    FRESULT err = MySD_Write(buf, buflen);
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
 }
 
