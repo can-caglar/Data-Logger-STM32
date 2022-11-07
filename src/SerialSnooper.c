@@ -22,11 +22,10 @@ void SerialSnooper_Close(void)
 
 void SerialSnooper_Run()
 {
-    uint32_t bufSize = 0;
-    while (!MyCircularBuffer_isEmpty() && bufSize < MAX_BUF)
+    uint32_t len = 0;
+    for ( ; (len < MAX_BUF) && !MyCircularBuffer_isEmpty(); len++)
     {
-        buf[bufSize] = MyCircularBuffer_read();
-        bufSize++;
+        buf[len] = MyCircularBuffer_read();
     }
-    MySD_Write(buf, bufSize);
+    MySD_Write(buf, len);
 }
