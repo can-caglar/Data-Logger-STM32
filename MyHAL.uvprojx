@@ -471,6 +471,16 @@
               <FileType>1</FileType>
               <FilePath>.\src\SerialSnooper.c</FilePath>
             </File>
+            <File>
+              <FileName>MyCircularBuffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyCircularBuffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyRTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyRTC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
