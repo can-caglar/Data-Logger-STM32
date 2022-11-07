@@ -3,18 +3,16 @@
 
 #include <stdint.h>
 
+void MyCircularBuffer_init(void);
+
 uint8_t MyCircularBuffer_read(void);
+
+void MyCircularBuffer_write(uint8_t val);
+
 uint8_t MyCircularBuffer_isEmpty(void);
 
+uint8_t MyCircularBuffer_isFull(void);
+
+uint32_t MyCircularBuffer_getCapacity(void);
+
 #endif
-
-/*
-
-write
-    adds to the circular buffer
-read
-    reads from the circular buffer
-free
-    frees the data to be used by producer again
-length 
-*/
