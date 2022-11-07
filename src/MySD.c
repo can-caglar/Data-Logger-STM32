@@ -47,7 +47,7 @@ FRESULT MySD_WriteString(char* buf)
     return err;
 }
 
-FRESULT MySD_Write(char* buf, uint32_t len)
+FRESULT MySD_Write(unsigned char* buf, uint32_t len)
 {
     unsigned int bytesWrote = 0;
     return f_write(&file, buf, len, &bytesWrote);

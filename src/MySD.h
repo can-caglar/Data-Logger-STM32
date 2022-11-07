@@ -6,6 +6,6 @@
 FRESULT MySD_Init(const char* filename);
 void MySD_Close(void);
 FRESULT MySD_WriteString(char* buf);
-FRESULT MySD_Write(char* buf, uint32_t len);
+FRESULT MySD_Write(unsigned char* buf, uint32_t len);
 
 #endif

@@ -4,7 +4,7 @@
 #include "MyCircularBuffer.h"
 #include <string.h>
 
-#define MAX_BUF 2048
+#define MAX_BUF 32
 
 static uint8_t buf[MAX_BUF];
 

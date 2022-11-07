@@ -45,6 +45,7 @@ Realtime clock:
 
 Misc:
 - [ ] Add versioning which displays on UART
+- [ ] Increase the length of command entered (40 characters?)
 
 Future:
 - [ ] Add small OLED(?) screen
