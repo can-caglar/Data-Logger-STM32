@@ -10,6 +10,11 @@ void setUp(void)
     MyCircularBuffer_init();
 }
 
+void tearDown(void)
+{
+    MyCircularBuffer_close();
+}
+
 void test_capacityIsPowerOfTwo(void)
 {
     // circular buffer shall "waste" a slot to tell full apart from empty
@@ -96,6 +101,14 @@ void test_bufferWontWriteIfFull(void)
     {
         TEST_ASSERT_EQUAL((uint8_t)(42 + i), MyCircularBuffer_read());
     }
+}
+
+void test_initialisingTwiceDoesNothing(void)
+{
+    MyCircularBuffer_write('A');
+    MyCircularBuffer_init();
+    
+    TEST_ASSERT_EQUAL('A', MyCircularBuffer_read());
 }
 
 /******************** Helper functions and their tests *************/

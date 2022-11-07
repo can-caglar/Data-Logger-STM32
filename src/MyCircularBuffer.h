@@ -5,6 +5,8 @@
 
 void MyCircularBuffer_init(void);
 
+void MyCircularBuffer_close(void);
+
 uint8_t MyCircularBuffer_read(void);
 
 void MyCircularBuffer_write(uint8_t val);

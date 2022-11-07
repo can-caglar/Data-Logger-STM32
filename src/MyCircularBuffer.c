@@ -10,11 +10,22 @@ static uint8_t buf[SIZE_OF_BUF];
 static uint32_t head = 0;
 static uint32_t tail = 0;
 
+static uint8_t initialised = 0;
+
 void MyCircularBuffer_init(void)
 {
-    head = 0;
-    tail = 0;
-    memset(buf, 0, SIZE_OF_BUF);
+    if (!initialised)
+    {
+        head = 0;
+        tail = 0;
+        memset(buf, 0, SIZE_OF_BUF);
+        initialised = 1;
+    }
+}
+
+void MyCircularBuffer_close(void)
+{
+    initialised = 0;
 }
 
 uint32_t MyCircularBuffer_getCapacity(void)
