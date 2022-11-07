@@ -123,7 +123,7 @@ void test_MyProcessor_sayCommand(void)
 void test_MyProcessor_writeSDCommandSuccess(void)
 {
     MySD_Init_ExpectAndReturn("cli.txt", FR_OK);
-    MySD_Write_ExpectAndReturn("hello there", FR_OK);
+    MySD_WriteString_ExpectAndReturn("hello there", FR_OK);
 
     MyProcessor_HandleCommandWithString("writeSD hello there");
 
@@ -144,7 +144,7 @@ void test_MyProcessor_writeSDCommandFailInit(void)
 void test_MyProcessor_writeSDCommandFailWrite(void)
 {
     MySD_Init_ExpectAndReturn("cli.txt", FR_OK);
-    MySD_Write_ExpectAndReturn("hello there", FR_NOT_READY);
+    MySD_WriteString_ExpectAndReturn("hello there", FR_NOT_READY);
 
     MyProcessor_HandleCommandWithString("writeSD hello there");
 
@@ -156,7 +156,7 @@ void test_MyProcessor_writeSDCommandFailWrite(void)
 void test_MyProcessor_writeSDCommand0Params(void)
 {
     MySD_Init_IgnoreAndReturn(FR_OK);
-    MySD_Write_IgnoreAndReturn(FR_OK);
+    MySD_WriteString_IgnoreAndReturn(FR_OK);
 
     MyProcessor_HandleCommandWithString("writeSD");
 

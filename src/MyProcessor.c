@@ -168,7 +168,7 @@ static void cmdWriteSD(void)
     FRESULT err = MySD_Init("cli.txt");
     if (err == FR_OK)
     {
-        err = MySD_Write(commandPhrase);
+        err = MySD_WriteString(commandPhrase);
         if (err == FR_OK)
         {
             sprintf(cmdResponse, "\"%s\" has been written to SD card.", commandPhrase);
