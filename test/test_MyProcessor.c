@@ -4,8 +4,9 @@
 #include "mock_MySD.h"
 #include "mock_MyDipSwitch.h"
 #include "mock_LED.h"
+#include "mock_MyCircularBuffer.h"
 
-#define LIST_OF_CMDS "help say seeAll writeSD readDip led"
+#define LIST_OF_CMDS "help say seeAll writeSD readDip led cirbufWrite cirbufRead"
 
 void setUp()
 {
@@ -14,7 +15,6 @@ void setUp()
 
 void tearDown()
 {
-
 }
 
 void test_MyProcessor_Init(void)
@@ -72,6 +72,16 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " led");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: led <on/off>", resp);
+
+    // "help cirbufWrite"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " cirbufWrite");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: cirbufWrite <bytes>", resp);
+
+    // "help cirbufRead"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " cirbufRead");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: cirbufRead", resp);
 }
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
@@ -211,6 +221,67 @@ void test_MyProcessor_led_wrong_param(void)
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Invalid parameter: \"onn\".", resp);
 }
+
+// ******************** 'cirbuf' commands ********************
+
+void test_MyProcessor_cirbufWrite(void)
+{
+    MyCircularBuffer_init_Expect();
+    MyCircularBuffer_write_Expect('h');
+    MyCircularBuffer_write_Expect('i');
+
+    MyProcessor_HandleCommandWithString("cirbufWrite hi");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("\"hi\" written to circular buffer.", resp);
+}
+
+void test_MyProcessor_cirbufWriteNothing(void)
+{
+    MyCircularBuffer_init_Expect();
+
+    MyProcessor_HandleCommandWithString("cirbufWrite");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("\"\" written to circular buffer.", resp);
+}
+
+void test_MyProcessor_cirbufRead(void)
+{
+    MyCircularBuffer_init_Expect();
+
+    for (int i = 0; i < 5; i++)
+    {
+        MyCircularBuffer_isEmpty_ExpectAndReturn(0);
+        MyCircularBuffer_read_ExpectAndReturn('a' + i);
+    }
+    MyCircularBuffer_isEmpty_ExpectAndReturn(1);
+
+    MyProcessor_HandleCommandWithString("cirbufRead");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Buffer: abcde", resp);
+}
+
+void test_MyProcessor_cirbufReadMax20Bytes(void)
+{
+    MyCircularBuffer_init_Expect();
+
+    for (int i = 0; i < 12; i++)
+    {
+        MyCircularBuffer_isEmpty_ExpectAndReturn(0);
+        MyCircularBuffer_read_ExpectAndReturn('a' + i);
+    }
+
+    MyCircularBuffer_isEmpty_ExpectAndReturn(0);
+
+    MyProcessor_HandleCommandWithString("cirbufRead");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Buffer: abcdefghijkl", resp);
+}
+
+// TODO, max cir buf read shall be in line with MAX_RESPONSE_LEN
 
 // TODO, refactor!
 

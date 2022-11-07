@@ -5,6 +5,7 @@
 #include "MySD.h"
 #include "MyDipSwitch.h"
 #include "LED.h"
+#include "MyCircularBuffer.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 50
@@ -29,6 +30,8 @@ static void cmdSeeAll(void);
 static void cmdWriteSD(void);
 static void cmdReadDip(void);
 static void cmdLed(void);
+static void cmdCirbufWrite(void);
+static void cmdCirbufRead(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -43,6 +46,8 @@ typedef enum
     CMD_WRITESD,
     CMD_READDIP,
     CMD_LED,
+    CMD_CIRBUFWRITE,
+    CMD_CIRBUFREAD,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -56,12 +61,14 @@ static struct
     char help[MAX_RESPONSE_LEN];
 } commands[CMD_COUNT] =
 {
-    [CMD_HELP]    = {"help", cmdHelp, "Usage: help <command>"},
-    [CMD_SAY]     = {"say", cmdSay, "Usage: say <string>"},
-    [CMD_SEE_ALL] = {"seeAll", cmdSeeAll, "Usage: seeAll"},
-    [CMD_WRITESD] = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
-    [CMD_READDIP] = {"readDip", cmdReadDip, "Usage: readDip"},
-    [CMD_LED]     = {"led", cmdLed, "Usage: led <on/off>"},
+    [CMD_HELP]          = {"help", cmdHelp, "Usage: help <command>"},
+    [CMD_SAY]           = {"say", cmdSay, "Usage: say <string>"},
+    [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, "Usage: seeAll"},
+    [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
+    [CMD_READDIP]       = {"readDip", cmdReadDip, "Usage: readDip"},
+    [CMD_LED]           = {"led", cmdLed, "Usage: led <on/off>"},
+    [CMD_CIRBUFWRITE]   = {"cirbufWrite", cmdCirbufWrite, "Usage: cirbufWrite <bytes>"},
+    [CMD_CIRBUFREAD]    = {"cirbufRead", cmdCirbufRead, "Usage: cirbufRead"},
 };
 
 //
@@ -217,6 +224,30 @@ static void cmdLed(void)
     {
         updateResponse("Missing parameter!");
     }
+}
+
+static void cmdCirbufWrite(void)
+{
+    sprintf(cmdResponse, "\"%s\" written to circular buffer.", commandPhrase);
+    MyCircularBuffer_init();
+
+    while(*commandPhrase)
+    {
+        MyCircularBuffer_write(*commandPhrase);
+        commandPhrase++;
+    }
+}
+
+static void cmdCirbufRead(void)
+{
+    char contents[MAX_RESPONSE_LEN] = "Buffer: ";
+    int size = strlen(contents);
+    MyCircularBuffer_init();
+    while (!MyCircularBuffer_isEmpty() && size < 20)
+    {
+        contents[size++] = MyCircularBuffer_read();
+    }
+    sprintf(cmdResponse, "%s", contents);
 }
 
 /********************* helper functions **************/
