@@ -16,7 +16,7 @@ int main(void)
 */
 int runApp(void)
 {
-    System_Init();
+    CubeMX_SystemInit(CMX_FATFS);
     AppDecider_Init();
     
     if (AppDecider_Decide() == APP_CLI)
@@ -29,6 +29,7 @@ int runApp(void)
     }
     else
     {
+        CubeMX_SystemInit(CMX_UART);
         SerialSnooper_Init();
         LOOP
         {

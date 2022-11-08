@@ -9,7 +9,7 @@
 
 #define FAKE_DATE   "06-11-22-1131.txt"
 #define READ_TO_RETURN 5
-#define MAX_BUF 2048
+#define MAX_BUF 32
 
 uint8_t isEmptyStubCallback(int numCalls);
 uint8_t readStubCallback(int numCalls);
@@ -21,6 +21,9 @@ void tearDown(void)
 
 void test_SerialSnooper_Init(void)
 {
+    MyCircularBuffer_init_Expect();
+    
+
     MyRTC_Init_ExpectAndReturn(0);
     MyRTC_GetTimeStr_ExpectAndReturn(FAKE_DATE);
     MySD_Init_ExpectAndReturn(FAKE_DATE, FR_OK);

@@ -7,5 +7,5 @@ int MyRTC_Init(void)
 
 const char* MyRTC_GetTimeStr(void)
 {
-    return "REPLACE ME";
+    return "hi.txt";
 }

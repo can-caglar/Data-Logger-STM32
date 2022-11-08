@@ -10,9 +10,10 @@ static uint8_t buf[MAX_BUF];
 
 void SerialSnooper_Init(void)
 {
+    MyCircularBuffer_init();
     MyRTC_Init();
     const char* timeStr = MyRTC_GetTimeStr();
-    MySD_Init(timeStr);
+    FRESULT err = MySD_Init(timeStr);
 }
 
 void SerialSnooper_Close(void)
@@ -27,5 +28,5 @@ void SerialSnooper_Run()
     {
         buf[len] = MyCircularBuffer_read();
     }
-    MySD_Write(buf, len);
+    FRESULT err = MySD_Write(buf, len);
 }

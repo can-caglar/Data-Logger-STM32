@@ -17,6 +17,8 @@
 
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart1;
+static uint8_t hal_initialised = 0;
+static uint8_t uartRecvBuf = 0;
 
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
@@ -25,19 +27,29 @@ static void MX_USART1_UART_Init(void);
 /*
 Initialises CubeMX code: HAL, FatFS and UART.
 */
-void System_Init(void)
+void CubeMX_SystemInit(unsigned int sys)
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+  if (!hal_initialised)
+  {
+    HAL_Init();
+    SystemClock_Config();
+    hal_initialised = 1;
+  }
 
-  SystemClock_Config();
+  if (sys & CMX_FATFS)
+  {
+    MX_GPIO_Init();
+    MX_FATFS_Init();
+    MX_SPI1_Init();
+    HAL_Delay(1000); //a short delay is important to let the SD card settle
+  }
+  if (sys & CMX_UART)
+  {
+    MX_USART1_UART_Init();
+    HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
+  }
   
-  MX_GPIO_Init();
-  MX_FATFS_Init();
-  MX_SPI1_Init();
-  MX_USART1_UART_Init();    // for serial in, not fatfs
-  
-  HAL_Delay(1000); //a short delay is important to let the SD card settle
 }
 
 /**

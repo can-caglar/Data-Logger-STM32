@@ -11,7 +11,7 @@ void test_App_CLI(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    System_Init_Expect();
+    CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_CLI);
 
@@ -28,10 +28,11 @@ void test_App_Snooping(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    System_Init_Expect();
+    CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
 
+    CubeMX_SystemInit_Expect(CMX_UART);
     SerialSnooper_Init_Expect();
     // expecting 3 calls
     SerialSnooper_Run_Expect();

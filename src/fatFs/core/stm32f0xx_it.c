@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f0xx_it.h"
+#include "MyCircularBuffer.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -145,15 +146,14 @@ void SysTick_Handler(void)
   */
 void USART1_IRQHandler(void)
 {
-  /* USER CODE BEGIN USART1_IRQn 0 */
-  /* USER CODE END USART1_IRQn 0 */
-    
   HAL_UART_IRQHandler(&huart1);
+  huart1.pRxBuffPtr--;  // assuming the buffer got moved
 
-  /* USER CODE BEGIN USART1_IRQn 1 */
-  /* USER CODE END USART1_IRQn 1 */
+  MyCircularBuffer_init();
+
+  // we don't care what the buffer is, set it again
+  MyCircularBuffer_write(*(huart1.pRxBuffPtr));
+
+  // set up irq again (1 addr down as it would've been incremented)
+  HAL_UART_Receive_IT(&huart1, huart1.pRxBuffPtr, 1);
 }
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */

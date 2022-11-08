@@ -53,8 +53,11 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+#define CMX_FATFS (1U << 0)
+#define CMX_UART  (1U << 1)
+
 void SystemClock_Config(void);
-void System_Init(void);
+void CubeMX_SystemInit(unsigned int sys);
 
 /* USER CODE END EFP */
 
