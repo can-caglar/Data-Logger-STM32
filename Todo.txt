@@ -20,6 +20,7 @@ SD card:
 - [x] Add SD card functions to the CLI
 - [ ] Write a UART module with DMA that continuously 
 writes to the circular buffer which will be handled by the DMA.
+- [ ] Make ffconf smaller
 
 Baud rate / Application Decider
 - [x] Make use of the blinky module, remove the adapters, make tests work

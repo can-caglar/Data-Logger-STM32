@@ -3,6 +3,7 @@
 #include "exploding_fakes.h"
 #include "mock_stm32f0xx_hal_uart.h"
 #include "mock_MyCircularBuffer.h"
+#include "mock_MyTimeString.h"
 #include <stdint.h>
 
 UART_HandleTypeDef huart1; // fake huart1

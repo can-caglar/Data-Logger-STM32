@@ -1,4 +1,5 @@
 #include "MySD.h"
+#include "LED.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -15,7 +16,6 @@ FRESULT MySD_Init(const char* filename)
     {
         err = f_mount(&FatFs, "", 1);
     }
-
     if (err == FR_OK)
     {
         if (mounted == 1)
@@ -24,6 +24,11 @@ FRESULT MySD_Init(const char* filename)
         }
         mounted = 1;
         err = f_open(&file, filename, writeMode);
+    }
+    if (err == FR_OK)
+    {
+        led_init();
+        led_on();
     }
 
     return err;
@@ -39,16 +44,25 @@ void MySD_Close(void)
 }
 
 // Pass in a c-string, the function will calculate length
-FRESULT MySD_WriteString(char* buf)
+FRESULT MySD_WriteString(const char* buf)
 {
     int sizeOfBuf = strlen(buf);
-    unsigned int bytesWrote = 0;
-    FRESULT err = f_write(&file, buf, sizeOfBuf, &bytesWrote);
+    FRESULT err = MySD_Write((const uint8_t*)buf, sizeOfBuf);
     return err;
 }
 
-FRESULT MySD_Write(unsigned char* buf, uint32_t len)
+FRESULT MySD_Write(const uint8_t* buf, uint32_t len)
 {
     unsigned int bytesWrote = 0;
-    return f_write(&file, buf, len, &bytesWrote);
+    FRESULT err = f_write(&file, buf, len, &bytesWrote);
+    if (err == FR_OK)
+    {
+        led_toggle();
+    }
+    return err;
+}
+
+FRESULT MySD_Flush(void)
+{
+    return f_sync(&file);
 }

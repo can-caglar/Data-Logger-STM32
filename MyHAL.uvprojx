@@ -477,9 +477,9 @@
               <FilePath>.\src\MyCircularBuffer.c</FilePath>
             </File>
             <File>
-              <FileName>MyRTC.c</FileName>
+              <FileName>MyTimeString.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyRTC.c</FilePath>
+              <FilePath>.\src\MyTimeString.c</FilePath>
             </File>
           </Files>
         </Group>
