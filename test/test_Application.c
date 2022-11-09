@@ -32,7 +32,7 @@ void test_App_Snooping(void)
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
 
-    CubeMX_SystemInit_Expect(CMX_UART);
+    CubeMX_SystemInit_Expect(CMX_UART | CMX_I2C);
     SerialSnooper_Init_Expect();
     // expecting 3 calls
     SerialSnooper_Run_Expect();

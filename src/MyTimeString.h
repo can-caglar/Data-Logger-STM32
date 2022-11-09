@@ -1,5 +1,5 @@
-#ifndef MY_RTC_H_INCLUDED
-#define MY_RTC_H_INCLUDED
+#ifndef MY_TIME_STRING_H_INCLUDED
+#define MY_TIME_STRING_H_INCLUDED
 
 // Module to return:
 // Full datetime in format: [2022-10-31 09:13:24.665]

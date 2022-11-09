@@ -1,7 +1,12 @@
 #include "MyTimeString.h"
+#include "MyRTC.h"
+#include <stdio.h>
+
+static char ret[30];
 
 int MyTimeString_Init(void)
 {
+    MyRTC_Init();
     return 0;
 }
 
@@ -14,5 +19,14 @@ const char* MyTimeString_GetFileName(void)
 
 const char* MyTimeString_GetTimeStamp(void)
 {
-    return "[2022-10-31 09:13:24.665] ";
+    MyTime time = MyRTC_ReadTime();
+
+    sprintf(ret, "[20%02d-%02d-%02d %02d:%02d:%02d] ",
+        time.year,
+        time.month,
+        time.day,
+        time.hour,
+        time.minute,
+        time.second);
+    return ret;
 }

@@ -29,7 +29,7 @@ int runApp(void)
     }
     else
     {
-        CubeMX_SystemInit(CMX_UART);
+        CubeMX_SystemInit(CMX_UART | CMX_I2C);
         SerialSnooper_Init();
         LOOP
         {

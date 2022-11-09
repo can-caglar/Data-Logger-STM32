@@ -3,5 +3,6 @@
 
 #include "stm32f0xx_hal_cortex.h"
 #include "stm32f0xx_hal_uart.h"
+#include "stm32f0xx_hal_i2c.h"
 
 #endif

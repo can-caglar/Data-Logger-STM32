@@ -481,6 +481,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\MyTimeString.c</FilePath>
             </File>
+            <File>
+              <FileName>MyRTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyRTC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
