@@ -2,7 +2,7 @@
 
 # Data Logger Tasks:
 
-- [ ] Perhaps write a new UART handler module,
+- [x] Perhaps write a new UART handler module,
 leave the CLI one as it is for now. we can refactor the CLI module
 to use the new UART handler if required.
 
@@ -20,7 +20,7 @@ SD card:
 - [x] Add SD card functions to the CLI
 - [ ] Write a UART module with DMA that continuously 
 writes to the circular buffer which will be handled by the DMA.
-- [ ] Make ffconf smaller
+- [ ] Make fatfs smaller via ffconf configs
 
 Baud rate / Application Decider
 - [x] Make use of the blinky module, remove the adapters, make tests work
@@ -29,10 +29,10 @@ Baud rate / Application Decider
 - [x] Create a 4-way DIP switch module
 
 Snooping application
-- [...] Write UART library using STM32 HAL,
-    - [ ] Experiment with it. Make it use DMA and fill RAM?
-- [ ] When receiving, toggle the LED
-- [ ] Timestamp each line (\n) of message
+- [x] Write UART library using STM32 HAL,
+    - [x] Experiment with it. Make it use DMA and fill RAM? | Use interrupt
+- [x] When receiving, toggle the LED
+- [x] Timestamp each line (\n) of message
 
 Possible Refactors:
 - [ ] The CLI to use the same UART module with circular buffer?
@@ -48,6 +48,10 @@ Misc:
 - [ ] Add versioning which displays on UART
 - [ ] Increase the length of command entered (40 characters?)
 
+Realtime clock:
+- [ ] Think about abstraction and layers
+    - [ ] RTC module with I2C
+    - [ ] A string manip module on top of that
+
 Future:
 - [ ] Add small OLED(?) screen
-- [ ] Add external realtime clock with battery
