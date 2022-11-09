@@ -55,6 +55,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN EFP */
 #define CMX_FATFS (1U << 0)
 #define CMX_UART  (1U << 1)
+#define CMX_I2C   (1U << 2)
 
 void SystemClock_Config(void);
 void CubeMX_SystemInit(unsigned int sys);
