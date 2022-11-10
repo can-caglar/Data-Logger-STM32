@@ -18,15 +18,17 @@ SD card:
         - [-] Try on an Ardunio
 - [x] Treat the SD driver as a black box and add it to our current system.
 - [x] Add SD card functions to the CLI
-- [ ] Write a UART module with DMA that continuously 
 writes to the circular buffer which will be handled by the DMA.
 - [ ] Make fatfs smaller via ffconf configs
+- [ ] Don't open file if it exists, (and don't light LED)
 
 Baud rate / Application Decider
 - [x] Make use of the blinky module, remove the adapters, make tests work
     - [x] Mock the "system" HAL and eventually remove "system_hal.h/c"
     - [ ] Re-develop the "gpio_interrupts" module via TDD (currently not done with TDD)
 - [x] Create a 4-way DIP switch module
+- [ ] Make DIP switch decide baud rate
+    - [ ] Make it on the fly?
 
 Snooping application
 - [x] Write UART library using STM32 HAL,
@@ -41,19 +43,17 @@ Files / folders:
 - [ ] Tidy file / folder structure in Keil and in the src folder
 - [ ] Rename modules (MySM is no longer a state machine, and DIP module uses both Dip and DIP )
 
-Realtime clock:
-- [ ] Add realtime clock for SD card saving and logging
-
 Misc:
 - [ ] Add versioning which displays on UART
 - [ ] Increase the length of command entered (40 characters?)
 
 Realtime clock:
-- [ ] Think about abstraction and layers
+- [x] Think about abstraction and layers
     - [x] RTC module with I2C
     - [x] A string manip module on top of that
-- [ ] Add RTC to the fatfs module
-- [ ] Fix the seconds bug
+- [ ] Add RTC to the fatfs module so files get right date when opened
+- [x] Update the filenames
+- [x] Fix the seconds bug
 
 Future:
 - [ ] Add small OLED(?) screen

@@ -38,7 +38,7 @@ extern I2C_HandleTypeDef hi2c1;
 static void readReg(uint8_t reg, uint8_t* ret);
 static uint8_t bcdToInt(uint8_t bcd);
 
-int MyRTC_Init(void)
+void MyRTC_Init(void)
 {
     CubeMX_SystemInit(CMX_I2C);
 }
@@ -46,8 +46,6 @@ int MyRTC_Init(void)
 MyTime MyRTC_ReadTime(void)
 {
     MyTime time = { 0 };
-
-    HAL_StatusTypeDef err = 0;
 
     readReg(PCF_SECONDS, &time.second);
     readReg(PCF_MINUTES, &time.minute);
@@ -72,9 +70,8 @@ MyTime MyRTC_ReadTime(void)
 
 static void readReg(uint8_t reg, uint8_t* ret)
 {
-    HAL_StatusTypeDef err = 0;
-    err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
-    err = HAL_I2C_Master_Receive(&hi2c1, READ_ADDR, ret, 1, 500);
+    HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
+    HAL_I2C_Master_Receive(&hi2c1, READ_ADDR, ret, 1, 500);
 }
 
 static uint8_t bcdToInt(uint8_t bcd)

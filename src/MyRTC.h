@@ -14,7 +14,7 @@ typedef struct MyTime
     uint8_t weekday;
 } MyTime;
 
-int MyRTC_Init(void);
+void MyRTC_Init(void);
 MyTime MyRTC_ReadTime(void);
 
 #endif

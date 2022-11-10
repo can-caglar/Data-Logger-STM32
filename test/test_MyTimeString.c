@@ -6,7 +6,7 @@ static void expect_rtc_readtime(MyTime time);
 
 void test_init(void)
 {
-    MyRTC_Init_ExpectAndReturn(0);
+    MyRTC_Init_Expect();
     MyTimeString_Init();
 }
 
@@ -22,6 +22,17 @@ void test_get_time_stamp_string_representation(void)
     TEST_ASSERT_EQUAL_STRING("[2002-01-09 01:07:01] ",
         MyTimeString_GetTimeStamp()
     );
+}
+
+void test_get_file_name_uses_unix_timestamp(void)
+{
+    // max is 12 characters (including .txt)
+    // 2027 March 12th, at 18:37:12
+    expect_rtc_readtime((MyTime){27, 3, 12, 18, 37, 12});
+    TEST_ASSERT_EQUAL_STRING("6B943B58.txt",
+        MyTimeString_GetFileName()
+    );
+
 }
 
 // Helpers
