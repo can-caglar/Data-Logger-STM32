@@ -8,7 +8,7 @@
 #include "main.h"
 
 #ifndef TEST
-#define runApp main    // TODO, change back to main
+#define runApp main
 #endif
 
 /*
@@ -24,7 +24,7 @@ int runApp(void)
         MyCLI_Init();
         LOOP
         {
-            MyCLI_Run();
+             MyCLI_Run();
         }
     }
     else
@@ -35,5 +35,4 @@ int runApp(void)
             SerialSnooper_Run();
         } 
     }
-    // never returns
 }

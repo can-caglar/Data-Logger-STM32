@@ -26,7 +26,6 @@ static char* commandPhrase;
 
 // Command handlers
 static void cmdHelp(void);
-static void cmdSay(void);
 static void cmdSeeAll(void);
 static void cmdWriteSD(void);
 static void cmdReadDip(void);
@@ -43,7 +42,6 @@ void updateResponse(char* newResponse);
 typedef enum
 {
     CMD_HELP,
-    CMD_SAY,
     CMD_SEE_ALL,
     CMD_WRITESD,
     CMD_READDIP,
@@ -65,7 +63,6 @@ static struct
 } commands[CMD_COUNT] =
 {
     [CMD_HELP]          = {"help", cmdHelp, "Usage: help <command>"},
-    [CMD_SAY]           = {"say", cmdSay, "Usage: say <string>"},
     [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, "Usage: seeAll"},
     [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
     [CMD_READDIP]       = {"readDip", cmdReadDip, "Usage: readDip"},
@@ -144,19 +141,6 @@ static void cmdHelp(void)
     {
         // help for the "help" command
         updateResponse(commands[CMD_HELP].help);
-    }
-}
-
-static void cmdSay(void)
-{
-    char* token = strtok(NULL, " ");
-    if (token != NULL)
-    {
-        sprintf(cmdResponse, "STM32 would like to say %s", token);
-    }
-    else
-    {
-        updateResponse("Missing parameter!");
     }
 }
 

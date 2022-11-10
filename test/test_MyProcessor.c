@@ -8,7 +8,7 @@
 #include "mock_MyTimeString.h"
 
 #define LIST_OF_CMDS \
-"help say seeAll writeSD readDip led cirbufWrite cirbufRead getTime"
+"help seeAll writeSD readDip led cirbufWrite cirbufRead getTime"
 
 void setUp()
 {
@@ -50,14 +50,9 @@ void test_MyProcessor_sendingVeryLongStringGivesUniqueResponse(void)
 
 void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
 {
-    // "help say"
-    MyProcessor_HandleCommandWithString(CMD_STR_HELP " say");
-    const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Usage: say <string>", resp);
-
     // "help seeAll"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " seeAll");
-    resp = MyProcessor_GetResponseMessage();
+    const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: seeAll", resp);
 
     // "help writeSD"
@@ -108,26 +103,6 @@ void test_MyProcessor_seeAll_ShowsAListOfAllCommands(void)
     MyProcessor_HandleCommandWithString("seeAll");
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING(LIST_OF_CMDS, resp);
-}
-
-// ******************** 'say' command ********************
-
-void test_MyProcessor_sayCommand(void)
-{
-    // 1 param
-    MyProcessor_HandleCommandWithString("say hello");
-    const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("STM32 would like to say hello", resp);
-
-    // 0 params
-    MyProcessor_HandleCommandWithString("say");
-    resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Missing parameter!", resp);
-
-    // Multiple params
-    MyProcessor_HandleCommandWithString("say hi hi");
-    resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("STM32 would like to say hi", resp);
 }
 
 // ******************** 'writeSD' command ********************
