@@ -1,9 +1,22 @@
 #include "MyRTC.h"
 #include "stm32f0xx_hal.h"
+#include "main.h"
+
+// Datasheet:
+// https://www.nxp.com/docs/en/data-sheet/PCF8523.pdf
 
 // I2C addr
 #define READ_ADDR  0xD1
 #define WRITE_ADDR 0xD0
+
+// Bitmasks for date time registers
+#define BM_SECONDS  0x7F    // bits 0-6
+#define BM_MINUTES  0x7F    // bits 0-6
+#define BM_HOURS    0x3F    // bits 0-5
+#define BM_DAYS     0x3F    // bits 0-5
+#define BM_MONTHS   0x1F    // bits 0-4
+#define BM_WEEKDAYS 0x07    // bits 0-2
+#define BM_YEARS    0xFF    // bits 0-7
 
 // Registers
 enum
@@ -27,6 +40,7 @@ static uint8_t bcdToInt(uint8_t bcd);
 
 int MyRTC_Init(void)
 {
+    CubeMX_SystemInit(CMX_I2C);
 }
 
 MyTime MyRTC_ReadTime(void)
@@ -43,13 +57,13 @@ MyTime MyRTC_ReadTime(void)
     readReg(PCF_YEARS, &time.year);
     readReg(PCF_WEEKDAYS, &time.weekday);
 
-    time.second = bcdToInt(time.second);
-    time.minute = bcdToInt(time.minute);
-    time.hour = bcdToInt(time.hour);
-    time.day = bcdToInt(time.day);
-    time.month = bcdToInt(time.month);
-    time.year = bcdToInt(time.year);
-    time.weekday = bcdToInt(time.weekday);
+    time.second = bcdToInt(time.second & BM_SECONDS) ;
+    time.minute = bcdToInt(time.minute & BM_MINUTES);
+    time.hour = bcdToInt(time.hour & BM_HOURS);
+    time.day = bcdToInt(time.day & BM_DAYS);
+    time.month = bcdToInt(time.month & BM_MONTHS);
+    time.year = bcdToInt(time.year & BM_YEARS);
+    time.weekday = bcdToInt(time.weekday & BM_WEEKDAYS);
 
     return time;
 }

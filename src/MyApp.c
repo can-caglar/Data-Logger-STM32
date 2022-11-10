@@ -16,7 +16,7 @@ int main(void)
 */
 int runApp(void)
 {
-    CubeMX_SystemInit(CMX_FATFS);
+    CubeMX_SystemInit(CMX_FATFS);   // needs a 1s delay
     AppDecider_Init();
     
     if (AppDecider_Decide() == APP_CLI)
@@ -29,7 +29,6 @@ int runApp(void)
     }
     else
     {
-        CubeMX_SystemInit(CMX_UART | CMX_I2C);
         SerialSnooper_Init();
         LOOP
         {

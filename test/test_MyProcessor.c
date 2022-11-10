@@ -5,8 +5,10 @@
 #include "mock_MyDipSwitch.h"
 #include "mock_LED.h"
 #include "mock_MyCircularBuffer.h"
+#include "mock_MyTimeString.h"
 
-#define LIST_OF_CMDS "help say seeAll writeSD readDip led cirbufWrite cirbufRead"
+#define LIST_OF_CMDS \
+"help say seeAll writeSD readDip led cirbufWrite cirbufRead getTime"
 
 void setUp()
 {
@@ -279,6 +281,19 @@ void test_MyProcessor_cirbufReadMax20Bytes(void)
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Buffer: abcdefghijkl", resp);
+}
+
+// ******************** 'getTime' commands ********************
+
+void test_MyProcessor_getTime(void)
+{
+    MyTimeString_Init_ExpectAndReturn(0);
+    MyTimeString_GetTimeStamp_ExpectAndReturn("[the time]");
+    MyProcessor_HandleCommandWithString("getTime");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("[the time]", resp);
 }
 
 // TODO, max cir buf read shall be in line with MAX_RESPONSE_LEN

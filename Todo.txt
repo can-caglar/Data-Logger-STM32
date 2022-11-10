@@ -50,8 +50,10 @@ Misc:
 
 Realtime clock:
 - [ ] Think about abstraction and layers
-    - [ ] RTC module with I2C
-    - [ ] A string manip module on top of that
+    - [x] RTC module with I2C
+    - [x] A string manip module on top of that
+- [ ] Add RTC to the fatfs module
+- [ ] Fix the seconds bug
 
 Future:
 - [ ] Add small OLED(?) screen

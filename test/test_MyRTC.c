@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "MyRTC.h"
 #include "mock_stm32f0xx_hal_i2c.h"
+#include "mock_main.h"
 #include <stdio.h>
 
 // Helpers
@@ -40,25 +41,35 @@ uint8_t reg_years = PCF_YEARS;
 void test_init(void)
 {
     // do nothing for now
+    CubeMX_SystemInit_Expect(CMX_I2C);
     MyRTC_Init();
 }
 
 void test_readTime(void)
 {
-    uint8_t secs_43 =  TO_BCD(4,3); // 43
-    uint8_t mins_54 =  TO_BCD(5,4); // 54
-    uint8_t hours_17 = TO_BCD(1,7); // 17
-    uint8_t days_9 = TO_BCD(0,9);   // 9
+    uint8_t secs_43 =  TO_BCD(4,3);    // 43
+    uint8_t mins_54 =  TO_BCD(5,4);    // 54
+    uint8_t hours_17 = TO_BCD(1,7);    // 17
+    uint8_t days_9 = TO_BCD(0,9);      // 9
     uint8_t months_10 = TO_BCD(1,0);   // 10
-    uint8_t years_22 = TO_BCD(2,2);   // 22
+    uint8_t years_99 = TO_BCD(9,9);    // 22
     uint8_t weekday_0 = TO_BCD(0,0);   // 0, Sunday
+
+    // messing up the bits that shouldn't be used in calculation
+    secs_43 |= 0x80; // bit 7
+    mins_54 |= 0x80; // bit 7
+    hours_17 |= 0xC0; // bits 6-7
+    days_9 |= 0xC0; // bits 6-7
+    months_10 |= 0xE0; // bits 5-7
+    years_99 |= 0;  // all bits to be used
+    weekday_0 |= 0xF8; // bit 3-7
     
     expectReadRegAndReturn(&reg_seconds, &secs_43);
     expectReadRegAndReturn(&reg_minutes, &mins_54);
     expectReadRegAndReturn(&reg_hours, &hours_17);
     expectReadRegAndReturn(&reg_days, &days_9);
     expectReadRegAndReturn(&reg_months, &months_10);
-    expectReadRegAndReturn(&reg_years, &years_22);
+    expectReadRegAndReturn(&reg_years, &years_99);
     expectReadRegAndReturn(&reg_weekdays, &weekday_0);
 
     MyTime time = MyRTC_ReadTime();
@@ -68,7 +79,7 @@ void test_readTime(void)
     TEST_ASSERT_EQUAL_INT(17, time.hour);
     TEST_ASSERT_EQUAL_INT(9, time.day);
     TEST_ASSERT_EQUAL_INT(10, time.month);
-    TEST_ASSERT_EQUAL_INT(22, time.year);
+    TEST_ASSERT_EQUAL_INT(99, time.year);
     TEST_ASSERT_EQUAL_INT(0, time.weekday);
 }
 

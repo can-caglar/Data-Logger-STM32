@@ -6,6 +6,7 @@
 #include "MyDipSwitch.h"
 #include "LED.h"
 #include "MyCircularBuffer.h"
+#include "MyTimeString.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 50
@@ -32,6 +33,7 @@ static void cmdReadDip(void);
 static void cmdLed(void);
 static void cmdCirbufWrite(void);
 static void cmdCirbufRead(void);
+static void cmdGetTime(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -48,6 +50,7 @@ typedef enum
     CMD_LED,
     CMD_CIRBUFWRITE,
     CMD_CIRBUFREAD,
+    CMD_GETTIME,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -69,6 +72,7 @@ static struct
     [CMD_LED]           = {"led", cmdLed, "Usage: led <on/off>"},
     [CMD_CIRBUFWRITE]   = {"cirbufWrite", cmdCirbufWrite, "Usage: cirbufWrite <bytes>"},
     [CMD_CIRBUFREAD]    = {"cirbufRead", cmdCirbufRead, "Usage: cirbufRead"},
+    [CMD_GETTIME]       = {"getTime", cmdGetTime, ""},
 };
 
 //
@@ -248,6 +252,12 @@ static void cmdCirbufRead(void)
         contents[size++] = MyCircularBuffer_read();
     }
     sprintf(cmdResponse, "%s", contents);
+}
+
+static void cmdGetTime(void)
+{
+    MyTimeString_Init();
+    strcpy(cmdResponse, MyTimeString_GetTimeStamp());
 }
 
 /********************* helper functions **************/

@@ -18,8 +18,11 @@ void SerialSnooper_Init(void)
 {
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
+
+    CubeMX_SystemInit(CMX_UART);
     MyCircularBuffer_init();
     MyTimeString_Init();
+
     const char* fileName = MyTimeString_GetFileName();
     FRESULT err = MySD_Init(fileName);
     if (err != FR_OK)

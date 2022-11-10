@@ -4,6 +4,7 @@
 #include "mock_MyTimeString.h"
 #include "mock_MyCircularBuffer.h"
 #include "mock_stm32f0xx_hal.h"
+#include "mock_main.h"
 #include "string.h"
 
 void successfulInit(void);
@@ -15,6 +16,7 @@ void test_SerialSnooper_InitSuccess(void)
 
 void test_SerialSnooper_Fail(void)
 {
+    CubeMX_SystemInit_Expect(CMX_UART);
     MyCircularBuffer_init_Ignore();
     MyTimeString_Init_IgnoreAndReturn(0);
     MyTimeString_GetFileName_IgnoreAndReturn("hi.txt");
@@ -135,6 +137,8 @@ void test_SerialSnooper_FlushesEvery500ms(void)
 
 void successfulInit(void)
 {
+    CubeMX_SystemInit_Expect(CMX_UART);
+
     MyCircularBuffer_init_Expect();
 
     MyTimeString_Init_ExpectAndReturn(0);
