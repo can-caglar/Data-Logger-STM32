@@ -33,6 +33,17 @@ void test_get_file_name_uses_unix_timestamp(void)
         MyTimeString_GetFileName()
     );
 
+    // 2017 February 12th at 15:32:10
+    expect_rtc_readtime((MyTime){17, 2, 12, 15, 32, 10});
+    TEST_ASSERT_EQUAL_STRING("58A07FFA.txt",
+        MyTimeString_GetFileName()
+    );
+
+    // 2099 February 12th at 15:32:10
+    expect_rtc_readtime((MyTime){99, 2, 12, 15, 32, 10});
+    TEST_ASSERT_EQUAL_STRING("F2DD5CFA.txt",
+        MyTimeString_GetFileName()
+    );
 }
 
 // Helpers
