@@ -39,8 +39,8 @@ enum
 extern I2C_HandleTypeDef hi2c1;
 
 // Helpers
-static int readReg(uint8_t reg, uint8_t* ret);
-static int writeReg(uint8_t reg, uint8_t val);
+static HAL_StatusTypeDef readReg(uint8_t reg, uint8_t* ret);
+static HAL_StatusTypeDef writeReg(uint8_t reg, uint8_t val);
 static uint8_t bcdToInt(uint8_t bcd);
 uint8_t intToBCD(uint8_t num);
 
@@ -92,7 +92,7 @@ int MyRTC_WriteTime(const MyTime* newTime)
 
     if (err == HAL_OK)
     {
-        writeReg(PCF_CTRL_1, stopOsc[1]);
+        err = writeReg(PCF_CTRL_1, stopOsc[1]);
         err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, send, 8, 500);
         stopOsc[1] &= ~CTRL1_BM_STOP;
         writeReg(PCF_CTRL_1, stopOsc[1]);
@@ -106,29 +106,21 @@ int MyRTC_WriteTime(const MyTime* newTime)
 
 // Helper functions
 
-static int readReg(uint8_t reg, uint8_t* ret)
+static HAL_StatusTypeDef readReg(uint8_t reg, uint8_t* ret)
 {
     HAL_StatusTypeDef err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
     if (err == HAL_OK)
     {
         err = HAL_I2C_Master_Receive(&hi2c1, READ_ADDR, ret, 1, 500);
     }
-    if (err == HAL_OK)
-    {
-        return 0;
-    }
-    return -1;
+    return err;
 }
 
-static int writeReg(uint8_t reg, uint8_t val)
+static HAL_StatusTypeDef writeReg(uint8_t reg, uint8_t val)
 {
     uint8_t data[2] = {reg, val};
     HAL_StatusTypeDef err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, data, 2, 500);
-    if (err == HAL_OK)
-    {
-        return 0;
-    }
-    return -1;
+    return err;
 }
 
 static uint8_t bcdToInt(uint8_t bcd)
