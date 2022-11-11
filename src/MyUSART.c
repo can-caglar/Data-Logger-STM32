@@ -2,35 +2,29 @@
 
 #include <math.h>
 #include "MyUSART.h"
+#include "stm32f0xx_hal.h"
+#include "main.h"
 
-#define USART_CR2_1STOPBIT    (USART_CR2_STOP_0 | USART_CR2_STOP_1)
-#define MAX_FRACTION    16  // OVER8 = 0 always for this module
-
-// Static declarations
-static io_register calculateBRR(unsigned long fclk, USART_BR_e baud);
-unsigned char isNullPtr(void* ptr);
+extern UART_HandleTypeDef huart1;
 
 // Public functions
 
 Error_Code_e MyUSART_Init(USART_TypeDef* USART, const USART_BR_e baud)
 {
-    USART->CR1 |= USART_CR1_UE;    // enable USART
-    USART->CR1 &= ~(USART_CR1_M);  // Word length = 8
-    USART->CR2 &= ~(USART_CR2_1STOPBIT);
-    USART->BRR = calculateBRR(SystemCoreClock, baud);
-    USART->CR1 |= USART_CR1_TE;    // send idle frame (enable transmitter)
-    USART->CR1 |= USART_CR1_RE;    // enable receiver
+    CubeMX_SystemInit(CMX_UART_POLL);
     return ECODE_OK;
 }
 
 Error_Code_e MyUSART_Write(USART_TypeDef* usart, const unsigned char byte)
 {
-    if (usart->ISR & USART_ISR_TXE)
+    if (HAL_UART_Transmit(&huart1, (uint8_t*)&byte, 1, 500) == HAL_OK)
     {
-        usart->TDR = byte;
         return ECODE_OK;
     }
-    return ECODE_NOT_READY;
+    else
+    {
+        return ECODE_NOT_READY;
+    }
 }
 
 // todo: MyUSART_Read shall just read (and pop) from a circular buffer
@@ -38,34 +32,12 @@ Error_Code_e MyUSART_Write(USART_TypeDef* usart, const unsigned char byte)
 // push it to the circular buffer
 Error_Code_e MyUSART_Read(USART_TypeDef* usart, unsigned char* outchar)
 {
-    if (isNullPtr(outchar))
+    if (HAL_UART_Receive(&huart1, outchar, 1, 500) == HAL_OK)
     {
-        return ECODE_BAD_PARAM;
-    }
-    if (usart->ISR & USART_ISR_RXNE)
-    {
-        *outchar = usart->RDR;
         return ECODE_OK;
     }
-    return ECODE_NOT_READY;
-}
-
-/****************** Static functions ********************/
-
-static io_register calculateBRR(unsigned long fclk, USART_BR_e baud)
-{
-    // equation from RM0090 page 981
-    float usartdiv = (float)(fclk) / (16UL * (unsigned long)baud);
-    io_register div_mantissa = floor(usartdiv);
-    float fraction = usartdiv - (int)(usartdiv);
-    io_register div_fraction = round(fraction * MAX_FRACTION);
-
-    io_register ret = (div_mantissa << 4) | div_fraction;
-
-    return ret;
-}
-
-unsigned char isNullPtr(void* ptr)
-{
-    return (ptr == 0);
+    else
+    {
+        return ECODE_NOT_READY;
+    }
 }

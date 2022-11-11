@@ -5,16 +5,6 @@
 #include "main.h"
 #include "fatfs.h"
 
-#include <string.h>
-#include <stdio.h>
-#include "MySD.h"
-
-#include "MyApp.h"
-#include "MyCLI.h"
-#include "Loop.h"
-#include "controller.h"
-#include "MyDIPSwitch.h"
-
 I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart1;
@@ -46,10 +36,13 @@ void CubeMX_SystemInit(unsigned int sys)
     MX_SPI1_Init();
     HAL_Delay(1000); //a short delay is important to let the SD card settle
   }
-  if (sys & CMX_UART)
+  if ((sys & CMX_UART) || (sys & CMX_UART_POLL))
   {
     MX_USART1_UART_Init();
-    HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
+    if (sys & CMX_UART)
+    {
+        HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
+    }
   }
   if (sys & CMX_I2C)
   {
@@ -152,7 +145,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 19200;
+  huart1.Init.BaudRate = 9600; //19200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
