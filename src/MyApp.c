@@ -31,20 +31,6 @@ int runApp(void)
     }
     else
     {
-        #if 0
-        MyRTC_Init();
-        MyTime t =
-        {
-            .year = 22,
-            .month = 11,
-            .day = 11,
-            .hour = 8,
-            .minute = 59,
-            .second = 0,
-            .weekday = 5
-        };
-        MyRTC_WriteTime(&t);
-        #endif
         SerialSnooper_Init();
         LOOP
         {
