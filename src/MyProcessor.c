@@ -69,7 +69,7 @@ static struct
     [CMD_LED]           = {"led", cmdLed, "Usage: led <on/off>"},
     [CMD_CIRBUFWRITE]   = {"cirbufWrite", cmdCirbufWrite, "Usage: cirbufWrite <bytes>"},
     [CMD_CIRBUFREAD]    = {"cirbufRead", cmdCirbufRead, "Usage: cirbufRead"},
-    [CMD_GETTIME]       = {"getTime", cmdGetTime, ""},
+    [CMD_GETTIME]       = {"getTime", cmdGetTime, "Usage: getTime"},
 };
 
 //

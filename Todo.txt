@@ -19,15 +19,15 @@ SD card:
 - [x] Treat the SD driver as a black box and add it to our current system.
 - [x] Add SD card functions to the CLI
 writes to the circular buffer which will be handled by the DMA.
-- [ ] Make fatfs smaller via ffconf configs
-- [ ] Don't open file if it exists, (and don't light LED)
+- [x] Make fatfs smaller via ffconf configs
+- [x] Don't light LED if fatfs init fails
 
 Baud rate / Application Decider
 - [x] Make use of the blinky module, remove the adapters, make tests work
     - [x] Mock the "system" HAL and eventually remove "system_hal.h/c"
     - [ ] Re-develop the "gpio_interrupts" module via TDD (currently not done with TDD)
 - [x] Create a 4-way DIP switch module
-- [ ] Make DIP switch decide baud rate
+- [!] Make DIP switch decide baud rate
     - [ ] Make it on the fly?
 
 Snooping application
@@ -45,13 +45,15 @@ Files / folders:
 
 Misc:
 - [ ] Add versioning which displays on UART
-- [ ] Increase the length of command entered (40 characters?)
+- [ ] Increase the length of command entered? (40 characters?)
+- [ ] Test fast UART input (we may need to increase size)
+- [ ] Optimise RAM usage (bss, data)
 
 Realtime clock:
 - [x] Think about abstraction and layers
     - [x] RTC module with I2C
     - [x] A string manip module on top of that
-- [ ] Add RTC to the fatfs module so files get right date when opened
+- [x] Add RTC to the fatfs module so files get right date when opened
 - [x] Update the filenames
 - [x] Fix the seconds bug
 

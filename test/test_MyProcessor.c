@@ -80,6 +80,11 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " cirbufRead");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: cirbufRead", resp);
+    
+    // "help getTime"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " getTime");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: getTime", resp);
 }
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
