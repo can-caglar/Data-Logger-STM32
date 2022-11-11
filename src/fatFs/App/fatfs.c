@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 #include "fatfs.h"
+#include "MyRTC.h"
 
 uint8_t retUSER;    /* Return value for USER */
 char USERPath[4];   /* USER logical drive path */
@@ -45,7 +46,16 @@ void MX_FATFS_Init(void)
 DWORD get_fattime(void)
 {
   /* USER CODE BEGIN get_fattime */
-  return 0;
+    DWORD ret = 0;
+    MyRTC_Init();
+    MyTime time = MyRTC_ReadTime();
+    ret =  (DWORD)((time.year + 2000) - 1980) << 25 |   // Year origin from the 1980 (0..127, e.g. 37 for 2017)
+           (DWORD)(time.month) << 21 |      // Month (1..12)
+           (DWORD)time.day     << 16 |      // Day of the month (1..31) 
+           (DWORD)time.hour    << 11 |     // Hour (0..23)
+           (DWORD)time.minute  << 5  |       // Minute (0..59)
+           (DWORD)time.second  >> 1;        // Second / 2 (0..29, e.g. 25 for 50)
+  return ret;
   /* USER CODE END get_fattime */
 }
 
