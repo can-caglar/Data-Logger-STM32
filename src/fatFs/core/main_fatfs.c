@@ -5,6 +5,7 @@
 #include "main.h"
 #include "fatfs.h"
 #include "BaudDecider.h"
+#include "LED.h"
 
 I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
@@ -249,9 +250,26 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
+  //__disable_irq();
+  led_init();
+  #define BLIP(ms) led_on(); HAL_Delay(ms); led_off(); HAL_Delay(200);
   while (1)
   {
+    // S
+    BLIP(200);
+    BLIP(200);
+    BLIP(200);
+    // O
+    BLIP(500);
+    BLIP(500);
+    BLIP(500);
+    // S
+    BLIP(200);
+    BLIP(200);
+    BLIP(200);
+
+    led_off();
+    HAL_Delay(500);
   }
   /* USER CODE END Error_Handler_Debug */
 }

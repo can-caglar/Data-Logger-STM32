@@ -22,16 +22,16 @@ uint32_t BaudDecider_GetBR(void)
     switch (dip)
     {
         case 0:
-            ret = 921600;
-            break;
-        case 1:
             ret = 460800;
             break;
-        case 2:
+        case 1:
             ret = 230400;
             break;
-        case 3:
+        case 2:
             ret = 115200;
+            break;
+        case 3:
+            ret = 76800;
             break;
         case 4:
             ret = 57600;
