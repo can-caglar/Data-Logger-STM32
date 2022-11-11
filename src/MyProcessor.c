@@ -9,7 +9,7 @@
 #include "MyTimeString.h"
 
 // preprocessor
-#define MAX_RESPONSE_LEN 50
+#define MAX_RESPONSE_LEN 30
 
 // typedefs
 typedef void(*CommandPtr)(void);

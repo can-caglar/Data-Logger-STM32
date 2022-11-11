@@ -6,6 +6,7 @@
 #include "mock_LED.h"
 #include "mock_MyCircularBuffer.h"
 #include "mock_MyTimeString.h"
+#include "mock_MyRTC.h"
 
 #define LIST_OF_CMDS \
 "help seeAll writeSD readDip led cirbufWrite cirbufRead getTime"
@@ -270,6 +271,32 @@ void test_MyProcessor_getTime(void)
 
     TEST_ASSERT_EQUAL_STRING("[the time]", resp);
 }
+
+// ******************** 'setTime' command ********************
+
+#if 0   // Will add this later
+void test_MyProcessor_setTime(void)
+{
+    MyTime expectedTime = 
+    {
+        .year = 22,
+        .month = 11,
+        .day = 10,
+        .hour = 18,
+        .minute = 56,
+        .second = 26,
+        .weekday = 4,
+    };
+
+    MyRTC_Init_Expect();
+    MyRTC_WriteTime_ExpectAndReturn(&expectedTime, 0);
+
+    MyProcessor_HandleCommandWithString("setTime 22 11 10 18 56 26 4");
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("Time has been set.", resp);
+}
+#endif
 
 // TODO, max cir buf read shall be in line with MAX_RESPONSE_LEN
 

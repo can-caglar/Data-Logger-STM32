@@ -35,8 +35,10 @@ enum
 
 extern I2C_HandleTypeDef hi2c1;
 
+// Helpers
 static void readReg(uint8_t reg, uint8_t* ret);
 static uint8_t bcdToInt(uint8_t bcd);
+uint8_t intToBCD(uint8_t num);
 
 void MyRTC_Init(void)
 {
@@ -66,6 +68,32 @@ MyTime MyRTC_ReadTime(void)
     return time;
 }
 
+int MyRTC_WriteTime(const MyTime* newTime)
+{
+    HAL_StatusTypeDef err = HAL_OK;
+    uint8_t reg = PCF_SECONDS;
+    uint8_t send[7];
+
+    send[0] = intToBCD(newTime->second);
+    send[1] = intToBCD(newTime->minute);
+    send[2] = intToBCD(newTime->hour);
+    send[3] = intToBCD(newTime->day);
+    send[4] = intToBCD(newTime->weekday);
+    send[5] = intToBCD(newTime->month);
+    send[6] = intToBCD(newTime->year);
+
+    err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
+    if (err == HAL_OK)
+    {
+        err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, send, 7, 500);
+    }
+    if (err != HAL_OK)
+    {
+        return -1;
+    }
+    return 0;
+}
+
 // Helper functions
 
 static void readReg(uint8_t reg, uint8_t* ret)
@@ -77,4 +105,13 @@ static void readReg(uint8_t reg, uint8_t* ret)
 static uint8_t bcdToInt(uint8_t bcd)
 {
     return ((bcd >> 4) * 10) + (bcd & 0xF);
+}
+
+uint8_t intToBCD(uint8_t num)
+{
+    // For 2 digit numbers only
+    uint8_t units = num % 10;
+    uint8_t tens = num / 10;
+
+    return (tens << 4) | (units);
 }

@@ -55,13 +55,13 @@ void test_readTime(void)
     uint8_t years_99 = TO_BCD(9,9);    // 22
     uint8_t weekday_0 = TO_BCD(0,0);   // 0, Sunday
 
-    // messing up the bits that shouldn't be used in calculation
+    // messing up the bits that shouldn't be used in the calculation
     secs_43 |= 0x80; // bit 7
     mins_54 |= 0x80; // bit 7
     hours_17 |= 0xC0; // bits 6-7
     days_9 |= 0xC0; // bits 6-7
     months_10 |= 0xE0; // bits 5-7
-    years_99 |= 0;  // all bits to be used
+    years_99 |= 0;  // all bits to be used in calculation
     weekday_0 |= 0xF8; // bit 3-7
     
     expectReadRegAndReturn(&reg_seconds, &secs_43);
@@ -83,6 +83,67 @@ void test_readTime(void)
     TEST_ASSERT_EQUAL_INT(0, time.weekday);
 }
 
+void test_writeTime(void)
+{
+    MyTime time = 
+    {
+        .year = 22,
+        .month = 11,
+        .day = 10,
+        .hour = 18,
+        .minute = 56,
+        .second = 26,
+        .weekday = 4,
+    };
+
+    uint8_t r1 = PCF_SECONDS;
+    uint8_t rbuf[7];
+    
+    rbuf[0] = TO_BCD(2,6)
+    rbuf[1] = TO_BCD(5,6)
+    rbuf[2] = TO_BCD(1,8)
+    rbuf[3] = TO_BCD(1,0)
+    rbuf[4] = TO_BCD(0,4)
+    rbuf[5] = TO_BCD(1,1)
+    rbuf[6] = TO_BCD(2,2)
+
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, &r1, 1, 500, 0);
+    
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, rbuf, 7, 500, 0);
+
+    TEST_ASSERT_EQUAL(0, MyRTC_WriteTime(&time));
+}
+
+void test_write_time_fail_1(void)
+{
+    MyTime time = {0};
+    uint8_t r1 = PCF_SECONDS;
+
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, &r1, 1, 500, 1);
+    
+    int err = MyRTC_WriteTime(&time);
+    TEST_ASSERT_EQUAL_INT(-1, err);
+}
+
+void test_write_time_fail_2(void)
+{
+    MyTime time = {0};
+    uint8_t r1 = PCF_SECONDS;
+    uint8_t send = 0;
+
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, &r1, 1, 500, 0);
+    
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, &send, 7, 500, 1);
+
+    TEST_ASSERT_EQUAL(-1, MyRTC_WriteTime(&time));
+}
+
+// Helpers
 void expectReadRegAndReturn(uint8_t* reg, uint8_t* returned)
 {
     HAL_I2C_Master_Transmit_ExpectAndReturn(

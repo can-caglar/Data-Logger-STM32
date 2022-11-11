@@ -15,6 +15,7 @@ typedef struct MyTime
 } MyTime;
 
 void MyRTC_Init(void);
-MyTime MyRTC_ReadTime(void);
+MyTime MyRTC_ReadTime(void);    // TODO, return error
+int MyRTC_WriteTime(const MyTime* newTime);
 
 #endif
