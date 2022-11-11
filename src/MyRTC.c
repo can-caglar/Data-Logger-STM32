@@ -18,6 +18,9 @@
 #define BM_WEEKDAYS 0x07    // bits 0-2
 #define BM_YEARS    0xFF    // bits 0-7
 
+// Bits
+#define CTRL1_BM_STOP (1 << 5)
+
 // Registers
 enum
 {
@@ -36,7 +39,8 @@ enum
 extern I2C_HandleTypeDef hi2c1;
 
 // Helpers
-static void readReg(uint8_t reg, uint8_t* ret);
+static int readReg(uint8_t reg, uint8_t* ret);
+static int writeReg(uint8_t reg, uint8_t val);
 static uint8_t bcdToInt(uint8_t bcd);
 uint8_t intToBCD(uint8_t num);
 
@@ -71,21 +75,27 @@ MyTime MyRTC_ReadTime(void)
 int MyRTC_WriteTime(const MyTime* newTime)
 {
     HAL_StatusTypeDef err = HAL_OK;
-    uint8_t reg = PCF_SECONDS;
-    uint8_t send[7];
+    uint8_t send[8];
+    uint8_t stopOsc[2] = {PCF_CTRL_1};
 
-    send[0] = intToBCD(newTime->second);
-    send[1] = intToBCD(newTime->minute);
-    send[2] = intToBCD(newTime->hour);
-    send[3] = intToBCD(newTime->day);
-    send[4] = intToBCD(newTime->weekday);
-    send[5] = intToBCD(newTime->month);
-    send[6] = intToBCD(newTime->year);
+    send[0] = PCF_SECONDS;
+    send[1] = intToBCD(newTime->second);
+    send[2] = intToBCD(newTime->minute);
+    send[3] = intToBCD(newTime->hour);
+    send[4] = intToBCD(newTime->day);
+    send[5] = intToBCD(newTime->weekday);
+    send[6] = intToBCD(newTime->month);
+    send[7] = intToBCD(newTime->year);
 
-    err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
+    err = readReg(stopOsc[0], &(stopOsc[1]));
+    stopOsc[1] |= CTRL1_BM_STOP;
+
     if (err == HAL_OK)
     {
-        err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, send, 7, 500);
+        writeReg(PCF_CTRL_1, stopOsc[1]);
+        err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, send, 8, 500);
+        stopOsc[1] &= ~CTRL1_BM_STOP;
+        writeReg(PCF_CTRL_1, stopOsc[1]);
     }
     if (err != HAL_OK)
     {
@@ -96,10 +106,29 @@ int MyRTC_WriteTime(const MyTime* newTime)
 
 // Helper functions
 
-static void readReg(uint8_t reg, uint8_t* ret)
+static int readReg(uint8_t reg, uint8_t* ret)
 {
-    HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
-    HAL_I2C_Master_Receive(&hi2c1, READ_ADDR, ret, 1, 500);
+    HAL_StatusTypeDef err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, &reg, 1, 500);
+    if (err == HAL_OK)
+    {
+        err = HAL_I2C_Master_Receive(&hi2c1, READ_ADDR, ret, 1, 500);
+    }
+    if (err == HAL_OK)
+    {
+        return 0;
+    }
+    return -1;
+}
+
+static int writeReg(uint8_t reg, uint8_t val)
+{
+    uint8_t data[2] = {reg, val};
+    HAL_StatusTypeDef err = HAL_I2C_Master_Transmit(&hi2c1, WRITE_ADDR, data, 2, 500);
+    if (err == HAL_OK)
+    {
+        return 0;
+    }
+    return -1;
 }
 
 static uint8_t bcdToInt(uint8_t bcd)

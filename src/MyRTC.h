@@ -5,13 +5,13 @@
 
 typedef struct MyTime
 {
-    uint8_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-    uint8_t weekday;
+    uint8_t year;   // 0 - 99
+    uint8_t month;  // 1 - 12
+    uint8_t day;    // 1 - 31
+    uint8_t hour;   // 0 - 23
+    uint8_t minute; // 0 - 59
+    uint8_t second; // 0 - 59
+    uint8_t weekday; // 0 - 6
 } MyTime;
 
 void MyRTC_Init(void);

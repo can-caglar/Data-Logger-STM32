@@ -96,22 +96,37 @@ void test_writeTime(void)
         .weekday = 4,
     };
 
-    uint8_t r1 = PCF_SECONDS;
-    uint8_t rbuf[7];
+    uint8_t rbuf[8];
     
-    rbuf[0] = TO_BCD(2,6)
-    rbuf[1] = TO_BCD(5,6)
-    rbuf[2] = TO_BCD(1,8)
-    rbuf[3] = TO_BCD(1,0)
-    rbuf[4] = TO_BCD(0,4)
-    rbuf[5] = TO_BCD(1,1)
-    rbuf[6] = TO_BCD(2,2)
+    rbuf[0] = PCF_SECONDS;
+    rbuf[1] = TO_BCD(2,6)
+    rbuf[2] = TO_BCD(5,6)
+    rbuf[3] = TO_BCD(1,8)
+    rbuf[4] = TO_BCD(1,0)
+    rbuf[5] = TO_BCD(0,4)
+    rbuf[6] = TO_BCD(1,1)
+    rbuf[7] = TO_BCD(2,2)
 
+    uint8_t stopbuf[2];
+    uint8_t returned = 0x3; // pretend that ctrl reg is like so
+    stopbuf[0] = PCF_CTRL_1;
+    stopbuf[1] = (1 << 5) | returned;
+
+    // Read CTRL reg 1, shall return 0x3
+    expectReadRegAndReturn(&(stopbuf[0]), &returned);
+
+    // We shall write to CTRL reg 1 to stop the RTC
     HAL_I2C_Master_Transmit_ExpectAndReturn(
-        &hi2c1, WRITE_ADDR, &r1, 1, 500, 0);
-    
+        &hi2c1, WRITE_ADDR, stopbuf, 2, 500, 0);
+
+    // Write new values
     HAL_I2C_Master_Transmit_ExpectAndReturn(
-        &hi2c1, WRITE_ADDR, rbuf, 7, 500, 0);
+        &hi2c1, WRITE_ADDR, rbuf, 8, 500, 0);
+
+    // Start RTC again
+    stopbuf[2] &= ~(1 << 5);
+    HAL_I2C_Master_Transmit_ExpectAndReturn(
+        &hi2c1, WRITE_ADDR, stopbuf, 2, 500, 0);
 
     TEST_ASSERT_EQUAL(0, MyRTC_WriteTime(&time));
 }
@@ -121,27 +136,21 @@ void test_write_time_fail_1(void)
     MyTime time = {0};
     uint8_t r1 = PCF_SECONDS;
 
-    HAL_I2C_Master_Transmit_ExpectAndReturn(
-        &hi2c1, WRITE_ADDR, &r1, 1, 500, 1);
+    HAL_I2C_Master_Receive_IgnoreAndReturn(1);
+    HAL_I2C_Master_Transmit_IgnoreAndReturn(0);
     
     int err = MyRTC_WriteTime(&time);
+
+    TEST_ASSERT_EQUAL_INT(-1, err);
+
+    HAL_I2C_Master_Receive_IgnoreAndReturn(0);
+    HAL_I2C_Master_Transmit_IgnoreAndReturn(1);
+    
+    err = MyRTC_WriteTime(&time);
+
     TEST_ASSERT_EQUAL_INT(-1, err);
 }
 
-void test_write_time_fail_2(void)
-{
-    MyTime time = {0};
-    uint8_t r1 = PCF_SECONDS;
-    uint8_t send = 0;
-
-    HAL_I2C_Master_Transmit_ExpectAndReturn(
-        &hi2c1, WRITE_ADDR, &r1, 1, 500, 0);
-    
-    HAL_I2C_Master_Transmit_ExpectAndReturn(
-        &hi2c1, WRITE_ADDR, &send, 7, 500, 1);
-
-    TEST_ASSERT_EQUAL(-1, MyRTC_WriteTime(&time));
-}
 
 // Helpers
 void expectReadRegAndReturn(uint8_t* reg, uint8_t* returned)
