@@ -7,9 +7,10 @@
 #include "mock_MyCircularBuffer.h"
 #include "mock_MyTimeString.h"
 #include "mock_MyRTC.h"
+#include "mock_BaudDecider.h"
 
 #define LIST_OF_CMDS \
-"help seeAll writeSD readDip led cirbufWrite cirbufRead getTime"
+"help seeAll writeSD readDip led cirbufWrite cirbufRead getTime getBR"
 
 void setUp()
 {
@@ -279,7 +280,7 @@ void test_MyProcessor_getTime(void)
 
 // ******************** 'setTime' command ********************
 
-#if 0   // Will add this later
+#if 0   // This is lower priority, will add it later
 void test_MyProcessor_setTime(void)
 {
     MyTime expectedTime = 
@@ -302,6 +303,20 @@ void test_MyProcessor_setTime(void)
     TEST_ASSERT_EQUAL_STRING("Time has been set.", resp);
 }
 #endif
+
+// ******************** 'getBR' command ********************
+
+void test_MyProcessor_getBR(void)
+{
+    BaudDecider_Init_Expect();
+    BaudDecider_GetBR_ExpectAndReturn(115200);
+
+    MyProcessor_HandleCommandWithString("getBR");
+
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("Baud Conf: 115200", resp);
+}
 
 // TODO, max cir buf read shall be in line with MAX_RESPONSE_LEN
 

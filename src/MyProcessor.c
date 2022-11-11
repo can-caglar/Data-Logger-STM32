@@ -7,6 +7,7 @@
 #include "LED.h"
 #include "MyCircularBuffer.h"
 #include "MyTimeString.h"
+#include "BaudDecider.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 30
@@ -33,6 +34,7 @@ static void cmdLed(void);
 static void cmdCirbufWrite(void);
 static void cmdCirbufRead(void);
 static void cmdGetTime(void);
+static void cmdGetBR(void);
 
 // Helper functions
 int findCommand(char* cmdStr);
@@ -49,6 +51,7 @@ typedef enum
     CMD_CIRBUFWRITE,
     CMD_CIRBUFREAD,
     CMD_GETTIME,
+    CMD_GETBR,
     CMD_COUNT   // must be last
 } AllCommands_e;
 
@@ -70,6 +73,7 @@ static struct
     [CMD_CIRBUFWRITE]   = {"cirbufWrite", cmdCirbufWrite, "Usage: cirbufWrite <bytes>"},
     [CMD_CIRBUFREAD]    = {"cirbufRead", cmdCirbufRead, "Usage: cirbufRead"},
     [CMD_GETTIME]       = {"getTime", cmdGetTime, "Usage: getTime"},
+    [CMD_GETBR]         = {"getBR", cmdGetBR, ""},
 };
 
 //
@@ -242,6 +246,13 @@ static void cmdGetTime(void)
 {
     MyTimeString_Init();
     strcpy(cmdResponse, MyTimeString_GetTimeStamp());
+}
+
+static void cmdGetBR(void)
+{
+    BaudDecider_Init();
+    uint32_t br = BaudDecider_GetBR();
+    sprintf(cmdResponse, "Baud Conf: %u", br);
 }
 
 /********************* helper functions **************/
