@@ -10,7 +10,7 @@
 #include "mock_BaudDecider.h"
 
 #define LIST_OF_CMDS \
-"help seeAll writeSD readDip led circWrite circRead getTime getBR"
+"help seeAll writeSD led circWrite circRead getTime getBR"
 
 void setUp()
 {
@@ -61,11 +61,6 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " writeSD");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: writeSD <text>", resp);
-
-    // "help readDip"
-    MyProcessor_HandleCommandWithString(CMD_STR_HELP " readDip");
-    resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Usage: readDip", resp);
 
     // "help led"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " led");
@@ -156,19 +151,6 @@ void test_MyProcessor_writeSDCommand0Params(void)
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("\"\" has been written to SD card.", resp);
-}
-
-// ******************** 'readDip' command ********************
-
-void test_MyProcessor_readDip(void)
-{
-    MyDIP_Init_Expect();
-    MyDIP_Read_ExpectAndReturn(5);
-    
-    MyProcessor_HandleCommandWithString("readDip");
-
-    const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("DIP Switch: 5", resp);
 }
 
 // ******************** 'led' command ********************

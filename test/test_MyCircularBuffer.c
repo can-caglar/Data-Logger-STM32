@@ -90,17 +90,17 @@ void test_bufferWritingWhenBufferFull(void)
     // fill up buffer
     for (int i = 0; i < MAX_SIZE; i++)
     {
-        MyCircularBuffer_write(i);
+        MyCircularBuffer_write((uint8_t)i);
     }
     // overflow buffer
     for (int i = 0; i < MAX_SIZE; i++)
     {
-        MyCircularBuffer_write(42 + i);
+        MyCircularBuffer_write((uint8_t)(42 + i));
     }
 
     for (int i = 0; i < MAX_SIZE; i++)
     {
-        TEST_ASSERT_EQUAL(i, MyCircularBuffer_read());
+        TEST_ASSERT_EQUAL((uint8_t)i, MyCircularBuffer_read());
     }
 }
 

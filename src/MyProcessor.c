@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 #include "MySD.h"
-#include "MyDipSwitch.h"
 #include "LED.h"
 #include "MyCircularBuffer.h"
 #include "MyTimeString.h"
@@ -30,7 +29,6 @@ static char* commandPhrase;
 static void cmdHelp(void);
 static void cmdSeeAll(void);
 static void cmdWriteSD(void);
-static void cmdReadDip(void);
 static void cmdLed(void);
 static void cmdCirbufWrite(void);
 static void cmdCirbufRead(void);
@@ -48,7 +46,6 @@ typedef enum
     CMD_HELP,
     CMD_SEE_ALL,
     CMD_WRITESD,
-    CMD_READDIP,
     CMD_LED,
     CMD_CIRBUFWRITE,
     CMD_CIRBUFREAD,
@@ -70,7 +67,6 @@ static struct
     [CMD_HELP]          = {"help", cmdHelp, "<command>"},
     [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, ""},
     [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "<text>"},
-    [CMD_READDIP]       = {"readDip", cmdReadDip, ""},
     [CMD_LED]           = {"led", cmdLed, "<on/off>"},
     [CMD_CIRBUFWRITE]   = {"circWrite", cmdCirbufWrite, "<chars>"},
     [CMD_CIRBUFREAD]    = {"circRead", cmdCirbufRead, ""},
@@ -184,13 +180,6 @@ static void cmdWriteSD(void)
     {
         sprintf(cmdResponse, "Could not initialise SD card.");
     }
-}
-
-static void cmdReadDip(void)
-{
-    MyDIP_Init();
-    uint8_t res = MyDIP_Read();
-    sprintf(cmdResponse, "DIP Switch: %d", res);
 }
 
 static void cmdLed(void)
