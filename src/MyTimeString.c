@@ -1,9 +1,33 @@
 #include "MyTimeString.h"
 #include "MyRTC.h"
 #include <stdio.h>
-// #include <time.h>
+#include <string.h>
 
 static char ret[23];
+
+static const char* const numToStrLookup[100] =
+{
+    "00", "01", "02", "03", "04",
+    "05", "06", "07", "08", "09",
+    "10", "11", "12", "13", "14",
+    "15", "16", "17", "18", "19",
+    "20", "21", "22", "23", "24",
+    "25", "26", "27", "28", "29",
+    "30", "31", "32", "33", "34",
+    "35", "36", "37", "38", "39",
+    "40", "41", "42", "43", "44",
+    "45", "46", "47", "48", "49",
+    "50", "51", "52", "53", "54",
+    "55", "56", "57", "58", "59",
+    "60", "61", "62", "63", "64",
+    "65", "66", "67", "68", "69",
+    "70", "71", "72", "73", "74",
+    "75", "76", "77", "78", "79",
+    "80", "81", "82", "83", "84",
+    "85", "86", "87", "88", "89",
+    "90", "91", "92", "93", "94",
+    "95", "96", "97", "98", "99",
+};
 
 static uint32_t secondsSinceEpoch(const MyTime* time);
 
@@ -26,15 +50,46 @@ const char* MyTimeString_GetFileName(void)
 
 const char* MyTimeString_GetTimeStamp(void)
 {
+    char* strPtr = ret;
+    #define maxSize 2
+    char colon = ':';
+    char space = ' ';
+    char rightArrow = '>';
     MyTime time = MyRTC_ReadTime();
-
-    sprintf(ret, "[20%02d-%02d-%02d %02d:%02d:%02d] ",
-        time.year,
-        time.month,
-        time.day,
-        time.hour,
-        time.minute,
-        time.second);
+    // Day
+    const char* number = numToStrLookup[time.day];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;
+    // Space
+    memcpy(strPtr, &space, 1);
+    strPtr += 1;
+    // Hour
+    number = numToStrLookup[time.hour];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;  
+    // Colon
+    memcpy(strPtr, &colon, 1);
+    strPtr += 1;
+    // Minute
+    number = numToStrLookup[time.minute];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;  
+    // Colon
+    memcpy(strPtr, &colon, 1);
+    strPtr += 1;
+    // Second
+    number = numToStrLookup[time.second];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;
+    // Right arrow
+    memcpy(strPtr, &rightArrow, 1);
+    strPtr += 1;
+    // Space
+    memcpy(strPtr, &space, 1);
+    strPtr += 1;
+    // Null
+    *strPtr = '\0';
+    
     return ret;
 }
 
