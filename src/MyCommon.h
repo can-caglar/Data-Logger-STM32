@@ -128,9 +128,9 @@ typedef volatile uint32_t io_register;
 // DIP switch
 #define GPIO_PORT_DIP   GPIOB
 #define CLK_ENABLE_DIP  __HAL_RCC_GPIOB_CLK_ENABLE
-#define GPIO_PIN_DIP_1  GPIO_PIN_0
+#define GPIO_PIN_DIP_1  GPIO_PIN_5
 #define GPIO_PIN_DIP_2  GPIO_PIN_1
-#define GPIO_PIN_DIP_3  GPIO_PIN_5
+#define GPIO_PIN_DIP_3  GPIO_PIN_0
 #define GPIO_PIN_DIP_4  GPIO_PIN_4
 
 #endif

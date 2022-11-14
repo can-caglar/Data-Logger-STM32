@@ -29,6 +29,7 @@ Baud rate / Application Decider
 - [x] Create a 4-way DIP switch module
 - [!] Make DIP switch decide baud rate
     - [ ] Make it on the fly?
+- [ ] Check that all baud rate settings work as expected
 
 Snooping application
 - [x] Write UART library using STM32 HAL,
@@ -56,6 +57,7 @@ Realtime clock:
 - [x] Add RTC to the fatfs module so files get right date when opened
 - [x] Update the filenames
 - [x] Fix the seconds bug
+- [ ] Add ability for milliseconds
 
 Future:
 - [ ] Add small OLED(?) screen

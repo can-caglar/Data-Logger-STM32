@@ -7,8 +7,6 @@
 
 #include "main.h"
 
-#include "MyRTC.h" //rm me
-
 #ifndef TEST
 #define runApp main
 #endif

@@ -44,7 +44,10 @@ void MyCircularBuffer_write(uint8_t val)
 {
     if (MyCircularBuffer_isFull())
     {
-        tail = ADVANCED(tail);
+        return;
+        #if 0
+        tail = ADVANCED(tail); // this is to overwrite
+        #endif
     }
     buf[head] = val;
     head = ADVANCED(head);

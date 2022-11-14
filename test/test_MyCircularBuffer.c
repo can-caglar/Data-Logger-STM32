@@ -85,13 +85,14 @@ void test_bufferReturns0_ifEmpty(void)
     TEST_ASSERT_EQUAL(0, MyCircularBuffer_read());
 }
 
-void test_bufferWontWriteIfFull(void)
+void test_bufferWritingWhenBufferFull(void)
 {
+    // fill up buffer
     for (int i = 0; i < MAX_SIZE; i++)
     {
         MyCircularBuffer_write(i);
     }
-
+    // overflow buffer
     for (int i = 0; i < MAX_SIZE; i++)
     {
         MyCircularBuffer_write(42 + i);
@@ -99,7 +100,7 @@ void test_bufferWontWriteIfFull(void)
 
     for (int i = 0; i < MAX_SIZE; i++)
     {
-        TEST_ASSERT_EQUAL((uint8_t)(42 + i), MyCircularBuffer_read());
+        TEST_ASSERT_EQUAL(i, MyCircularBuffer_read());
     }
 }
 
