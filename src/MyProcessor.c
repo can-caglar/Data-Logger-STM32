@@ -11,6 +11,7 @@
 
 // preprocessor
 #define MAX_RESPONSE_LEN 30
+#define HELP_STR    "Usage:"
 
 // typedefs
 typedef void(*CommandPtr)(void);
@@ -39,6 +40,7 @@ static void cmdGetBR(void);
 // Helper functions
 int findCommand(char* cmdStr);
 void updateResponse(char* newResponse);
+void buildHelpString(int cmdIndex);
 
 // Command count
 typedef enum
@@ -62,17 +64,17 @@ static struct
 {
     char str[MAX_COMMAND_LEN];
     CommandPtr fn;
-    char help[MAX_RESPONSE_LEN];
+    char help[MAX_HELP_LEN];
 } commands[CMD_COUNT] =
 {
-    [CMD_HELP]          = {"help", cmdHelp, "Usage: help <command>"},
-    [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, "Usage: seeAll"},
-    [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "Usage: writeSD <text>"},
-    [CMD_READDIP]       = {"readDip", cmdReadDip, "Usage: readDip"},
-    [CMD_LED]           = {"led", cmdLed, "Usage: led <on/off>"},
-    [CMD_CIRBUFWRITE]   = {"cirbufWrite", cmdCirbufWrite, "Usage: cirbufWrite <bytes>"},
-    [CMD_CIRBUFREAD]    = {"cirbufRead", cmdCirbufRead, "Usage: cirbufRead"},
-    [CMD_GETTIME]       = {"getTime", cmdGetTime, "Usage: getTime"},
+    [CMD_HELP]          = {"help", cmdHelp, "<command>"},
+    [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, ""},
+    [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "<text>"},
+    [CMD_READDIP]       = {"readDip", cmdReadDip, ""},
+    [CMD_LED]           = {"led", cmdLed, "<on/off>"},
+    [CMD_CIRBUFWRITE]   = {"circWrite", cmdCirbufWrite, "<chars>"},
+    [CMD_CIRBUFREAD]    = {"circRead", cmdCirbufRead, ""},
+    [CMD_GETTIME]       = {"getTime", cmdGetTime, ""},
     [CMD_GETBR]         = {"getBR", cmdGetBR, ""},
 };
 
@@ -80,9 +82,9 @@ static struct
 void MyProcessor_HandleCommandWithString(char* str)
 {
     size_t inputStrLen = strlen(str);
-    if (inputStrLen >= MAX_COMMAND_LEN)
+    if (inputStrLen >= MAX_INPUT_LEN)
     {
-        updateResponse("Command too long!");
+        updateResponse("Input too long!");
         return;
     }
     
@@ -133,7 +135,8 @@ static void cmdHelp(void)
         int cmdIndex = findCommand(token);
         if (cmdIndex != -1)
         {
-            updateResponse(commands[cmdIndex].help);
+            // build help string
+            buildHelpString(cmdIndex);
         }
         else
         {
@@ -144,7 +147,7 @@ static void cmdHelp(void)
     else
     {
         // help for the "help" command
-        updateResponse(commands[CMD_HELP].help);
+        buildHelpString(CMD_HELP);
     }
 }
 
@@ -273,4 +276,18 @@ void updateResponse(char* newResponse)
 {
     // TODO, cut response if it's too long?
     strcpy(cmdResponse, newResponse);
+}
+
+void buildHelpString(int cmdIndex)
+{
+    char separator = ' ';
+    if (strcmp(commands[cmdIndex].help, "") == 0)
+    {
+        separator = '\0';
+    }
+    sprintf(cmdResponse, "%s %s%c%s", 
+        HELP_STR,
+        commands[cmdIndex].str, 
+        separator,
+        commands[cmdIndex].help);
 }

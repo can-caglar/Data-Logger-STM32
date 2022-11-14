@@ -1,7 +1,9 @@
 #ifndef MY_PROCESSOR_H
 #define MY_PROCESSOR_H
 
-#define MAX_COMMAND_LEN 20
+#define MAX_COMMAND_LEN 10
+#define MAX_HELP_LEN 10
+#define MAX_INPUT_LEN 20
 #define CMD_STR_HELP "help"
 
 void MyProcessor_HandleCommandWithString(char* str);

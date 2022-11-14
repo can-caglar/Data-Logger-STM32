@@ -10,7 +10,7 @@
 #include "mock_BaudDecider.h"
 
 #define LIST_OF_CMDS \
-"help seeAll writeSD readDip led cirbufWrite cirbufRead getTime getBR"
+"help seeAll writeSD readDip led circWrite circRead getTime getBR"
 
 void setUp()
 {
@@ -45,7 +45,7 @@ void test_MyProcessor_sendingVeryLongStringGivesUniqueResponse(void)
 {
     MyProcessor_HandleCommandWithString("01234567890123456789");
     const char* resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Command too long!", resp);
+    TEST_ASSERT_EQUAL_STRING("Input too long!", resp);
 }
 
 // ******************** 'help' command ********************
@@ -72,17 +72,17 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: led <on/off>", resp);
 
-    // "help cirbufWrite"
-    MyProcessor_HandleCommandWithString(CMD_STR_HELP " cirbufWrite");
+    // "help circWrite"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " circWrite");
     resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Usage: cirbufWrite <bytes>", resp);
+    TEST_ASSERT_EQUAL_STRING("Usage: circWrite <chars>", resp);
 
-    // "help cirbufRead"
-    MyProcessor_HandleCommandWithString(CMD_STR_HELP " cirbufRead");
+    // "help circRead"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " circRead");
     resp = MyProcessor_GetResponseMessage();
-    TEST_ASSERT_EQUAL_STRING("Usage: cirbufRead", resp);
+    TEST_ASSERT_EQUAL_STRING("Usage: circRead", resp);
     
-    // "help getTime"
+// "help getTime"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " getTime");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: getTime", resp);
@@ -208,29 +208,29 @@ void test_MyProcessor_led_wrong_param(void)
 
 // ******************** 'cirbuf' commands ********************
 
-void test_MyProcessor_cirbufWrite(void)
+void test_MyProcessor_circWrite(void)
 {
     MyCircularBuffer_init_Expect();
     MyCircularBuffer_write_Expect('h');
     MyCircularBuffer_write_Expect('i');
 
-    MyProcessor_HandleCommandWithString("cirbufWrite hi");
+    MyProcessor_HandleCommandWithString("circWrite hi");
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("\"hi\" written to circular buffer.", resp);
 }
 
-void test_MyProcessor_cirbufWriteNothing(void)
+void test_MyProcessor_circWriteNothing(void)
 {
     MyCircularBuffer_init_Expect();
 
-    MyProcessor_HandleCommandWithString("cirbufWrite");
+    MyProcessor_HandleCommandWithString("circWrite");
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("\"\" written to circular buffer.", resp);
 }
 
-void test_MyProcessor_cirbufRead(void)
+void test_MyProcessor_circRead(void)
 {
     MyCircularBuffer_init_Expect();
 
@@ -241,13 +241,13 @@ void test_MyProcessor_cirbufRead(void)
     }
     MyCircularBuffer_isEmpty_ExpectAndReturn(1);
 
-    MyProcessor_HandleCommandWithString("cirbufRead");
+    MyProcessor_HandleCommandWithString("circRead");
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Buffer: abcde", resp);
 }
 
-void test_MyProcessor_cirbufReadMax20Bytes(void)
+void test_MyProcessor_circReadMax20Bytes(void)
 {
     MyCircularBuffer_init_Expect();
 
@@ -259,7 +259,7 @@ void test_MyProcessor_cirbufReadMax20Bytes(void)
 
     MyCircularBuffer_isEmpty_ExpectAndReturn(0);
 
-    MyProcessor_HandleCommandWithString("cirbufRead");
+    MyProcessor_HandleCommandWithString("circRead");
 
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Buffer: abcdefghijkl", resp);
