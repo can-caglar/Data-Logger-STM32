@@ -9,7 +9,7 @@
 #include "BaudDecider.h"
 
 // preprocessor
-#define MAX_RESPONSE_LEN 30
+#define MAX_RESPONSE_LEN 26
 #define HELP_STR    "Usage:"
 
 // typedefs
@@ -57,12 +57,14 @@ typedef enum
 //
 // The command table
 //
-static struct
+typedef struct Commands
 {
-    char str[MAX_COMMAND_LEN];
-    CommandPtr fn;
-    char help[MAX_HELP_LEN];
-} commands[CMD_COUNT] =
+    const char str[MAX_COMMAND_LEN];
+    const CommandPtr fn;
+    const char help[MAX_HELP_LEN];
+} Commands;
+
+const Commands commands[CMD_COUNT] =
 {
     [CMD_HELP]          = {"help", cmdHelp, "<command>"},
     [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, ""},

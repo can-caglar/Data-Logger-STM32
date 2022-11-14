@@ -3,7 +3,7 @@
 #include <stdio.h>
 // #include <time.h>
 
-static char ret[30];
+static char ret[23];
 
 static uint32_t secondsSinceEpoch(const MyTime* time);
 

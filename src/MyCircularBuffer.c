@@ -2,13 +2,13 @@
 #include <string.h>
 
 // Max size must be power of 2 for fast ptr advancing
-#define SIZE_OF_BUF     1024
+#define SIZE_OF_BUF     2048
 #define MAX_SIZE    ((SIZE_OF_BUF) - 1)  // "wasting" a slot to tell apart full/empty
 #define ADVANCED(ptr) (((ptr) + 1) & (SIZE_OF_BUF - 1))
 
 static uint8_t buf[SIZE_OF_BUF]; 
-static uint32_t head = 0;
-static uint32_t tail = 0;
+static uint16_t head = 0;
+static uint16_t tail = 0;
 static uint8_t initialised = 0;
 
 void MyCircularBuffer_init(void)
