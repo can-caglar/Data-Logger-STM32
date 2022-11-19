@@ -7,6 +7,7 @@
 #include "MyCircularBuffer.h"
 #include "MyTimeString.h"
 #include "BaudDecider.h"
+#include "MyRTC.h"
 
 // preprocessor
 #define MAX_RESPONSE_LEN 26
@@ -23,6 +24,9 @@ static char scratchpad[MAX_RESPONSE_LEN]; // Used for string manipulation
 static char scratchpad2[MAX_RESPONSE_LEN];
 static char* commandPhrase;
 
+#define MISSING_PARAM_STR   "Missing parameter!"
+#define INVALID_PARAM_STR   "Invalid parameter!"
+
 // Forward declarations
 
 // Command handlers
@@ -33,6 +37,7 @@ static void cmdLed(void);
 static void cmdCirbufWrite(void);
 static void cmdCirbufRead(void);
 static void cmdGetTime(void);
+static void cmdSetTime(void);
 static void cmdGetBR(void);
 
 // Helper functions
@@ -50,6 +55,7 @@ typedef enum
     CMD_CIRBUFWRITE,
     CMD_CIRBUFREAD,
     CMD_GETTIME,
+    CMD_SETTIME,
     CMD_GETBR,
     CMD_COUNT   // must be last
 } AllCommands_e;
@@ -73,6 +79,7 @@ const Commands commands[CMD_COUNT] =
     [CMD_CIRBUFWRITE]   = {"circWrite", cmdCirbufWrite, "<chars>"},
     [CMD_CIRBUFREAD]    = {"circRead", cmdCirbufRead, ""},
     [CMD_GETTIME]       = {"getTime", cmdGetTime, ""},
+    [CMD_SETTIME]       = {"setTime", cmdSetTime, "<yymmddhhmmss>"},
     [CMD_GETBR]         = {"getBR", cmdGetBR, ""},
 };
 
@@ -208,7 +215,7 @@ static void cmdLed(void)
     }
     else
     {
-        updateResponse("Missing parameter!");
+        updateResponse(MISSING_PARAM_STR);
     }
 }
 
@@ -240,6 +247,50 @@ static void cmdGetTime(void)
 {
     MyTimeString_Init();
     strcpy(cmdResponse, MyTimeString_GetTimeStamp());
+}
+
+static void cmdSetTime(void)
+{
+    const char* token = strtok(NULL, " ");
+    const char* timeToSet = token;
+    if (timeToSet != NULL)
+    {
+        if (strlen(timeToSet) != 12)
+        {
+            updateResponse(INVALID_PARAM_STR);
+            return;
+        }
+        char timeValues[12][3] = { 0 };
+        for (int i = 0; i < 12; i++)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                timeValues[i][j] = *timeToSet;
+                timeToSet++;
+            }
+        }
+        MyRTC_Init();
+        MyTime newTime = { 0 };
+        newTime.year = atoi(timeValues[0]);
+        newTime.month = atoi(timeValues[1]);
+        newTime.day = atoi(timeValues[2]);
+        newTime.hour = atoi(timeValues[3]);
+        newTime.minute = atoi(timeValues[4]);
+        newTime.second = atoi(timeValues[5]);
+
+        if (MyRTC_WriteTime(&newTime) == 0)
+        {
+            updateResponse("Time has been set.");
+        }
+        else
+        {
+            updateResponse("Time not set. RTC error.");
+        }
+    }
+    else
+    {
+        updateResponse("Missing parameter!");
+    }
 }
 
 static void cmdGetBR(void)

@@ -10,7 +10,7 @@
 #include "mock_BaudDecider.h"
 
 #define LIST_OF_CMDS \
-"help seeAll writeSD led circWrite circRead getTime getBR"
+"help seeAll writeSD led circWrite circRead getTime setTime getBR"
 
 void setUp()
 {
@@ -43,7 +43,7 @@ void test_MyProcessor_sendingEmptyStringGivesUniqueResponse(void)
 
 void test_MyProcessor_sendingVeryLongStringGivesUniqueResponse(void)
 {
-    MyProcessor_HandleCommandWithString("01234567890123456789");
+    MyProcessor_HandleCommandWithString("012345678901234567890");
     const char* resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Input too long!", resp);
 }
@@ -77,10 +77,15 @@ void test_MyProcessor_help_ShowsHelpMessageForCommands(void)
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: circRead", resp);
     
-// "help getTime"
+    // "help getTime"
     MyProcessor_HandleCommandWithString(CMD_STR_HELP " getTime");
     resp = MyProcessor_GetResponseMessage();
     TEST_ASSERT_EQUAL_STRING("Usage: getTime", resp);
+
+    // "help setTime"
+    MyProcessor_HandleCommandWithString(CMD_STR_HELP " setTime");
+    resp = MyProcessor_GetResponseMessage();
+    TEST_ASSERT_EQUAL_STRING("Usage: setTime <yymmddhhmmss>", resp);
 }
 
 void test_MyProcessor_help_ShowsItsOwnHelpWhenNoParams(void)
@@ -262,7 +267,6 @@ void test_MyProcessor_getTime(void)
 
 // ******************** 'setTime' command ********************
 
-#if 0   // This is lower priority, will add it later
 void test_MyProcessor_setTime(void)
 {
     MyTime expectedTime = 
@@ -273,18 +277,57 @@ void test_MyProcessor_setTime(void)
         .hour = 18,
         .minute = 56,
         .second = 26,
-        .weekday = 4,
+        .weekday = 0,
     };
 
     MyRTC_Init_Expect();
     MyRTC_WriteTime_ExpectAndReturn(&expectedTime, 0);
 
-    MyProcessor_HandleCommandWithString("setTime 22 11 10 18 56 26 4");
+    // 2022-11-10 18:56:26
+    MyProcessor_HandleCommandWithString("setTime 221110185626");
     const char* resp = MyProcessor_GetResponseMessage();
 
     TEST_ASSERT_EQUAL_STRING("Time has been set.", resp);
 }
-#endif
+
+void test_MyProcessor_setTimeFailRTC(void)
+{
+    MyTime expectedTime = 
+    {
+        .year = 22,
+        .month = 11,
+        .day = 10,
+        .hour = 18,
+        .minute = 56,
+        .second = 26,
+        .weekday = 0,
+    };
+
+    MyRTC_Init_Expect();
+    MyRTC_WriteTime_ExpectAndReturn(&expectedTime, 1);  // fails
+
+    // 2022-11-10 18:56:26
+    MyProcessor_HandleCommandWithString("setTime 221110185626");
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("Time not set. RTC error.", resp);
+}
+
+void test_MyProcessor_setTimeBadInput(void)
+{
+    MyProcessor_HandleCommandWithString("setTime 12");
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("Invalid parameter!", resp);
+}
+
+void test_MyProcessor_setTimeNoInput(void)
+{
+    MyProcessor_HandleCommandWithString("setTime");
+    const char* resp = MyProcessor_GetResponseMessage();
+
+    TEST_ASSERT_EQUAL_STRING("Missing parameter!", resp);
+}
 
 // ******************** 'getBR' command ********************
 
