@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support;.\src\blinky;.\src\fatFs;.\src\fatFs\App;.\src\fatFs\core;.\src\fatFs\middlewares;.\src\fatFs\middlewares\option;.\src\fatFs\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc;.\RTE\Device\STM32F031K6Tx</IncludePath>
+              <IncludePath>.\test\support;.\src\stm32cube_files;.\src\stm32cube_files\App;.\src\stm32cube_files\core;.\src\stm32cube_files\middlewares;.\src\stm32cube_files\middlewares\option;.\src\stm32cube_files\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc;.\RTE\Device\STM32F031K6Tx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,7 +379,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>MyHAL</GroupName>
+          <GroupName>MyApplication</GroupName>
           <Files>
             <File>
               <FileName>MyRCC.c</FileName>
@@ -434,17 +434,17 @@
             <File>
               <FileName>button.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\blinky\button.c</FilePath>
+              <FilePath>.\src\button.c</FilePath>
             </File>
             <File>
               <FileName>gpio_interrupts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\blinky\gpio_interrupts.c</FilePath>
+              <FilePath>.\src\gpio_interrupts.c</FilePath>
             </File>
             <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\blinky\LED.c</FilePath>
+              <FilePath>.\src\LED.c</FilePath>
             </File>
             <File>
               <FileName>MySD.c</FileName>
@@ -499,62 +499,62 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>FatFs</GroupName>
+          <GroupName>stm32cube_files</GroupName>
           <Files>
             <File>
               <FileName>user_diskio_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\user_diskio_spi.c</FilePath>
+              <FilePath>.\src\stm32cube_files\user_diskio_spi.c</FilePath>
             </File>
             <File>
               <FileName>user_diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\Target\user_diskio.c</FilePath>
+              <FilePath>.\src\stm32cube_files\Target\user_diskio.c</FilePath>
             </File>
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\middlewares\diskio.c</FilePath>
+              <FilePath>.\src\stm32cube_files\middlewares\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\middlewares\ff.c</FilePath>
+              <FilePath>.\src\stm32cube_files\middlewares\ff.c</FilePath>
             </File>
             <File>
               <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\middlewares\ff_gen_drv.c</FilePath>
+              <FilePath>.\src\stm32cube_files\middlewares\ff_gen_drv.c</FilePath>
             </File>
             <File>
               <FileName>syscall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\middlewares\option\syscall.c</FilePath>
+              <FilePath>.\src\stm32cube_files\middlewares\option\syscall.c</FilePath>
             </File>
             <File>
               <FileName>unicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\middlewares\option\unicode.c</FilePath>
+              <FilePath>.\src\stm32cube_files\middlewares\option\unicode.c</FilePath>
             </File>
             <File>
               <FileName>fatfs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\App\fatfs.c</FilePath>
+              <FilePath>.\src\stm32cube_files\App\fatfs.c</FilePath>
             </File>
             <File>
               <FileName>stm32f0xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\core\stm32f0xx_hal_msp.c</FilePath>
+              <FilePath>.\src\stm32cube_files\core\stm32f0xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>stm32f0xx_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\core\stm32f0xx_it.c</FilePath>
+              <FilePath>.\src\stm32cube_files\core\stm32f0xx_it.c</FilePath>
             </File>
             <File>
               <FileName>main_fatfs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\fatFs\core\main_fatfs.c</FilePath>
+              <FilePath>.\src\stm32cube_files\core\main_fatfs.c</FilePath>
             </File>
           </Files>
         </Group>
