@@ -437,11 +437,6 @@
               <FilePath>.\src\blinky\button.c</FilePath>
             </File>
             <File>
-              <FileName>controller.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\blinky\controller.c</FilePath>
-            </File>
-            <File>
               <FileName>gpio_interrupts.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\blinky\gpio_interrupts.c</FilePath>

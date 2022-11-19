@@ -4,13 +4,6 @@
 #include "stm32f0xx_hal_rcc.h"
 #include "MyCommon.h"
 
-// static GPIO_InitTypeDef dipswitch =
-// {
-//     .Pin = GPIO_PIN_DIP_1 | GPIO_PIN_DIP_2 | GPIO_PIN_DIP_3 | GPIO_PIN_DIP_4,
-//     .Mode = GPIO_MODE_INPUT,
-//     .Pull = GPIO_PULLUP,
-// };
-
 void MyDIP_Init()
 {
     GPIO_InitTypeDef dipswitch =

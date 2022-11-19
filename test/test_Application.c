@@ -1,7 +1,6 @@
 #include "unity.h"
 #include "MyApp.h"
 #include "mock_MyCLI.h"
-#include "mock_controller.h"
 #include "mock_AppDecider.h"
 #include "mock_SerialSnooper.h"
 #include "mock_main.h"

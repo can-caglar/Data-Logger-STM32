@@ -1,7 +1,6 @@
 #include "MyApp.h"
 #include "MyCLI.h"
 #include "Loop.h"
-#include "controller.h"
 #include "AppDecider.h"
 #include "SerialSnooper.h"
 

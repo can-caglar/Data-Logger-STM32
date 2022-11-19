@@ -7,27 +7,12 @@
 #define NEW_LINE_DENOTER "> "
 
 static char initialised = 0;
-static MyGPIO terminalUartGpio =
-{
-    .gpio_register = MY_USART_GPIO,
-    .mode = GPIO_ALT,
-    .alt_func = MY_USART_ALT,
-    .output_type = GPIO_PUSH_PULL,
-    .pupd = GPIO_PUPD_UP
-};
 
 void MyTerminalUART_Init(void)
 {
     if (!initialised)
     {
         initialised = 1;
-        terminalUartGpio.pin_mask = (MY_USART_RX | MY_USART_TX);
-
-        // enable clocks
-        MyRCC_ClockEnable(&(RCC->AHBENR), MY_USART_GPIO_RCC_POS);
-        MyRCC_ClockEnable(&(RCC->APB2ENR), MY_USART_UART_RCC_POS);
-
-        MyGPIO_Init(&terminalUartGpio);
         MyUSART_Init(MY_USART, USART_BR_19200);
     }
 }

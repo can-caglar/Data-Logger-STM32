@@ -41,7 +41,7 @@ int MyTimeString_Init(void)
 const char* MyTimeString_GetFileName(void)
 {
     // max 8 characters (+ .txt)
-    // Unix timestamp, should be good for many, many decades
+    // Unix timestamp, should be good for many decades
     // as of 2022
     MyTime time = MyRTC_ReadTime();
     uint32_t unixTs = secondsSinceEpoch(&time);
