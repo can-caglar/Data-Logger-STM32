@@ -23,9 +23,12 @@ Final report for the project can be found <a ref="https://docs.google.com/docume
 
 A prototype board has been created to aid the software development. 
 
+Headers have been soldered to a perforated board. A mixture of wire wrapping and soldering used for the connections.
+
 ### The working prototype
 
 <img src="resource/prototype.png">
+<img src="resource/perf_board.jpg">
 
 ### Pinouts
 
