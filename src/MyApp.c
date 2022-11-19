@@ -6,6 +6,7 @@
 
 #include "main.h"
 
+// Ceedling has its own main function
 #ifndef TEST
 #define runApp main
 #endif

@@ -2,7 +2,6 @@
 #include "MyReceiver.h"
 #include "MyCommon.h"
 #include "mock_MyUSART.h"
-#include "mock_MyGPIO.h"
 #include "mock_MyTerminalUART.h"
 #include "unity_helper.h"
 #include <stdio.h>

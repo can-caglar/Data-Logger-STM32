@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support;.\src\stm32cube_files;.\src\stm32cube_files\App;.\src\stm32cube_files\core;.\src\stm32cube_files\middlewares;.\src\stm32cube_files\middlewares\option;.\src\stm32cube_files\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc;.\RTE\Device\STM32F031K6Tx</IncludePath>
+              <IncludePath>.\test\support;.\src\stm32cube_files;.\src\stm32cube_files\App;.\src\stm32cube_files\core;.\src\stm32cube_files\middlewares;.\src\stm32cube_files\middlewares\option;.\src\stm32cube_files\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc;.\RTE\Device\STM32F031K6Tx;src\RTC;src\led;src\sd_card;src\serial_snooper;src\dip_switch;src\circular_buffer;src\cli;src\common</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -382,39 +382,34 @@
           <GroupName>MyApplication</GroupName>
           <Files>
             <File>
-              <FileName>MyRCC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\MyRCC.c</FilePath>
-            </File>
-            <File>
               <FileName>MyCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyCommon.c</FilePath>
+              <FilePath>.\src\common\MyCommon.c</FilePath>
             </File>
             <File>
               <FileName>MyReceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyReceiver.c</FilePath>
+              <FilePath>.\src\cli\MyReceiver.c</FilePath>
             </File>
             <File>
               <FileName>MyUSART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyUSART.c</FilePath>
+              <FilePath>.\src\cli\MyUSART.c</FilePath>
             </File>
             <File>
               <FileName>MyGPIO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyGPIO.c</FilePath>
+              <FilePath>.\src\led\MyGPIO.c</FilePath>
             </File>
             <File>
               <FileName>MyProcessor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyProcessor.c</FilePath>
+              <FilePath>.\src\cli\MyProcessor.c</FilePath>
             </File>
             <File>
               <FileName>MyTerminalUART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyTerminalUART.c</FilePath>
+              <FilePath>.\src\cli\MyTerminalUART.c</FilePath>
             </File>
             <File>
               <FileName>MyApp.c</FileName>
@@ -424,67 +419,57 @@
             <File>
               <FileName>Loop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\Loop.c</FilePath>
+              <FilePath>.\src\common\Loop.c</FilePath>
             </File>
             <File>
               <FileName>MyCLI.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyCLI.c</FilePath>
-            </File>
-            <File>
-              <FileName>button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\button.c</FilePath>
-            </File>
-            <File>
-              <FileName>gpio_interrupts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\gpio_interrupts.c</FilePath>
+              <FilePath>.\src\cli\MyCLI.c</FilePath>
             </File>
             <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\LED.c</FilePath>
+              <FilePath>.\src\led\LED.c</FilePath>
             </File>
             <File>
               <FileName>MySD.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MySD.c</FilePath>
+              <FilePath>.\src\sd_card\MySD.c</FilePath>
             </File>
             <File>
               <FileName>MyDipSwitch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyDipSwitch.c</FilePath>
+              <FilePath>.\src\dip_switch\MyDipSwitch.c</FilePath>
             </File>
             <File>
               <FileName>AppDecider.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\AppDecider.c</FilePath>
+              <FilePath>.\src\dip_switch\AppDecider.c</FilePath>
             </File>
             <File>
               <FileName>SerialSnooper.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\SerialSnooper.c</FilePath>
+              <FilePath>.\src\serial_snooper\SerialSnooper.c</FilePath>
             </File>
             <File>
               <FileName>MyCircularBuffer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyCircularBuffer.c</FilePath>
+              <FilePath>.\src\circular_buffer\MyCircularBuffer.c</FilePath>
             </File>
             <File>
               <FileName>MyTimeString.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyTimeString.c</FilePath>
+              <FilePath>.\src\rtc\MyTimeString.c</FilePath>
             </File>
             <File>
               <FileName>MyRTC.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\MyRTC.c</FilePath>
+              <FilePath>.\src\rtc\MyRTC.c</FilePath>
             </File>
             <File>
               <FileName>BaudDecider.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BaudDecider.c</FilePath>
+              <FilePath>.\src\dip_switch\BaudDecider.c</FilePath>
             </File>
           </Files>
         </Group>

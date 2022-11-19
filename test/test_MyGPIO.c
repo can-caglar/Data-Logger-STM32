@@ -4,7 +4,6 @@
 #include <string.h>
 #include "unity.h"
 #include "MyGPIO.h"
-#include "MyRCC.h"
 #include "MyCommon.h"
 #include "MyBitStuff.h"
 #include "user_stm32f407xx.h"
