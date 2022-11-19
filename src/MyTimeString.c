@@ -5,6 +5,7 @@
 
 static char ret[23];
 
+// 
 static const char* const numToStrLookup[100] =
 {
     "00", "01", "02", "03", "04",
@@ -54,10 +55,29 @@ const char* MyTimeString_GetTimeStamp(void)
     #define maxSize 2
     char colon = ':';
     char space = ' ';
-    char rightArrow = '>';
+    char hyphen = '-';
+    char squareOpen = '[';
+    char squareClose = ']';
     MyTime time = MyRTC_ReadTime();
+    // Square open
+    memcpy(strPtr, &squareOpen, 1);
+    strPtr += 1;
+    // Year
+    const char* number = numToStrLookup[time.year];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;
+    // Hyphen
+    memcpy(strPtr, &hyphen, 1);
+    strPtr += 1;
+    // Month
+    number = numToStrLookup[time.month];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;
+    // Hyphen
+    memcpy(strPtr, &hyphen, 1);
+    strPtr += 1;
     // Day
-    const char* number = numToStrLookup[time.day];
+    number = numToStrLookup[time.day];
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Space
@@ -81,15 +101,15 @@ const char* MyTimeString_GetTimeStamp(void)
     number = numToStrLookup[time.second];
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
-    // Right arrow
-    memcpy(strPtr, &rightArrow, 1);
+    // Square close
+    memcpy(strPtr, &squareClose, 1);
     strPtr += 1;
     // Space
     memcpy(strPtr, &space, 1);
     strPtr += 1;
     // Null
     *strPtr = '\0';
-    
+
     return ret;
 }
 
@@ -141,15 +161,6 @@ static uint32_t secondsSinceEpoch(const MyTime* time)
 
     // second
     timeEpoch += time->second;
-
-//    t.tm_year = (2000 + time->year) - 1900;  // Year - 1900
-//    t.tm_mon = time->month - 1;  // Month, where 0 = jan
-//    t.tm_mday = time->day;       // Day of the month
-//    t.tm_hour = time->hour;
-//    t.tm_min = time->minute;
-//    t.tm_sec = time->second;
-//    t.tm_isdst = -1;        // Is DST on? 1 = yes, 0 = no, -1 = unknown
-//    //timeEpoch = mktime(&t);
 
     return timeEpoch;
 }
