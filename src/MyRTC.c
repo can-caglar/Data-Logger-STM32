@@ -1,6 +1,7 @@
 #include "MyRTC.h"
 #include "stm32f0xx_hal.h"
 #include "main.h"
+#include <string.h>
 
 // Datasheet:
 // https://www.nxp.com/docs/en/data-sheet/PCF8523.pdf
@@ -20,6 +21,13 @@
 
 // Bits
 #define CTRL1_BM_STOP (1 << 5)
+
+// Static variables
+static uint32_t timeLastCalled = 0;
+static MyTime time = { 0 };
+
+// Consts
+#define ONE_SECOND  1000
 
 // Registers
 enum
@@ -47,28 +55,35 @@ uint8_t intToBCD(uint8_t num);
 void MyRTC_Init(void)
 {
     CubeMX_SystemInit(CMX_I2C);
+    memset(&time, 0, sizeof(time));
+    timeLastCalled = 0;
 }
 
 MyTime MyRTC_ReadTime(void)
 {
-    MyTime time = { 0 };
+    uint32_t timeNow = HAL_GetTick();
 
-    readReg(PCF_SECONDS, &time.second);
-    readReg(PCF_MINUTES, &time.minute);
-    readReg(PCF_HOURS, &time.hour);
-    readReg(PCF_DAYS, &time.day);
-    readReg(PCF_MONTHS, &time.month);
-    readReg(PCF_YEARS, &time.year);
-    readReg(PCF_WEEKDAYS, &time.weekday);
+    if ((timeNow >= (timeLastCalled + ONE_SECOND)) || timeLastCalled == 0)
+    {
+        timeLastCalled = timeNow;
 
-    time.second = bcdToInt(time.second & BM_SECONDS) ;
-    time.minute = bcdToInt(time.minute & BM_MINUTES);
-    time.hour = bcdToInt(time.hour & BM_HOURS);
-    time.day = bcdToInt(time.day & BM_DAYS);
-    time.month = bcdToInt(time.month & BM_MONTHS);
-    time.year = bcdToInt(time.year & BM_YEARS);
-    time.weekday = bcdToInt(time.weekday & BM_WEEKDAYS);
+        readReg(PCF_SECONDS, &time.second);
+        readReg(PCF_MINUTES, &time.minute);
+        readReg(PCF_HOURS, &time.hour);
+        readReg(PCF_DAYS, &time.day);
+        readReg(PCF_MONTHS, &time.month);
+        readReg(PCF_YEARS, &time.year);
+        readReg(PCF_WEEKDAYS, &time.weekday);
 
+        time.second = bcdToInt(time.second & BM_SECONDS) ;
+        time.minute = bcdToInt(time.minute & BM_MINUTES);
+        time.hour = bcdToInt(time.hour & BM_HOURS);
+        time.day = bcdToInt(time.day & BM_DAYS);
+        time.month = bcdToInt(time.month & BM_MONTHS);
+        time.year = bcdToInt(time.year & BM_YEARS);
+        time.weekday = bcdToInt(time.weekday & BM_WEEKDAYS);
+    }
+    
     return time;
 }
 

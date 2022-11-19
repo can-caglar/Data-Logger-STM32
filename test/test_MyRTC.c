@@ -2,10 +2,12 @@
 #include "MyRTC.h"
 #include "mock_stm32f0xx_hal_i2c.h"
 #include "mock_main.h"
+#include "mock_stm32f0xx_hal.h"
 #include <stdio.h>
 
 // Helpers
 static void expectReadRegAndReturn(uint8_t* reg, uint8_t* returned);
+static void ignoreReadRegAndReturn(void);
 
 #define TO_BCD(dec, units) (((dec) << 4) | (units));
 
@@ -38,9 +40,8 @@ uint8_t reg_weekdays = PCF_WEEKDAYS;
 uint8_t reg_months = PCF_MONTHS;
 uint8_t reg_years = PCF_YEARS;
 
-void test_init(void)
+void setUp(void)
 {
-    // do nothing for now
     CubeMX_SystemInit_Expect(CMX_I2C);
     MyRTC_Init();
 }
@@ -63,6 +64,8 @@ void test_readTime(void)
     months_10 |= 0xE0; // bits 5-7
     years_99 |= 0;  // all bits to be used in calculation
     weekday_0 |= 0xF8; // bit 3-7
+
+    HAL_GetTick_ExpectAndReturn(999); // first time
     
     expectReadRegAndReturn(&reg_seconds, &secs_43);
     expectReadRegAndReturn(&reg_minutes, &mins_54);
@@ -81,6 +84,51 @@ void test_readTime(void)
     TEST_ASSERT_EQUAL_INT(10, time.month);
     TEST_ASSERT_EQUAL_INT(99, time.year);
     TEST_ASSERT_EQUAL_INT(0, time.weekday);
+
+    // shortly after should not do anything
+    HAL_GetTick_ExpectAndReturn(1500); // too early
+    time = MyRTC_ReadTime();
+}
+
+void test_readTimeWithTimeouts(void)
+{
+    uint8_t secs_43 =  0;
+    uint8_t mins_54 =  0;
+    uint8_t hours_17 = 0;
+    uint8_t days_9 = 0;
+    uint8_t months_10 = 0;
+    uint8_t years_99 = 0;
+    uint8_t weekday_0 = 0;
+
+    HAL_GetTick_ExpectAndReturn(999); // first time
+    
+    // shall expect read reg
+    expectReadRegAndReturn(&reg_seconds, &secs_43);
+    expectReadRegAndReturn(&reg_minutes, &mins_54);
+    expectReadRegAndReturn(&reg_hours, &hours_17);
+    expectReadRegAndReturn(&reg_days, &days_9);
+    expectReadRegAndReturn(&reg_months, &months_10);
+    expectReadRegAndReturn(&reg_years, &years_99);
+    expectReadRegAndReturn(&reg_weekdays, &weekday_0);
+
+    MyRTC_ReadTime();
+
+    // shortly after should not do anything
+    HAL_GetTick_ExpectAndReturn(1500); // too early
+    MyRTC_ReadTime();
+
+    // 1 second later shall
+    HAL_GetTick_ExpectAndReturn(1999); // just right
+
+    expectReadRegAndReturn(&reg_seconds, &secs_43);
+    expectReadRegAndReturn(&reg_minutes, &mins_54);
+    expectReadRegAndReturn(&reg_hours, &hours_17);
+    expectReadRegAndReturn(&reg_days, &days_9);
+    expectReadRegAndReturn(&reg_months, &months_10);
+    expectReadRegAndReturn(&reg_years, &years_99);
+    expectReadRegAndReturn(&reg_weekdays, &weekday_0);
+
+    MyRTC_ReadTime();
 }
 
 void test_writeTime(void)
@@ -163,4 +211,11 @@ void expectReadRegAndReturn(uint8_t* reg, uint8_t* returned)
         &hi2c1, READ_ADDR, &tempVal, 1, 500, 0);
 
     HAL_I2C_Master_Receive_ReturnThruPtr_pData(returned);
+}
+
+void ignoreReadRegAndReturn(void)
+{
+    HAL_I2C_Master_Transmit_IgnoreAndReturn(0);
+
+    HAL_I2C_Master_Receive_IgnoreAndReturn(0);
 }
