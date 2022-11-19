@@ -182,9 +182,3 @@ void test_MyProcessor_getBR(void)
 
     TEST_ASSERT_EQUAL_STRING("Baud Conf: 115200", resp);
 }
-
-// TODO, max cir buf read shall be in line with MAX_RESPONSE_LEN
-
-// TODO, refactor!
-
-// TODO: maybe make the \r a global? a string literal?

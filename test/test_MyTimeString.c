@@ -13,13 +13,13 @@ void test_init(void)
 void test_get_time_stamp_string_representation(void)
 {
     expect_rtc_readtime((MyTime){22, 11, 5, 18, 37, 12});
-    TEST_ASSERT_EQUAL_STRING("[22-11-05 18:37:12] ",
+    TEST_ASSERT_EQUAL_STRING("[2022-11-05 18:37:12] ",
         MyTimeString_GetTimeStamp()
     );
 
     // with 1 digit, will pad 0s to make them 2 digits
     expect_rtc_readtime((MyTime){2, 1, 9, 1, 7, 1});
-    TEST_ASSERT_EQUAL_STRING("[02-01-09 01:07:01] ",
+    TEST_ASSERT_EQUAL_STRING("[2002-01-09 01:07:01] ",
         MyTimeString_GetTimeStamp()
     );
 }

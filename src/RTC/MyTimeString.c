@@ -62,8 +62,12 @@ const char* MyTimeString_GetTimeStamp(void)
     // Square open
     memcpy(strPtr, &squareOpen, 1);
     strPtr += 1;
+    // Year two thousand...
+    const char* number = numToStrLookup[20];
+    memcpy(strPtr, number, maxSize);
+    strPtr += 2;
     // Year
-    const char* number = numToStrLookup[time.year];
+    number = numToStrLookup[time.year];
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Hyphen
