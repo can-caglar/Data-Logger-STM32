@@ -32,10 +32,6 @@ static char* commandPhrase;
 // Command handlers
 static void cmdHelp(void);
 static void cmdSeeAll(void);
-static void cmdWriteSD(void);
-static void cmdLed(void);
-static void cmdCirbufWrite(void);
-static void cmdCirbufRead(void);
 static void cmdGetTime(void);
 static void cmdSetTime(void);
 static void cmdGetBR(void);
@@ -50,10 +46,6 @@ typedef enum
 {
     CMD_HELP,
     CMD_SEE_ALL,
-    CMD_WRITESD,
-    CMD_LED,
-    CMD_CIRBUFWRITE,
-    CMD_CIRBUFREAD,
     CMD_GETTIME,
     CMD_SETTIME,
     CMD_GETBR,
@@ -74,10 +66,6 @@ const Commands commands[CMD_COUNT] =
 {
     [CMD_HELP]          = {"help", cmdHelp, "<command>"},
     [CMD_SEE_ALL]       = {"seeAll", cmdSeeAll, ""},
-    [CMD_WRITESD]       = {"writeSD", cmdWriteSD, "<text>"},
-    [CMD_LED]           = {"led", cmdLed, "<on/off>"},
-    [CMD_CIRBUFWRITE]   = {"circWrite", cmdCirbufWrite, "<chars>"},
-    [CMD_CIRBUFREAD]    = {"circRead", cmdCirbufRead, ""},
     [CMD_GETTIME]       = {"getTime", cmdGetTime, ""},
     [CMD_SETTIME]       = {"setTime", cmdSetTime, "<yymmddhhmmss>"},
     [CMD_GETBR]         = {"getBR", cmdGetBR, ""},
@@ -170,79 +158,6 @@ static void cmdSeeAll(void)
     updateResponse(scratchpad);
 }
 
-static void cmdWriteSD(void)
-{
-    FRESULT err = MySD_Init("cli.txt");
-    if (err == FR_OK)
-    {
-        err = MySD_WriteString(commandPhrase);  
-        if (err == FR_OK)
-        {
-            sprintf(cmdResponse, "\"%s\" has been written to SD card.", commandPhrase);
-        }
-        else
-        {
-            sprintf(cmdResponse, "Failed to write to SD card.");
-        }
-    }
-    else
-    {
-        sprintf(cmdResponse, "Could not initialise SD card.");
-    }
-}
-
-static void cmdLed(void)
-{
-    char* token = strtok(NULL, " ");
-    if (token != NULL)
-    {
-        if (strcmp(token, "on") == 0)
-        {
-            led_init();
-            led_on();
-            updateResponse("LED is now ON.");
-        }
-        else if (strcmp(token, "off") == 0)
-        {
-            led_init();
-            led_off();
-            updateResponse("LED is now OFF.");
-        }
-        else
-        {
-            sprintf(cmdResponse, "Invalid parameter: \"%s\".", token);
-        }
-    }
-    else
-    {
-        updateResponse(MISSING_PARAM_STR);
-    }
-}
-
-static void cmdCirbufWrite(void)
-{
-    sprintf(cmdResponse, "\"%s\" written to circular buffer.", commandPhrase);
-    MyCircularBuffer_init();
-
-    while(*commandPhrase)
-    {
-        MyCircularBuffer_write(*commandPhrase);
-        commandPhrase++;
-    }
-}
-
-static void cmdCirbufRead(void)
-{
-    char contents[MAX_RESPONSE_LEN] = "Buffer: ";
-    int size = strlen(contents);
-    MyCircularBuffer_init();
-    while (!MyCircularBuffer_isEmpty() && size < 20)
-    {
-        contents[size++] = MyCircularBuffer_read();
-    }
-    sprintf(cmdResponse, "%s", contents);
-}
-
 static void cmdGetTime(void)
 {
     MyTimeString_Init();
@@ -316,7 +231,7 @@ int findCommand(char* cmdStr)
 
 void updateResponse(char* newResponse)
 {
-    // TODO, cut response if it's too long?
+    // TODO, limit response if it's too long
     strcpy(cmdResponse, newResponse);
 }
 
