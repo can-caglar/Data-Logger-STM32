@@ -1,8 +1,6 @@
 #include "unity.h"
 #include "MyCommon.h"
-#include "mock_MyGPIO.h"
 #include "mock_MyUSART.h"
-#include "mock_MyRCC.h"
 #include "unity_helper.h"
 #include "MyTerminalUART.h"
 
@@ -18,20 +16,6 @@ void tearDown(void)
 
 void test_MyTerminalUART_Init_InitialisationInitsKnownPins(void)
 {
-    // MyGPIO expectedStruct =
-    // {
-    //     .gpio_register = MY_USART_GPIO,
-    //     .pin_mask = (MY_USART_RX | MY_USART_TX),
-    //     .mode = GPIO_ALT,
-    //     .alt_func = MY_USART_ALT,
-    //     .output_type = GPIO_PUSH_PULL,
-    //     .pupd = GPIO_PUPD_UP
-    // };
-    
-    // MyRCC_ClockEnable_ExpectAndReturn(&(RCC->AHBENR), 17, ECODE_OK);
-    // MyRCC_ClockEnable_ExpectAndReturn(&(RCC->APB2ENR), 14, ECODE_OK);
-
-    // MyGPIO_Init_ExpectAndReturn(&expectedStruct, ECODE_OK);
     MyUSART_Init_ExpectAndReturn(MY_USART, USART_BR_19200, ECODE_OK);
 
     MyTerminalUART_Init();

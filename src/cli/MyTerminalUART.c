@@ -1,8 +1,6 @@
 #include "MyTerminalUART.h"
 #include "MyUSART.h"
 #include "MyCommon.h"
-#include "MyGPIO.h"
-#include "MyRCC.h"
 
 #define NEW_LINE_DENOTER "> "
 

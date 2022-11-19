@@ -1,6 +1,9 @@
 #ifndef MY_LOOP_H_INCLUDED
 #define MY_LOOP_H_INCLUDED
 
+// For tests, infinite loops
+// will only loop for however
+// many times the test needs
 #ifdef TEST
 extern unsigned int testIndex;
 extern unsigned int testIndexMax;
