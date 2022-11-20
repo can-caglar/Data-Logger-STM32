@@ -11,7 +11,6 @@ This is my submission for the final project in the course Making Embedded System
 Final report for the project can be found <a ref="https://docs.google.com/document/d/1QN5CVr99LwbAlFGOjgETou2btL8RMqJVu_yTGeXLMHs/edit?usp=sharing">here (currently a draft version)</a>.
 
 ## Block Diagram
-
 *Please see the report linked above for more information on the software architecture and design.*
 
 <center>
