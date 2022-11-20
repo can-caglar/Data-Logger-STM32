@@ -3,10 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
+static const char* strLookup(uint8_t num);
+
 static char ret[23];
 
-// 
-static const char* const numToStrLookup[100] =
+#define LOOKUP_AMOUNT 100
+
+static const char* const numToStrLookup[LOOKUP_AMOUNT] =
 {
     "00", "01", "02", "03", "04",
     "05", "06", "07", "08", "09",
@@ -63,46 +66,46 @@ const char* MyTimeString_GetTimeStamp(void)
     memcpy(strPtr, &squareOpen, 1);
     strPtr += 1;
     // Year two thousand...
-    const char* number = numToStrLookup[20];
+    const char* number = strLookup(20);    
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Year
-    number = numToStrLookup[time.year];
+    number = strLookup(time.year);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Hyphen
     memcpy(strPtr, &hyphen, 1);
     strPtr += 1;
     // Month
-    number = numToStrLookup[time.month];
+    number = strLookup(time.month);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Hyphen
     memcpy(strPtr, &hyphen, 1);
     strPtr += 1;
     // Day
-    number = numToStrLookup[time.day];
+    number = strLookup(time.day);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Space
     memcpy(strPtr, &space, 1);
     strPtr += 1;
     // Hour
-    number = numToStrLookup[time.hour];
+    number = strLookup(time.hour);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;  
     // Colon
     memcpy(strPtr, &colon, 1);
     strPtr += 1;
     // Minute
-    number = numToStrLookup[time.minute];
+    number = strLookup(time.minute);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;  
     // Colon
     memcpy(strPtr, &colon, 1);
     strPtr += 1;
     // Second
-    number = numToStrLookup[time.second];
+    number = strLookup(time.second);
     memcpy(strPtr, number, maxSize);
     strPtr += 2;
     // Square close
@@ -167,4 +170,14 @@ static uint32_t secondsSinceEpoch(const MyTime* time)
     timeEpoch += time->second;
 
     return timeEpoch;
+}
+
+const char* strLookup(uint8_t num)
+{
+    const char* ret = numToStrLookup[0];
+    if (num < LOOKUP_AMOUNT)
+    {
+        ret = numToStrLookup[num];
+    }
+    return ret;
 }

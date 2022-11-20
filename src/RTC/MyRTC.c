@@ -57,6 +57,13 @@ void MyRTC_Init(void)
     CubeMX_SystemInit(CMX_I2C);
     memset(&time, 0, sizeof(time));
     timeLastCalled = 0;
+    
+    // as per documentation:
+    // battery switch-over function is enabled in direct switching mode;
+    // battery low detection function is disabled
+    // this helps with RTC data getting corrupted
+    // when power is disconnected
+    writeReg(PCF_CTRL_3, (0b101 << 5));
 }
 
 MyTime MyRTC_ReadTime(void)
