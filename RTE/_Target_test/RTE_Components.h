@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'MyHAL' 
+ * Project: 'SerialSnooper' 
  * Target:  'Target_test' 
  */
 
