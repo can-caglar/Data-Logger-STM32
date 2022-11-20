@@ -22,6 +22,12 @@ void test_get_time_stamp_string_representation(void)
     TEST_ASSERT_EQUAL_STRING("[2002-01-09 01:07:01] ",
         MyTimeString_GetTimeStamp()
     );
+
+    // with bad input, will return 0s
+    expect_rtc_readtime((MyTime){100, 100, 100, 100, 100, 100});
+    TEST_ASSERT_EQUAL_STRING("[2000-00-00 00:00:00] ",
+        MyTimeString_GetTimeStamp()
+    );
 }
 
 void test_get_file_name_uses_unix_timestamp(void)
