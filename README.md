@@ -8,7 +8,7 @@ The Serial Snooper is a UART data logger with a configurable baud rate, real tim
 
 This is my submission for the final project in the course Making Embedded Systems by Elecia White.
 
-Final report for the project can be found <a ref="https://docs.google.com/document/d/1QN5CVr99LwbAlFGOjgETou2btL8RMqJVu_yTGeXLMHs/edit?usp=sharing">here (currently a draft version)</a>.
+Final report for the project can be found [here](https://docs.google.com/document/d/1QN5CVr99LwbAlFGOjgETou2btL8RMqJVu_yTGeXLMHs/edit?usp=sharing).
 
 ## Block Diagram
 *Please see the report linked above for more information on the software architecture and design.*
@@ -26,7 +26,7 @@ Headers have been soldered to a perforated board. A mixture of wire wrapping and
 
 ### The working prototype
 
-<img src="resource/prototype.png">
+<img src="resource/prototype2.png">
 <img src="resource/perf_board.jpg">
 
 ### Pinouts
