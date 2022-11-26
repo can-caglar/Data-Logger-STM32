@@ -17,4 +17,6 @@ uint8_t MyCircularBuffer_isFull(void);
 
 uint32_t MyCircularBuffer_getCapacity(void);
 
+uint8_t MyCircularBuffer_peek(void);
+
 #endif

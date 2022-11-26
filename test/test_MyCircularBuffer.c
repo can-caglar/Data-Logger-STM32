@@ -112,6 +112,18 @@ void test_initialisingTwiceDoesNothing(void)
     TEST_ASSERT_EQUAL('A', MyCircularBuffer_read());
 }
 
+void test_circularBufferPeek(void)
+{
+    MyCircularBuffer_write('A');
+    MyCircularBuffer_write('B');
+
+    TEST_ASSERT_EQUAL(0, MyCircularBuffer_isEmpty());
+    TEST_ASSERT_EQUAL('A', MyCircularBuffer_read());
+    TEST_ASSERT_EQUAL('B', MyCircularBuffer_peek());
+    TEST_ASSERT_EQUAL('B', MyCircularBuffer_read());
+    TEST_ASSERT_EQUAL(1, MyCircularBuffer_isEmpty());
+}
+
 /******************** Helper functions and their tests *************/
 
 uint8_t isPowerOfTwo(uint32_t num)

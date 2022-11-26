@@ -7,7 +7,25 @@
 #include "mock_main.h"
 #include "string.h"
 
-void successfulInit(void);
+typedef enum
+{
+    DONT_EXPECT_TIMESTAMP,
+    EXPECT_TIMESTAMP,
+} ExpectTimestamp_e;
+
+static void successfulInit(void);
+static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTimestamp_e expectTimestamp)
+{
+    // first character shall always be timestamped
+    MyCircularBuffer_isEmpty_ExpectAndReturn(0);
+    MyCircularBuffer_read_ExpectAndReturn(*thisValue);
+    if (expectTimestamp == EXPECT_TIMESTAMP)
+    {
+        MyTimeString_GetTimeStamp_ExpectAndReturn("[26-11-22]");    // get timestamp
+        MySD_WriteString_ExpectAndReturn("[26-11-22]", FR_OK);      // write it to SD
+    }
+    MySD_Write_ExpectAndReturn(thisValue, 1, FR_OK);
+}
 
 void test_SerialSnooper_InitSuccess(void)
 {
@@ -68,35 +86,148 @@ void test_SerialSnooper_WriteSDFail(void)
     SerialSnooper_Run();
 }
 
-void test_SerialSnooper_WriteSDCarriageReturnWillAddTimestamp(void)
+void test_SerialSnooper_WriteSD_CROrLFAtEndWillAddTimestamp(void)
 {
     successfulInit();
-    uint8_t byteWritten = '\r';
 
-    // with \r
-    MyCircularBuffer_isEmpty_ExpectAndReturn(0);
-    MyCircularBuffer_read_ExpectAndReturn(byteWritten);
-    MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
-    MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
-    MySD_Write_ExpectAndReturn(&byteWritten, 1, FR_OK);
-    HAL_GetTick_ExpectAndReturn(0);
+    HAL_GetTick_IgnoreAndReturn(0);
+
+    // first character shall always be timestamped
+    uint8_t byteWritten = 'q';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
     SerialSnooper_Run();
 
-    // any other character
+    // with \r, this shall not be timestamped
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // // any other character after the \r will be timestamped
     byteWritten = 'a';
-    MyCircularBuffer_isEmpty_ExpectAndReturn(0);
-    MyCircularBuffer_read_ExpectAndReturn(byteWritten);
-    MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
-    MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
-    MySD_Write_ExpectAndReturn(&byteWritten, 1, FR_OK);      // write new word to sd
-    HAL_GetTick_ExpectAndReturn(0);
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
     SerialSnooper_Run();
 
-    // another character
-    MyCircularBuffer_isEmpty_ExpectAndReturn(0);
-    MyCircularBuffer_read_ExpectAndReturn(byteWritten);
-    MySD_Write_ExpectAndReturn(&byteWritten, 1, FR_OK);
-    HAL_GetTick_ExpectAndReturn(0);
+    // another character, no timestamp
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+}
+
+void test_SerialSnooper_WriteSD_ConstantCRorLFWillAddTS(void)
+{
+    successfulInit();
+
+    HAL_GetTick_IgnoreAndReturn(0);
+
+    // first character shall always be timestamped
+    uint8_t byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+}
+
+void test_SerialSnooper_WriteSD_RespectsCRLF(void)
+{
+    successfulInit();
+
+    HAL_GetTick_IgnoreAndReturn(0);
+
+    // first character shall always be timestamped
+    uint8_t byteWritten = 'a';
+    uint8_t nextByte = '\r';
+    expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\r';
+    nextByte = '\n';
+    expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\n';
+    nextByte = 'q';
+    expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    nextByte = 'q';
+    expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+}
+
+void test_SerialSnooper_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
+{
+    successfulInit();
+
+    HAL_GetTick_IgnoreAndReturn(0);
+
+    // first character shall always be timestamped
+    uint8_t byteWritten = 'a';
+    uint8_t nextByte = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    byteWritten = '\n';
+    byteWritten = 'q';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+}
+
+void test_SerialSnooper_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
+{
+    successfulInit();
+
+    HAL_GetTick_IgnoreAndReturn(0);
+
+    // first character shall always be timestamped
+    // '[Timestamp]: a'
+    uint8_t byteWritten = 'a';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r'
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r\n'
+    byteWritten = '\n';
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r\n'
+    // '[Timestamp]: \r'
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r\n'
+    // '[Timestamp]: \r\n'
+    byteWritten = '\n';
+    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r\n'
+    // '[Timestamp]: \r\n'
+    // '[Timestamp]: \r'
+    byteWritten = '\r';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
+    SerialSnooper_Run();
+
+    // '[Timestamp]: a\r\n'
+    // '[Timestamp]: \r\n'
+    // '[Timestamp]: \r'
+    // '[Timestamp]: a'
+    byteWritten = 'a';
+    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
     SerialSnooper_Run();
 }
 

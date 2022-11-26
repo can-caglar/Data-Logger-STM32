@@ -61,3 +61,8 @@ uint8_t MyCircularBuffer_isFull(void)
 {
     return ADVANCED(head) == (tail);
 }
+
+uint8_t MyCircularBuffer_peek(void)
+{
+    return buf[tail];
+}
