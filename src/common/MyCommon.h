@@ -120,6 +120,10 @@ typedef volatile uint32_t io_register;
 #define LED_GPIO_PIN    GPIO_PIN_3
 #define LED_GPIO_CLK_ENABLE __HAL_RCC_GPIOB_CLK_ENABLE
 
+#define LED_ERROR_PORT GPIOA
+#define LED_ERROR_PIN  GPIO_PIN_11
+#define LED_ERROR_CLK_ENABLE __HAL_RCC_GPIOA_CLK_ENABLE
+
 // Button
 #define BUTTON_PIN GPIO_PIN_0
 #define BUTTON_PORT GPIOB

@@ -21,6 +21,7 @@
 #include "main.h"
 #include "stm32f0xx_it.h"
 #include "MyCircularBuffer.h"
+#include "ErrorIndicator.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -152,7 +153,10 @@ void USART1_IRQHandler(void)
   MyCircularBuffer_init();
 
   // we don't care what the buffer is, set it again
-  MyCircularBuffer_write(*(huart1.pRxBuffPtr));
+  if (MyCircularBuffer_write(*(huart1.pRxBuffPtr)))
+  {
+    ErrorIndicator_Indicate();
+  }
 
   // set up irq again (1 addr down as it would've been incremented)
   HAL_UART_Receive_IT(&huart1, huart1.pRxBuffPtr, 1);

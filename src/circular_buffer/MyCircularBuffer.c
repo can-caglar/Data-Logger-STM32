@@ -6,6 +6,9 @@
 #define MAX_SIZE    ((SIZE_OF_BUF) - 1)  // "wasting" a slot to tell apart full/empty
 #define ADVANCED(ptr) (((ptr) + 1) & (SIZE_OF_BUF - 1))
 
+#define CB_SUCCESS 0
+#define CB_FAIL 1
+
 static uint8_t buf[SIZE_OF_BUF]; 
 static uint16_t head = 0;
 static uint16_t tail = 0;
@@ -39,17 +42,18 @@ uint8_t MyCircularBuffer_read(void)
     return ret;
 }
 
-void MyCircularBuffer_write(uint8_t val)
+uint8_t MyCircularBuffer_write(uint8_t val)
 {
     if (MyCircularBuffer_isFull())
     {
-        return;
         #if 0
         tail = ADVANCED(tail); // this is to overwrite
         #endif
+        return 1;   // indicate that buffer was full
     }
     buf[head] = val;
     head = ADVANCED(head);
+    return 0;
 }
 
 uint8_t MyCircularBuffer_isEmpty(void)

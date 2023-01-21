@@ -9,7 +9,7 @@ void MyCircularBuffer_close(void);
 
 uint8_t MyCircularBuffer_read(void);
 
-void MyCircularBuffer_write(uint8_t val);
+uint8_t MyCircularBuffer_write(uint8_t val);    // ret 1 if buf was full
 
 uint8_t MyCircularBuffer_isEmpty(void);
 

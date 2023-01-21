@@ -4,22 +4,53 @@
 #include "mock_stm32f0xx_hal_uart.h"
 #include "mock_MyCircularBuffer.h"
 #include "mock_MyTimeString.h"
+#include "mock_ErrorIndicator.h"
 #include <stdint.h>
 
-UART_HandleTypeDef huart1; // fake huart1
-
-void test_USART1_IRQHandler_calls_hal(void)
+typedef enum
 {
-    uint8_t fakeUartBuf = 8; // fake UART buffer
-    huart1.pRxBuffPtr = &fakeUartBuf;
-    HAL_UART_IRQHandler_Expect(&huart1);
-    huart1.pRxBuffPtr++;    // simulating the HAL
+    NOT_FULL,
+    FULL
+} CircularBufferState;
 
-    MyCircularBuffer_init_Expect();
-    MyCircularBuffer_write_Expect(fakeUartBuf);
+static void callWhenCircularBufferIs(CircularBufferState state);
 
-    HAL_UART_Receive_IT_ExpectAndReturn(&huart1,
-        &fakeUartBuf, 1, 0);
+UART_HandleTypeDef huart1; // fake huart1
+const uint8_t fakeUartBuf = 8; // fake UART buffer
+
+void test_USART1_IRQHandler_normal_operation(void)
+{
+    callWhenCircularBufferIs(NOT_FULL);
 
     USART1_IRQHandler();
+}
+
+void test_USART1_IRQHandler_when_buffer_full_indicates_error(void)
+{
+    callWhenCircularBufferIs(FULL);
+
+    USART1_IRQHandler();
+}
+
+static void callWhenCircularBufferIs(CircularBufferState state)
+{
+    huart1.pRxBuffPtr = &fakeUartBuf;
+    huart1.pRxBuffPtr++;    // simulating the HAL which increments addr
+
+    HAL_UART_IRQHandler_Expect(&huart1);
+    MyCircularBuffer_init_Expect();
+
+    if (state == NOT_FULL)
+    {
+        MyCircularBuffer_write_ExpectAndReturn(fakeUartBuf, 0);
+    }
+    else
+    {
+        // turn on led if overflowed
+        MyCircularBuffer_write_ExpectAndReturn(fakeUartBuf, 1);
+        ErrorIndicator_Indicate_Expect();
+    }
+    // Expect the same buffer address to be written to for next time
+    HAL_UART_Receive_IT_ExpectAndReturn(&huart1,
+        &fakeUartBuf, 1, 0);
 }
