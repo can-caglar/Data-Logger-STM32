@@ -1,9 +1,6 @@
-// TODO: Should include "stm32f0xx_hal.h" ONLY!""
 #include "LED.h"
 #include "MyCommon.h"
 #include "stm32f0xx_hal.h"
-#include "stm32f0xx_hal_gpio.h"
-#include "stm32f0xx_hal_rcc.h"
 
 void led_init(void)
 {
