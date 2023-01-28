@@ -66,3 +66,8 @@ FRESULT MySD_Flush(void)
 {
     return f_sync(&file);
 }
+
+FSIZE_t MySD_getOpenedFileSize(void)
+{
+    return f_size(&file);
+}

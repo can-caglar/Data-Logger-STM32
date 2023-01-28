@@ -157,6 +157,31 @@ void test_mysd_flush(void)
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
 }
 
+void test_mysd_size(void)
+{    
+    FIL file = { 0 };
+    // funny hack to get around encapsulating the FIL object
+    FIL fileWithSize = { 0 };   
+    fileWithSize.obj.objsize = 33;
+
+    BYTE mode = FA_WRITE | FA_OPEN_APPEND;
+
+    f_mount_IgnoreAndReturn(0);
+    f_open_ExpectAndReturn(&file, 
+        "filename", mode, FR_OK);
+    // here's the hack, the encapsulated file will now
+    // have a size of 33
+    f_open_ReturnMemThruPtr_fp(&fileWithSize, sizeof(FIL));
+    led_init_Ignore();
+    led_on_Ignore();
+
+    FRESULT err = MySD_Init("filename");
+
+    FSIZE_t size = MySD_getOpenedFileSize();
+
+    TEST_ASSERT_EQUAL(33, size);
+}
+
 /*
 
 - [x] Init will mount SD card then open a file for writing
