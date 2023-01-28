@@ -40,18 +40,22 @@ void SerialSnooper_Run()
     {
         if (!MyCircularBuffer_isEmpty())
         {
-            // parse "val"
+            // get top item from circular buffer
             uint8_t val = MyCircularBuffer_read();
-            // determine if need to timestamp
+            // parse it (determine if need to timestamp)
             if (timestampThisLine(val))
             {
+                // write timestamp
                 const char* ts = MyTimeString_GetTimeStamp();
                 MySD_WriteString(ts);
                 status &= ~STATUS_TIMESTAMP;
             }
+            // write data to SD card
             MySD_Write(&val, 1);
             previousData = val;
         }
+        // Device may be unplugged at any moment.
+        // Flush every 500 ms.
         if (HAL_GetTick() >= (lastTimeFlushed + 500))
         {
             MySD_Flush();
