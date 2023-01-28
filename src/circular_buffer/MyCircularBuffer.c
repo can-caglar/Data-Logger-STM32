@@ -70,3 +70,18 @@ uint8_t MyCircularBuffer_peek(void)
 {
     return buf[tail];
 }
+
+uint16_t MyCircularBuffer_size(void)
+{
+    uint16_t ret;
+    if (head < tail)
+    {
+        // 0 indexed, so + 1
+        ret = ((MAX_SIZE - tail) + head) + 1;  
+    }
+    else
+    {
+        ret = head - tail;
+    }
+    return ret;
+}

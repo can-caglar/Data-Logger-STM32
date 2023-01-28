@@ -19,4 +19,6 @@ uint32_t MyCircularBuffer_getCapacity(void);
 
 uint8_t MyCircularBuffer_peek(void);
 
+uint16_t MyCircularBuffer_size(void);
+
 #endif
