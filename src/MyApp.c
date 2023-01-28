@@ -29,10 +29,13 @@ int runApp(void)
     }
     else
     {
-        SerialSnooper_Init();
-        LOOP
+        int err = SerialSnooper_Init();
+        if (err == SS_SUCCESS)
         {
-            SerialSnooper_Run();
-        } 
+            LOOP
+            {
+                SerialSnooper_Run();
+            } 
+        }
     }
 }

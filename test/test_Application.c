@@ -23,7 +23,7 @@ void test_App_CLI(void)
     runApp();
 }
 
-void test_App_Snooping(void)
+void test_App_SnoopingSuccess(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
@@ -31,11 +31,26 @@ void test_App_Snooping(void)
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
 
-    SerialSnooper_Init_Expect();
+    SerialSnooper_Init_ExpectAndReturn(SS_SUCCESS);
     // expecting 3 calls
     SerialSnooper_Run_Expect();
     SerialSnooper_Run_Expect();
     SerialSnooper_Run_Expect();
+
+    runApp();
+}
+
+void test_App_SnoopingFailInit(void)
+{
+    LOOP_COUNT(3);  // expecting 3 times round the loop
+
+    CubeMX_SystemInit_Expect(CMX_FATFS);
+    AppDecider_Init_Expect();
+    AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
+
+    SerialSnooper_Init_ExpectAndReturn(SS_FAIL);
+    
+    // expecting 0 calls to SerialSnooper_Run
 
     runApp();
 }

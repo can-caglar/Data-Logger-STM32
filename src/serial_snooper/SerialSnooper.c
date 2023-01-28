@@ -17,8 +17,9 @@ static uint32_t lastTimeFlushed;
 static uint8_t timestampThisLine(uint8_t thisByte);
 static uint8_t previousData;
 
-void SerialSnooper_Init(void)
+int SerialSnooper_Init(void)
 {
+    int ret = SS_SUCCESS;
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
 
@@ -30,37 +31,36 @@ void SerialSnooper_Init(void)
     FRESULT err = MySD_Init(fileName);
     if (err != FR_OK)
     {
-        status |= STATUS_INIT_FAIL;
+        ret = SS_FAIL;
     }
+    return ret;
 }
 
+// Only call after a successful Init()
 void SerialSnooper_Run()
 {
-    if ((status & STATUS_INIT_FAIL) == 0)
+    if (!MyCircularBuffer_isEmpty())
     {
-        if (!MyCircularBuffer_isEmpty())
+        // get top item from circular buffer
+        uint8_t val = MyCircularBuffer_read();
+        // parse it (determine if need to timestamp)
+        if (timestampThisLine(val))
         {
-            // get top item from circular buffer
-            uint8_t val = MyCircularBuffer_read();
-            // parse it (determine if need to timestamp)
-            if (timestampThisLine(val))
-            {
-                // write timestamp
-                const char* ts = MyTimeString_GetTimeStamp();
-                MySD_WriteString(ts);
-                status &= ~STATUS_TIMESTAMP;
-            }
-            // write data to SD card
-            MySD_Write(&val, 1);
-            previousData = val;
+            // write timestamp
+            const char* ts = MyTimeString_GetTimeStamp();
+            MySD_WriteString(ts);
+            status &= ~STATUS_TIMESTAMP;
         }
-        // Device may be unplugged at any moment.
-        // Flush every 500 ms.
-        if (HAL_GetTick() >= (lastTimeFlushed + 500))
-        {
-            MySD_Flush();
-            lastTimeFlushed = HAL_GetTick();
-        }
+        // write data to SD card
+        MySD_Write(&val, 1);
+        previousData = val;
+    }
+    // Device may be unplugged at any moment.
+    // Flush every 500 ms.
+    if (HAL_GetTick() >= (lastTimeFlushed + 500))
+    {
+        MySD_Flush();
+        lastTimeFlushed = HAL_GetTick();
     }
 }
 
@@ -104,3 +104,10 @@ static uint8_t timestampThisLine(uint8_t thisByte)
     }
     return ret;
 }
+
+/*
+- [ ] Always read from circular buffer and write to SD
+- [ ] Write a message in SD card when data is corrupt.
+- [ ] Do activities like flushing only if circular buffer is empty
+    - Or a long time period passes, e.g. 5 minutes
+*/

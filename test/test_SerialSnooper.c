@@ -40,10 +40,7 @@ void test_SerialSnooper_Fail(void)
     MyTimeString_GetFileName_IgnoreAndReturn("hi.txt");
     MySD_Init_ExpectAndReturn("hi.txt", FR_NOT_READY);
 
-    SerialSnooper_Init();
-
-    // should do nothing
-    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(SS_FAIL, SerialSnooper_Init());
 }
 
 void test_SerialSnooper_PollsCircularBufferWhenEmpty(void)
@@ -276,7 +273,7 @@ void successfulInit(void)
     MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
     MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
 
-    SerialSnooper_Init();
+    TEST_ASSERT_EQUAL(SS_SUCCESS, SerialSnooper_Init());
 }
 
 /*
