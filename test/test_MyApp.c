@@ -30,7 +30,7 @@ void test_App_SnoopingSuccess(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    initSerialSnooperHelper(SS_SUCCESS);
+    initSerialSnooperHelper(0);  // todo; magic number
 
     // expecting 3 calls
     SerialSnooper_Run_Expect();
@@ -44,7 +44,7 @@ void test_App_SnoopingFailInit(void)
 {
     LOOP_COUNT(3);  // expecting 3 times round the loop
 
-    initSerialSnooperHelper(SS_FAIL);
+    initSerialSnooperHelper(1); // todo; magic number
     
     // expecting 0 calls to SerialSnooper_Run
     runApp();

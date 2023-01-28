@@ -10,7 +10,7 @@ typedef struct SubjectData_t SubjectData_t;
 
 int SystemOperations_Init(void);
 int SystemOperations_OpenNewFile(void);
-void notifySdCardWriter(SubjectData_t* data);
-void notifySdCardFlusher(SubjectData_t* data);
+void notifySdCardWriter(const SubjectData_t* data);
+void notifySdCardFlusher(const SubjectData_t* data);
 
 #endif

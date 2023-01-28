@@ -33,3 +33,22 @@ void AssertEqualMyGPIO(MyGPIO expected, MyGPIO actual, unsigned short line)
         line,
         "MyGPIO .pupd failed");
 }
+
+void AssertEqualSubjectData(SubjectData_t expected, 
+    SubjectData_t actual, unsigned short line)
+{
+    UNITY_TEST_ASSERT_EQUAL_INT(expected.circBufData, 
+        actual.circBufData,
+        line,
+        "SubjectData_t.circBufData failed");
+
+    UNITY_TEST_ASSERT_EQUAL_INT(expected.isEmpty, 
+        actual.isEmpty,
+        line,
+        "SubjectData_t.isEmpty failed");
+    
+    UNITY_TEST_ASSERT_EQUAL_INT(expected.tNow, 
+        actual.tNow,
+        line,
+        "SubjectData_t.tNow failed");
+}

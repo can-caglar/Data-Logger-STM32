@@ -18,7 +18,7 @@ static uint8_t timestampThisLine(uint8_t thisByte);
 
 int SystemOperations_Init(void)
 {
-    int ret = SS_SUCCESS;
+    int ret = SO_SUCCESS;
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
 
@@ -29,7 +29,7 @@ int SystemOperations_Init(void)
     FRESULT err = MySD_Init(fileName);
     if (err != FR_OK)
     {
-        ret = SS_FAIL;
+        ret = SO_FAIL;
     }
     return ret;
 }   
@@ -54,7 +54,7 @@ int SystemOperations_OpenNewFile()
 }
 
 
-void notifySdCardWriter(SubjectData_t* data)
+void notifySdCardWriter(const SubjectData_t* data)
 {
     if (!data->isEmpty)
     {
@@ -74,7 +74,7 @@ void notifySdCardWriter(SubjectData_t* data)
     }
 }
 
-void notifySdCardFlusher(SubjectData_t* data)
+void notifySdCardFlusher(const SubjectData_t* data)
 {
     // Device may be unplugged at any moment.
     // Flush every 500 ms.
