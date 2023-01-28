@@ -5,6 +5,7 @@
 #include "mock_MyCircularBuffer.h"
 #include "mock_stm32f0xx_hal.h"
 #include "mock_main.h"
+#include "SystemOperations.h"
 #include "string.h"
 
 typedef enum
@@ -258,6 +259,38 @@ void test_SerialSnooper_FlushesEvery500ms(void)
     SerialSnooper_Run();
 }
 
+
+void test_SerialSnooper_FlushesEveryLESSmsIfCircBufferEmpty(void)
+{
+    successfulInit();
+    uint8_t byteWritten = 0x2;
+
+    // with \r
+    MyCircularBuffer_isEmpty_IgnoreAndReturn(0);
+    MyCircularBuffer_read_IgnoreAndReturn(byteWritten);
+    MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
+    MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
+    MySD_Write_IgnoreAndReturn(FR_OK);
+
+    HAL_GetTick_ExpectAndReturn(0);
+
+    SerialSnooper_Run();
+
+    HAL_GetTick_ExpectAndReturn(400);
+
+    SerialSnooper_Run();
+
+    HAL_GetTick_ExpectAndReturn(500);
+    MySD_Flush_ExpectAndReturn(FR_OK);
+    HAL_GetTick_ExpectAndReturn(500);
+
+    SerialSnooper_Run();
+
+    // won't call it again
+    HAL_GetTick_ExpectAndReturn(510);
+    SerialSnooper_Run();
+}
+
 /************************************************************/
 
 // Helper functions
@@ -270,7 +303,8 @@ void successfulInit(void)
     MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
     MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
 
-    TEST_ASSERT_EQUAL(SS_SUCCESS, SerialSnooper_Init());
+    int res = SerialSnooper_Init();
+    TEST_ASSERT_EQUAL(SS_SUCCESS, res);
 }
 
 /*
@@ -286,4 +320,5 @@ void successfulInit(void)
 - [ ] If there is data available in the write buffer,
     will write to the SD card. (Not sure how this will behave w/circ buf)
         - [ ] 
+- 
 */
