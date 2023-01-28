@@ -23,7 +23,6 @@ int SerialSnooper_Init(void)
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
 
-    CubeMX_SystemInit(CMX_UART);
     MyCircularBuffer_init();
     MyTimeString_Init();
 
@@ -106,8 +105,13 @@ static uint8_t timestampThisLine(uint8_t thisByte)
 }
 
 /*
-- [ ] Always read from circular buffer and write to SD
-- [ ] Write a message in SD card when data is corrupt.
-- [ ] Do activities like flushing only if circular buffer is empty
-    - Or a long time period passes, e.g. 5 minutes
+- [ ] Always read from circular buffer and write to SD as
+    soon as circular buffer is not full.
+- [ ] Write a message in SD card when buffer overfilled
+    {LD?}
+- [ ] Do activities like flushing only if circular buffer 
+    is empty. Or a long time period passes, e.g. 5 minutes
+- [ ] Open a new file if size of file is > 20MB
+
+
 */
