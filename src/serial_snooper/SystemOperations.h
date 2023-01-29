@@ -7,13 +7,6 @@
 #define SO_FAIL 1
 
 typedef struct DataContext DataContext;
-// temporary, to delete:
-typedef struct DataContext
-{
-    int isEmpty;
-    char circBufData;
-} DataContext;
-
 
 int SystemOperations_Init(void);
 int SystemOperations_OpenLogFile(void);
