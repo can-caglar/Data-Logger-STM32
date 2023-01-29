@@ -237,7 +237,7 @@ void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
 }
 
 
-void test_sdCardFlusher_FlushesEvery500ms(void)
+void test_sdCardFlusher_FlushesEveryFLUSH_TIME_MS(void)
 {
     successfulInit();
 
@@ -248,20 +248,20 @@ void test_sdCardFlusher_FlushesEvery500ms(void)
     notifySdCardFlusher(fakeDataContext);
     assertDataContextWasPassedInToGetters();
 
-    fakeSetTime(400);
+    fakeSetTime(FLUSH_TIME_MS / 2);
 
     notifySdCardFlusher(fakeDataContext);
     assertDataContextWasPassedInToGetters();
 
-    fakeSetTime(500);
+    fakeSetTime(FLUSH_TIME_MS);
     MySD_Flush_ExpectAndReturn(FR_OK);
-    fakeSetTime(500);
+    fakeSetTime(FLUSH_TIME_MS);
 
     notifySdCardFlusher(fakeDataContext);
     assertDataContextWasPassedInToGetters();
 
     // won't call it again
-    fakeSetTime(510);
+    fakeSetTime(FLUSH_TIME_MS * 1.5);
     notifySdCardFlusher(fakeDataContext);
     assertDataContextWasPassedInToGetters();
 }

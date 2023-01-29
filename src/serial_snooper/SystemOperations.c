@@ -5,7 +5,6 @@
 #include "DataHolder.h"
 
 #define MAX_BUF 32
-#define FLUSH_TIME_MS   500
 
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)
