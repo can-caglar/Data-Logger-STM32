@@ -26,6 +26,7 @@ static FnGetData getDataFromDataHolder;
 // Internal state variable
 static uint64_t schedulerTime = 0;
 
+// Initialises internal variables to 0
 void SerialSnooper_Init(FnGetData fnGetData)
 {
     taskCounter = 0;
@@ -34,24 +35,33 @@ void SerialSnooper_Init(FnGetData fnGetData)
     getDataFromDataHolder = fnGetData;
 }
 
+// Run the scheduler
+// Grabs DataContext from DataHolder including the current time
+// Calls tasks when it is their time and passes in datacontext to them
 void SerialSnooper_Run(void)
 {
     DataContext* data = NULL;
     schedulerTime = DH_GetTime(data);
 
+    // Grab data
     if (getDataFromDataHolder)
     {
         data = getDataFromDataHolder();
     }
+
+    // Do the scheduling
     for (uint8_t i = 0; i < taskCounter; i++)
     {
-        SSTask_t* thisTask = &ssTasks[i];
+        SSTask_t* thisTask = &ssTasks[i];   // for easy access
         if (thisTask->enabled)
         {
+            // task is enabled...
             if (schedulerTime >= thisTask->nextCall)
             {
+                // it's time to call it, so call it...
                 thisTask->fnPtr(data);
                 thisTask->nextCall = schedulerTime + thisTask->period;
+                // disable if it was a one-shot
                 if (thisTask->isPeriodic == false)
                 {
                     thisTask->enabled = false;
@@ -61,7 +71,7 @@ void SerialSnooper_Run(void)
     }
 }
 
-
+// Add task to scheduler
 int SerialSnooper_AddTask(FnTask func, 
     uint32_t period, bool periodic, bool enabled)
 {

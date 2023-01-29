@@ -302,7 +302,7 @@ and pass in the time to them
 - [x] Passes this to Tasks
 - [x] Tasks are function pointers with periods for how often, oneshot and enable/disable
 to call (may take longer depending on time of other tasks)
-- [ ] Oneshot tasks are called only once
+- [x] Oneshot tasks are called only once
 - [x] Tasks are initialised with addTask(fnPointer, period, oneshot)
 - [x] There is a maximum number of tasks fails if could not add task
 - [x] If a function pointer already exists, will just add task
