@@ -124,7 +124,7 @@ void test_SerialSnooper_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
     successfulInit();
     fakeSetIsThereNewData(1);
 
-    HAL_GetTick_IgnoreAndReturn(0);
+    fakeSetTime(0);
 
     // first character shall always be timestamped
     uint8_t byteWritten = 'a';
@@ -147,7 +147,7 @@ void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
     successfulInit();
     fakeSetIsThereNewData(1);
 
-    HAL_GetTick_IgnoreAndReturn(0);
+    fakeSetTime(0);
 
     // first character shall always be timestamped
     // '[Timestamp]: a'
@@ -200,22 +200,22 @@ void test_sdCardFlusher_FlushesEvery500ms(void)
 
     uint8_t byteWritten = 0x2;
 
-    HAL_GetTick_ExpectAndReturn(0);
+    fakeSetTime(0);
 
     notifySdCardFlusher(NULL);
 
-    HAL_GetTick_ExpectAndReturn(400);
+    fakeSetTime(400);
 
     notifySdCardFlusher(NULL);
 
-    HAL_GetTick_ExpectAndReturn(500);
+    fakeSetTime(500);
     MySD_Flush_ExpectAndReturn(FR_OK);
-    HAL_GetTick_ExpectAndReturn(500);
+    fakeSetTime(500);
 
     notifySdCardFlusher(NULL);
 
     // won't call it again
-    HAL_GetTick_ExpectAndReturn(510);
+    fakeSetTime(510);
     notifySdCardFlusher(NULL);
 }
 

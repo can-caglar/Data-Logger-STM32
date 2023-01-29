@@ -67,10 +67,11 @@ void notifySdCardFlusher(const DataContext* data)
 {
     // Device may be unplugged at any moment.
     // Flush every 500 ms.
-    if (HAL_GetTick() >= (lastTimeFlushed + FLUSH_TIME_MS))
+    uint32_t tNow = DH_GetTime(data);
+    if (tNow >= (lastTimeFlushed + FLUSH_TIME_MS))
     {
         MySD_Flush();
-        lastTimeFlushed = HAL_GetTick();
+        lastTimeFlushed = tNow;
     }
 }
 
