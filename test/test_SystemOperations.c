@@ -37,8 +37,8 @@ void test_notifySdCard_FirstTimeWritesTimestampAndByteToSD(void)
 {
     DataContext data = {.isEmpty = 0, .circBufData = 'c'};
     fakeSetIsThereNewData(1);
+    fakeSetLatestData('c');
 
-    MyCircularBuffer_read_ExpectAndReturn(data.circBufData);
     MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
     MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
     MySD_Write_ExpectAndReturn(&data.circBufData, 1, FR_OK);
@@ -50,6 +50,7 @@ void test_notifySdCard_WriteSD_CROrLFAtEndWillAddTimestamp(void)
 {
     DataContext data = {.isEmpty = 0, .circBufData = 'c'};
     fakeSetIsThereNewData(1);
+    fakeSetLatestData('c');
 
     successfulInit();
 
@@ -265,7 +266,8 @@ void successfulInit(void)
 static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTimestamp_e expectTimestamp)
 {
     // first character shall always be timestamped
-    MyCircularBuffer_read_ExpectAndReturn(*thisValue);
+    fakeSetLatestData(*thisValue);
+
     if (expectTimestamp == EXPECT_TIMESTAMP)
     {
         MyTimeString_GetTimeStamp_ExpectAndReturn("[26-11-22]");    // get timestamp

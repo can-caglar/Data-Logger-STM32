@@ -53,7 +53,7 @@ void notifySdCardWriter(const DataContext* data)
     if (thereIsNewData)
     {
         // get top item from circular buffer
-        uint8_t val = MyCircularBuffer_read();
+        uint8_t val = DH_GetLatestData(data); //MyCircularBuffer_read();
         // parse it (determine if need to timestamp)
         if (timestampThisLine(val))
         {
