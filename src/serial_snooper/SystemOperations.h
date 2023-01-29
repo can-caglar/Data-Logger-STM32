@@ -9,7 +9,7 @@
 typedef struct DataContext DataContext;
 
 int SystemOperations_Init(void);
-int SystemOperations_OpenLogFile(void);
+int SystemOperations_OpenLogFile(const DataContext* data);
 void notifySdCardWriter(const DataContext* data);
 void notifySdCardFlusher(const DataContext* data);
 

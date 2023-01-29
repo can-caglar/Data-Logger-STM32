@@ -1,6 +1,5 @@
 #include "SystemOperations.h"
 #include "MySD.h"
-#include "MyTimeString.h"
 #include "MyCircularBuffer.h"
 #include "stm32f0xx_hal.h"
 #include "SerialSnooper.h"
@@ -24,16 +23,15 @@ int SystemOperations_Init(void)
     lastTimeFlushed = 0;
 
     MyCircularBuffer_init();
-    MyTimeString_Init();
 
-    return SystemOperations_OpenLogFile();
+    return SystemOperations_OpenLogFile(NULL);
 }   
 
-int SystemOperations_OpenLogFile()
+int SystemOperations_OpenLogFile(const DataContext* data)
 {
     int ret = SO_SUCCESS;
 
-    const char* fileName = MyTimeString_GetFileName();
+    const char* fileName = DH_GetFileName(NULL);
 
     // open file
     FRESULT err = MySD_Init(fileName);
@@ -58,7 +56,7 @@ void notifySdCardWriter(const DataContext* data)
         if (timestampThisLine(val))
         {
             // write timestamp
-            const char* ts = MyTimeString_GetTimeStamp();
+            const char* ts = DH_GetTimestampString(data);
             MySD_WriteString(ts);
             status &= ~STATUS_TIMESTAMP;
         }

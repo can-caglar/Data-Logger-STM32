@@ -38,7 +38,7 @@ void test_notifySdCard_FirstTimeWritesTimestampAndByteToSD(void)
     fakeSetIsThereNewData(1);
     fakeSetLatestData(ch);
 
-    MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
+    fakeSetTimestampString("example");
     MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
     MySD_Write_ExpectAndReturn(&ch, 1, FR_OK);
     
@@ -224,12 +224,12 @@ void test_sdCardFlusher_FlushesEvery500ms(void)
 void test_OpenLogFile_OpensOneFileClosesTheOther(void)
 {
     // gets name of file from time string
-    MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
+    fakeSetFileName("hi.txt");
 
     // opens file
     MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
 
-    SystemOperations_OpenLogFile();
+    SystemOperations_OpenLogFile(NULL);
 }
 
 
@@ -240,10 +240,8 @@ void successfulInit(void)
 {
     MyCircularBuffer_init_Expect();
 
-    MyTimeString_Init_ExpectAndReturn(0);
-
     // gets name of file from time string
-    MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
+    fakeSetFileName("hi.txt");
 
     // opens file
     MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
@@ -259,7 +257,7 @@ static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTime
 
     if (expectTimestamp == EXPECT_TIMESTAMP)
     {
-        MyTimeString_GetTimeStamp_ExpectAndReturn("[26-11-22]");    // get timestamp
+        fakeSetTimestampString("[26-11-22]");
         MySD_WriteString_ExpectAndReturn("[26-11-22]", FR_OK);      // write it to SD
     }
     MySD_Write_ExpectAndReturn(thisValue, 1, FR_OK);
