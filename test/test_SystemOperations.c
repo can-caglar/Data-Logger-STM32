@@ -4,7 +4,6 @@
 #include "mock_MyTimeString.h"
 #include "mock_stm32f0xx_hal.h"
 #include "mock_MyCircularBuffer.h"
-#include "SerialSnooper.h"
 
 typedef enum
 {
@@ -241,6 +240,12 @@ void successfulInit(void)
     MyCircularBuffer_init_Expect();
 
     MyTimeString_Init_ExpectAndReturn(0);
+
+    // gets name of file from time string
+    MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
+
+    // opens file
+    MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
 
     int res = SystemOperations_Init();
     TEST_ASSERT_EQUAL(SO_SUCCESS, res);

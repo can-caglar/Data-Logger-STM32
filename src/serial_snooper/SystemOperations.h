@@ -6,7 +6,12 @@
 #define SO_SUCCESS 0
 #define SO_FAIL 1
 
-typedef struct SubjectData_t SubjectData_t;
+typedef struct SubjectData_t
+{
+    int isEmpty;
+    char circBufData;
+} SubjectData_t;
+
 
 int SystemOperations_Init(void);
 int SystemOperations_OpenLogFile(void);
