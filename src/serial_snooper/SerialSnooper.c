@@ -14,6 +14,7 @@ typedef struct SSTask_t
     FnTask fnPtr;
     bool enabled;
     uint32_t period;
+    uint64_t nextCall;
 } SSTask_t;
 
 // Task database
@@ -23,9 +24,13 @@ static uint8_t taskCounter = 0;
 // Grab data
 static FnGetData getDataFromDataHolder;
 
+// Internal state variable
+static uint64_t schedulerTime = 0;
+
 void SerialSnooper_Init(FnGetData fnGetData)
 {
     taskCounter = 0;
+    schedulerTime = 0;
     memset(ssTasks, 0, sizeof(ssTasks));
     getDataFromDataHolder = fnGetData;
 }
@@ -33,7 +38,7 @@ void SerialSnooper_Init(FnGetData fnGetData)
 void SerialSnooper_Run(void)
 {
     DataContext* data = NULL;
-    uint64_t timeFromContext = DH_GetTime(data);
+    schedulerTime = DH_GetTime(data);
 
     if (getDataFromDataHolder)
     {
@@ -44,9 +49,10 @@ void SerialSnooper_Run(void)
         SSTask_t* thisTask = &ssTasks[i];
         if (thisTask->enabled)
         {
-            if (timeFromContext == thisTask->period)
+            if (schedulerTime >= thisTask->nextCall)
             {
                 thisTask->fnPtr(data);
+                thisTask->nextCall = schedulerTime + thisTask->period;
             }
         }
     }
@@ -59,5 +65,6 @@ int SerialSnooper_AddTask(FnTask func,
     ssTasks[taskCounter].fnPtr = func;
     ssTasks[taskCounter].enabled = enabled;
     ssTasks[taskCounter].period = period;
+    ssTasks[taskCounter].nextCall = schedulerTime + period;
     taskCounter++;
 }

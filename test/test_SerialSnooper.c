@@ -91,34 +91,76 @@ void test_SchedulerWillGrabDataAndPassToTasks(void)
     TEST_ASSERT_EQUAL_INT(fakeDataContext, getTask1DataPassedIn());
 }
 
-// void test_SchedulerWillOnlyCallTaskWhenItsTheRightTime(void)
-// {
-//     const int period = 100;
-//     SerialSnooper_AddTask(task1ptr, period, true, true);
+void test_SchedulerWillOnlyCallTaskWhenItsTheRightTime(void)
+{
+    const int period = 100;
+    SerialSnooper_AddTask(task1ptr, period, true, true);
 
-//     // Not time yet
-//     SerialSnooper_Run();
-//     TEST_ASSERT_EQUAL_INT(0, task1Called);
+    // Not time yet, don't call
+    fakeSetTime(period - 1);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
-//     // Now's the exact time, should be called
-//     resetTaskData();
-//     fakeSetTime(period);
-//     SerialSnooper_Run();
-//     TEST_ASSERT_EQUAL_INT(1, task1Called);
+    // Now's the exact time, should be called
+    fakeSetTime(period);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-//     // Not time again
-//     resetTaskData();
-//     fakeSetTime(period + 1);
-//     SerialSnooper_Run();
-//     TEST_ASSERT_EQUAL_INT(0, task1Called);
+    // Not time again, don't call
+    fakeSetTime(period + 1);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
+}
 
-//     // Now's the exact time again
-//     resetTaskData();
-//     fakeSetTime(period * 2);
-//     SerialSnooper_Run();
-//     TEST_ASSERT_EQUAL_INT(1, task1Called);
-// }
+void test_SchedulerWillCallIfItIsLateToCall(void)
+{
+    const int period = 100;
+    SerialSnooper_AddTask(task1ptr, period, true, true);
 
+    // Late
+    fakeSetTime(period + 1);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+}
+
+void test_SchedulerWithTwoTasksKnowsWhenToCallThem(void)
+{
+    const int period1 = 100;
+    const int period2 = 150;
+
+    SerialSnooper_AddTask(task1ptr, period1, true, true);
+    SerialSnooper_AddTask(task2ptr, period2, true, true);
+
+    // Task 1 time to call
+    fakeSetTime(period1);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+    TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
+
+    // Task 2 time to call
+    fakeSetTime(period2);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
+    TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
+}
+
+// TODO, test when time is late but task added later on
+void test_AddingTaskAfterInitialisation(void)
+{
+    const int startTime = 500;
+    const int period = 100;
+
+    // Scheduler already running
+    fakeSetTime(startTime);
+    SerialSnooper_Run();
+
+    // Task added afterwards
+    SerialSnooper_AddTask(task1ptr, period, true, true);
+
+    // Shouldn't call the task until "period" has elapsed
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
+}
 
 /* Helpers */
 
