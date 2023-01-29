@@ -9,6 +9,8 @@ static uint8_t latestData = 0;
 static char filename[MAX_FILE_NAME] = { 0 };
 static char timestampString[MAX_FILE_NAME] = { 0 };
 
+static int fakeDataContext = 0;
+
 void fakeSetTime(uint64_t newTime)
 {
     fakeTime = newTime;
@@ -57,4 +59,14 @@ const char* DH_GetTimestampString(const DataContext* data)
 void fakeSetTimestampString(const char* newFileName)
 {
     strncpy(timestampString, newFileName, MAX_FILE_NAME);
+}
+
+void fakeSetDataContext(DataContext* newData)
+{
+    fakeDataContext = (int)newData;
+}
+
+DataContext* DH_RefreshData(void)
+{
+    return (DataContext*)fakeDataContext;
 }

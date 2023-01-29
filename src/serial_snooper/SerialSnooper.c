@@ -20,19 +20,15 @@ typedef struct SSTask_t
 static SSTask_t ssTasks[MAX_TASKS];
 static uint8_t taskCounter = 0;
 
-// Grab data
-static FnGetData getDataFromDataHolder;
-
 // Internal state variable
 static uint64_t schedulerTime = 0;
 
 // Initialises internal variables to 0
-void SerialSnooper_Init(FnGetData fnGetData)
+void SerialSnooper_Init(void)
 {
     taskCounter = 0;
     schedulerTime = 0;
     memset(ssTasks, 0, sizeof(ssTasks));
-    getDataFromDataHolder = fnGetData;
 }
 
 // Run the scheduler
@@ -44,10 +40,7 @@ void SerialSnooper_Run(void)
     schedulerTime = DH_GetTime(data);
 
     // Grab data
-    if (getDataFromDataHolder)
-    {
-        data = getDataFromDataHolder();
-    }
+    data = DH_RefreshData();
 
     // Do the scheduling
     for (uint8_t i = 0; i < taskCounter; i++)

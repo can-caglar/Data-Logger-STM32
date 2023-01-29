@@ -28,7 +28,7 @@ static DataContext* task2dataPassedIn;
 // Set up
 void setUp(void)
 {
-    SerialSnooper_Init(NULL);
+    SerialSnooper_Init();
     resetTaskData();
     fakeSetTime(0);
 }
@@ -78,8 +78,10 @@ void test_AddTask_MultipleTasksCanBeAddedWillCallSequentially(void)
 
 void test_SchedulerWillGrabDataAndPassToTasks(void)
 {
-    // init with a "data grabber"
-    SerialSnooper_Init(fnForGettingData);  
+    SerialSnooper_Init();
+
+    // Set up a fake context to be returned
+    fakeSetDataContext((DataContext*)fakeDataContext);
 
     // add some task
     SerialSnooper_AddTask(task1ptr, 0, true, true);

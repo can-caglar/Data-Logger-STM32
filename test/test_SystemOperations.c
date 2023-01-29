@@ -6,8 +6,6 @@
 #include "mock_MyCircularBuffer.h"
 #include "fake_DataHolder.h"
 
-DataContext* dataPtr = 0;
-
 typedef enum
 {
     DONT_EXPECT_TIMESTAMP,

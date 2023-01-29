@@ -5,6 +5,7 @@
 
 typedef struct DataContext DataContext;
 
+DataContext* DH_RefreshData(void);
 uint64_t DH_GetTime(const DataContext* data);
 int DH_IsThereNewData(const DataContext* data);
 uint8_t DH_GetLatestData(const DataContext* data);

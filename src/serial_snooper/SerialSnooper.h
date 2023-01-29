@@ -20,13 +20,10 @@ enum
 // Fw declare DataContext
 typedef struct DataContext DataContext;
 
-// Fn pointer for grabbing data
-typedef DataContext* (*FnGetData)(void);
-
 // Scheduler task function pointer
 typedef void (*FnTask)(DataContext* data);
 
-void SerialSnooper_Init(FnGetData fnGetData);
+void SerialSnooper_Init(void);
 void SerialSnooper_Run(void);
 
 int SerialSnooper_AddTask(FnTask func, 
