@@ -1,6 +1,5 @@
 #include "SystemOperations.h"
 #include "MySD.h"
-#include "MyCircularBuffer.h"
 #include "stm32f0xx_hal.h"
 #include "SerialSnooper.h"
 #include "DataHolder.h"
@@ -21,8 +20,6 @@ int SystemOperations_Init(void)
     int ret = SO_SUCCESS;
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
-
-    MyCircularBuffer_init();
 
     return SystemOperations_OpenLogFile(NULL);
 }   

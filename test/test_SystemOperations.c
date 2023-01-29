@@ -238,8 +238,6 @@ void test_OpenLogFile_OpensOneFileClosesTheOther(void)
 
 void successfulInit(void)
 {
-    MyCircularBuffer_init_Expect();
-
     // gets name of file from time string
     fakeSetFileName("hi.txt");
 
