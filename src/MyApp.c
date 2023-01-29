@@ -30,13 +30,10 @@ int runApp(void)
     else
     {
         CubeMX_SystemInit(CMX_UART);
-        int err = SerialSnooper_Init();
-        if (!err)
+        SerialSnooper_Init();
+        LOOP
         {
-            LOOP
-            {
-                SerialSnooper_Run();
-            } 
+            SerialSnooper_Run();
         }
     }
 }

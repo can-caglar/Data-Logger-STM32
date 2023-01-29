@@ -17,18 +17,17 @@ static uint8_t timestampThisLine(uint8_t thisByte);
 
 int SystemOperations_Init(void)
 {
-    int ret = SO_SUCCESS;
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
 
-    return SystemOperations_OpenLogFile(NULL);
+    return SO_SUCCESS;
 }   
 
 int SystemOperations_OpenLogFile(const DataContext* data)
 {
     int ret = SO_SUCCESS;
 
-    const char* fileName = DH_GetFileName(NULL);
+    const char* fileName = DH_GetFileName(data);
 
     // open file
     FRESULT err = MySD_Init(fileName);
@@ -44,7 +43,7 @@ int SystemOperations_OpenLogFile(const DataContext* data)
 
 void notifySdCardWriter(const DataContext* data)
 {
-    uint8_t thereIsNewData = DH_IsThereNewData(data); // !data->isEmpty;
+    uint8_t thereIsNewData = DH_IsThereNewData(data);
     if (thereIsNewData)
     {
         // get top item from circular buffer

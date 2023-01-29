@@ -1,3 +1,4 @@
+#include "unity.h"
 #include "fake_DataHolder.h"
 #include <string.h>
 
@@ -10,6 +11,7 @@ static char filename[MAX_FILE_NAME] = { 0 };
 static char timestampString[MAX_FILE_NAME] = { 0 };
 
 static int fakeDataContext = 0;
+static int latestDataContextPassedIn = 0;
 
 void fakeSetTime(uint32_t newTime)
 {
@@ -18,11 +20,13 @@ void fakeSetTime(uint32_t newTime)
 
 uint32_t DH_GetTime(const DataContext* data)
 {
+    latestDataContextPassedIn = (int)data;
     return fakeTime;
 }
 
 uint8_t DH_IsThereNewData(const DataContext* data)
 {
+    latestDataContextPassedIn = (int)data;
     return isThereNewData;
 }
 
@@ -33,6 +37,7 @@ void fakeSetIsThereNewData(int newState)
 
 uint8_t DH_GetLatestData(const DataContext* data)
 {
+    latestDataContextPassedIn = (int)data;
     return latestData;
 }
 
@@ -43,6 +48,7 @@ void fakeSetLatestData(uint8_t newData)
 
 const char* DH_GetFileName(const DataContext* data)
 {
+    latestDataContextPassedIn = (int)data;
     return filename;
 }
 
@@ -53,6 +59,7 @@ void fakeSetFileName(const char* newFileName)
 
 const char* DH_GetTimestampString(const DataContext* data)
 {
+    latestDataContextPassedIn = (int)data;
     return timestampString;
 }
 
@@ -69,4 +76,11 @@ void fakeSetDataContext(DataContext* newData)
 DataContext* DH_RefreshData(void)
 {
     return (DataContext*)fakeDataContext;
+}
+
+DataContext* fakeGetLatestDataContextPassedIn(void)
+{
+    int ret = latestDataContextPassedIn;
+    latestDataContextPassedIn = 0;
+    return (DataContext*)ret;
 }

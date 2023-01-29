@@ -4,6 +4,8 @@
 #include "mock_AppDecider.h"
 #include "mock_SerialSnooper.h"
 #include "mock_main.h"
+#include "mock_SystemOperations.h"
+#include "mock_DataHolder.h"
 #include "Loop.h"
 
 // Helpers
@@ -40,16 +42,6 @@ void test_App_SnoopingSuccess(void)
     runApp();
 }
 
-void test_App_SnoopingFailInit(void)
-{
-    LOOP_COUNT(3);  // expecting 3 times round the loop
-
-    initSerialSnooperHelper(1); // todo; magic number
-    
-    // expecting 0 calls to SerialSnooper_Run
-    runApp();
-}
-
 /*********** Helpers ***********/
 
 void initSerialSnooperHelper(int error)
@@ -59,5 +51,9 @@ void initSerialSnooperHelper(int error)
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
     CubeMX_SystemInit_Expect(CMX_UART);
 
-    SerialSnooper_Init_ExpectAndReturn(error);
+    SerialSnooper_Init_Expect();
+    //SystemOperations_Init_ExpectAndReturn(0);
+    //DH_Init_ExpectAndReturn(0);
+
+    //SerialSnooper_AddTask_ExpectAndReturn();
 }
