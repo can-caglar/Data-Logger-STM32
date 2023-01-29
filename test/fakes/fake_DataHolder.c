@@ -13,6 +13,8 @@ static char timestampString[MAX_FILE_NAME] = { 0 };
 static int fakeDataContext = 0;
 static int latestDataContextPassedIn = 0;
 
+static uint32_t fakeFileSize = 0;
+
 void fakeSetTime(uint32_t newTime)
 {
     fakeTime = newTime;
@@ -83,4 +85,14 @@ DataContext* fakeGetLatestDataContextPassedIn(void)
     int ret = latestDataContextPassedIn;
     latestDataContextPassedIn = 0;
     return (DataContext*)ret;
+}
+
+void fakeSetFileSize(uint32_t newFileSize)
+{
+    fakeFileSize = newFileSize;
+}
+
+uint32_t DH_GetOpenedFileSize(const DataContext* data)
+{
+    return fakeFileSize;
 }

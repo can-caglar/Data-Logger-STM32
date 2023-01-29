@@ -21,7 +21,7 @@ enum
 typedef struct DataContext DataContext;
 
 // Scheduler task function pointer
-typedef void (*FnTask)(DataContext* data);
+typedef void (*FnTask)(const DataContext* data);
 
 void SerialSnooper_Init(void);
 void SerialSnooper_Run(void);

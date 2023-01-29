@@ -12,13 +12,28 @@ typedef enum
     EXPECT_TIMESTAMP,
 } ExpectTimestamp_e;
 
+enum
+{
+    WITH_SUCCESS,
+    WITH_FAILURE,
+};
+
+// Used to find out if this arg is being passed into the getters in DataHolder
+// TODO, refactor this! No need to pass in the data context!
 static const int testValue = 777;
 static const DataContext* fakeDataContext = (DataContext*)testValue;
 
 static void successfulInit(void);
 static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTimestamp_e expectTimestamp);
 static void assertDataContextWasPassedInToGetters(void);
+static void expectToOpenAFile(int withSuccessOrFailure);
+
 // Tests
+
+void setUp(void)
+{
+    SystemOperations_Init();
+}
 
 void test_successInit(void)
 {
@@ -251,18 +266,65 @@ void test_sdCardFlusher_FlushesEvery500ms(void)
     assertDataContextWasPassedInToGetters();
 }
 
-void test_OpenLogFile_OpensOneFileClosesTheOther(void)
+void test_OpenLogFile_OpensOneFileClosesTheOtherWhenNoFileOpen(void)
 {
-    // gets name of file from time string
-    fakeSetFileName("hi.txt");
+    expectToOpenAFile(WITH_SUCCESS);
 
-    // opens file
-    MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
-
+    // first time round
     SystemOperations_OpenLogFile(fakeDataContext);
-    assertDataContextWasPassedInToGetters();
+    assertDataContextWasPassedInToGetters();    // refactored soon
+
+    // a file is already open, should do nothing
+    SystemOperations_OpenLogFile(fakeDataContext);
 }
 
+void test_OpenLogFile_TriesAgainIfOpenFailed(void)
+{
+    expectToOpenAFile(WITH_FAILURE);
+
+    SystemOperations_OpenLogFile(fakeDataContext);
+
+    // second time round, tries again
+    expectToOpenAFile(WITH_SUCCESS);
+
+    SystemOperations_OpenLogFile(fakeDataContext);
+}
+
+void test_OpenLogFile_OpensAnotherFileIfSizeAboveLimit(void)
+{
+    // gets name of file from time string
+    expectToOpenAFile(WITH_SUCCESS);
+
+    SystemOperations_OpenLogFile(fakeDataContext);
+
+    // update the file size
+    fakeSetFileSize(MAX_FILE_SIZE);
+    fakeSetIsThereNewData(1);  // say we have data
+
+    // expect to open a new file since max size reached
+    expectToOpenAFile(WITH_SUCCESS);
+
+    SystemOperations_OpenLogFile(fakeDataContext);
+}
+
+void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
+{
+    // expect to open new file
+    expectToOpenAFile(WITH_SUCCESS);
+    SystemOperations_OpenLogFile(fakeDataContext);
+
+    // update the file size to low threshold
+    fakeSetFileSize(FILE_SIZE_LOWER_THRESHOLD);
+    // but we have data in buffer
+    fakeSetIsThereNewData(1); 
+
+    // new data available, don't expect to open a new file
+    SystemOperations_OpenLogFile(fakeDataContext);
+
+    fakeSetIsThereNewData(0); // no new data, expect to open now
+    expectToOpenAFile(WITH_SUCCESS);
+    SystemOperations_OpenLogFile(fakeDataContext);
+}
 
 // Helper functions
 
@@ -289,6 +351,18 @@ static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTime
 static void assertDataContextWasPassedInToGetters(void)
 {
     TEST_ASSERT_EQUAL(fakeDataContext, fakeGetLatestDataContextPassedIn());
+}
+
+static void expectToOpenAFile(int withSuccessOrFailure)
+{
+    int err = (withSuccessOrFailure == WITH_SUCCESS) ?
+        FR_OK : FR_DISK_ERR;
+
+    // gets name of file from time string
+    fakeSetFileName("hi.txt");
+
+    // open file
+    MySD_Init_ExpectAndReturn("hi.txt", err);
 }
 
 

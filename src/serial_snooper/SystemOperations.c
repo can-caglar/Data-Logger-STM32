@@ -13,31 +13,47 @@
 static uint8_t previousData;
 static uint32_t lastTimeFlushed;
 static uint8_t status;
+static uint8_t aFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
+    aFileIsOpen = 0;
 
     return SO_SUCCESS;
 }   
 
-int SystemOperations_OpenLogFile(const DataContext* data)
+void SystemOperations_OpenLogFile(const DataContext* data)
 {
-    int ret = SO_SUCCESS;
+    // get size of file
+    uint32_t dataSize = DH_GetOpenedFileSize(data);
+    // find out if we have data to handle
+    uint8_t newDataToHandle = DH_IsThereNewData(data);
+    // open new file if size is greater than maximum allowed
+    uint8_t maxDataSizeReached = (dataSize >= MAX_FILE_SIZE);
+    uint8_t lowerBoundSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
+    // open file "early" if system has no new data to handle
+    uint8_t openNewFileEarly = (lowerBoundSizeReached && !newDataToHandle);
 
-    const char* fileName = DH_GetFileName(data);
-
-    // open file
-    FRESULT err = MySD_Init(fileName);
-
-    // return any error
-    if (err != FR_OK)
+    if (!aFileIsOpen || maxDataSizeReached || openNewFileEarly)
     {
-        ret = SO_FAIL;
+        // get file name
+        const char* fileName = DH_GetFileName(data);
+
+        // open file
+        FRESULT err = MySD_Init(fileName);
+
+        if (err == FR_OK)
+        {
+            aFileIsOpen = 1;
+        }
+        else
+        {
+            aFileIsOpen = 0;
+        }
     }
-    return ret;
 }
 
 

@@ -4,9 +4,9 @@
 #include "mock_AppDecider.h"
 #include "mock_SerialSnooper.h"
 #include "mock_main.h"
-#include "mock_SystemOperations.h"
-#include "mock_DataHolder.h"
 #include "Loop.h"
+
+// TODO, incomplete module
 
 // Helpers
 void initSerialSnooperHelper(int error);
@@ -52,8 +52,4 @@ void initSerialSnooperHelper(int error)
     CubeMX_SystemInit_Expect(CMX_UART);
 
     SerialSnooper_Init_Expect();
-    //SystemOperations_Init_ExpectAndReturn(0);
-    //DH_Init_ExpectAndReturn(0);
-
-    //SerialSnooper_AddTask_ExpectAndReturn();
 }
