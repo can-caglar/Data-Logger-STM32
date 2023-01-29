@@ -144,7 +144,6 @@ void test_SchedulerWithTwoTasksKnowsWhenToCallThem(void)
     TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
 }
 
-// TODO, test when time is late but task added later on
 void test_AddingTaskAfterInitialisation(void)
 {
     const int startTime = 500;
@@ -157,9 +156,56 @@ void test_AddingTaskAfterInitialisation(void)
     // Task added afterwards
     SerialSnooper_AddTask(task1ptr, period, true, true);
 
-    // Shouldn't call the task until "period" has elapsed
+    // Shouldn't call the task until "period" has elapsed from then
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
+}
+
+void test_AddingSameFunctionAgainCreatesMultipleEntriesInScheduler(void)
+{
+    const int period1 = 75;
+    const int period2 = 100;
+
+    SerialSnooper_AddTask(task1ptr, period1, true, true);
+    SerialSnooper_AddTask(task1ptr, period2, true, true);
+
+    // period1 has elapsed, should call function
+    fakeSetTime(period1);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+
+    fakeSetTime(period2);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+
+    fakeSetTime(period1 * 2);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+
+    fakeSetTime(period2 * 2);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+}
+
+void test_ThereIsALimitToHowManyFunctionsToAdd(void)
+{
+    // Adding tasks up to MAX_TASKS
+    for (int i = 0; i < MAX_TASKS; i++)
+    {
+        TEST_ASSERT_EQUAL_INT(SS_ERR_NONE,
+            SerialSnooper_AddTask(task1ptr, 0, true, true));
+    }
+    // Anymore will just return an eror
+    TEST_ASSERT_EQUAL_INT(SS_ERR_FAULT,
+        SerialSnooper_AddTask(task2ptr, 0, true, true));
+
+    SerialSnooper_Run();
+
+    // Task 1 is called
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+    // Task 2 isn't
+    TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
+
 }
 
 /* Helpers */

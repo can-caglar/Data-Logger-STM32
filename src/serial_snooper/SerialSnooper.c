@@ -7,8 +7,6 @@ Call this in a tight loop.
 #include "DataHolder.h"
 #include <string.h>
 
-#define MAX_TASKS 5
-
 typedef struct SSTask_t
 {
     FnTask fnPtr;
@@ -62,9 +60,18 @@ void SerialSnooper_Run(void)
 int SerialSnooper_AddTask(FnTask func, 
     uint32_t period, bool periodic, bool enabled)
 {
-    ssTasks[taskCounter].fnPtr = func;
-    ssTasks[taskCounter].enabled = enabled;
-    ssTasks[taskCounter].period = period;
-    ssTasks[taskCounter].nextCall = schedulerTime + period;
-    taskCounter++;
+    int err = SS_ERR_NONE;
+    if (taskCounter < MAX_TASKS)
+    {
+        ssTasks[taskCounter].fnPtr = func;
+        ssTasks[taskCounter].enabled = enabled;
+        ssTasks[taskCounter].period = period;
+        ssTasks[taskCounter].nextCall = schedulerTime + period;
+        taskCounter++;
+    }
+    else
+    {
+        err = SS_ERR_FAULT;
+    }
+    return err;
 }
