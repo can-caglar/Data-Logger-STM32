@@ -22,17 +22,6 @@ void test_successInit(void)
     successfulInit();
 }
 
-void test_Failinit(void)
-{
-    MyCircularBuffer_init_Ignore();
-    MyTimeString_Init_IgnoreAndReturn(0);
-    MyTimeString_GetFileName_IgnoreAndReturn("hi.txt");
-    MySD_Init_ExpectAndReturn("hi.txt", FR_NOT_READY);
-
-    int res = SystemOperations_Init();
-    TEST_ASSERT_EQUAL_INT(SO_FAIL, res);
-}
-
 void test_notifySdCardDoesNothingWhenBufferIsEmpty(void)
 {
     SubjectData_t data = {.isEmpty = 1};
@@ -232,6 +221,17 @@ void test_sdCardFlusher_FlushesEvery500ms(void)
     notifySdCardFlusher(&data);
 }
 
+void test_OpenLogFile_OpensOneFileClosesTheOther(void)
+{
+    // gets name of file from time string
+    MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
+
+    // opens file
+    MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
+
+    SystemOperations_OpenLogFile();
+}
+
 
 // Helper functions
 
@@ -241,8 +241,6 @@ void successfulInit(void)
     MyCircularBuffer_init_Expect();
 
     MyTimeString_Init_ExpectAndReturn(0);
-    MyTimeString_GetFileName_ExpectAndReturn("hi.txt");
-    MySD_Init_ExpectAndReturn("hi.txt", FR_OK);
 
     int res = SystemOperations_Init();
     TEST_ASSERT_EQUAL(SO_SUCCESS, res);

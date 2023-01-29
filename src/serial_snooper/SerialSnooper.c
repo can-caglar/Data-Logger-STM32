@@ -21,7 +21,6 @@ void SerialSnooper_Run()
 
     // Get data
     mySubjectData.isEmpty = MyCircularBuffer_isEmpty();
-    mySubjectData.circBufData = MyCircularBuffer_read();
     mySubjectData.tNow = HAL_GetTick();
 
     // Notify Observers

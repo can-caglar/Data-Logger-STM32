@@ -25,21 +25,13 @@ int SystemOperations_Init(void)
     MyCircularBuffer_init();
     MyTimeString_Init();
 
-    const char* fileName = MyTimeString_GetFileName();
-    FRESULT err = MySD_Init(fileName);
-    if (err != FR_OK)
-    {
-        ret = SO_FAIL;
-    }
-    return ret;
+    return SystemOperations_OpenLogFile();
 }   
 
-int SystemOperations_OpenNewFile()
+int SystemOperations_OpenLogFile()
 {
     int ret = SO_SUCCESS;
 
-    // get file name
-    MyTimeString_Init();
     const char* fileName = MyTimeString_GetFileName();
 
     // open file
@@ -78,7 +70,7 @@ void notifySdCardFlusher(const SubjectData_t* data)
 {
     // Device may be unplugged at any moment.
     // Flush every 500 ms.
-    if (HAL_GetTick() >= (lastTimeFlushed + 500))
+    if (HAL_GetTick() >= (lastTimeFlushed + FLUSH_TIME_MS))
     {
         MySD_Flush();
         lastTimeFlushed = HAL_GetTick();

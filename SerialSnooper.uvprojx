@@ -476,6 +476,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\led\ErrorIndicator.c</FilePath>
             </File>
+            <File>
+              <FileName>SystemOperations.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\serial_snooper\SystemOperations.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
