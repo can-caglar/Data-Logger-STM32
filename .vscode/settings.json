@@ -14,6 +14,7 @@
         "memory": "c",
         "new": "c",
         "functional": "c",
-        "mock_myterminaluart.h": "c"
+        "mock_myterminaluart.h": "c",
+        "xutility": "c"
     }
 }

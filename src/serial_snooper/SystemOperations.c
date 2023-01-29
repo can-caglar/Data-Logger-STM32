@@ -44,7 +44,7 @@ int SystemOperations_OpenLogFile(const DataContext* data)
 
 void notifySdCardWriter(const DataContext* data)
 {
-    int thereIsNewData = DH_IsThereNewData(data); // !data->isEmpty;
+    uint8_t thereIsNewData = DH_IsThereNewData(data); // !data->isEmpty;
     if (thereIsNewData)
     {
         // get top item from circular buffer

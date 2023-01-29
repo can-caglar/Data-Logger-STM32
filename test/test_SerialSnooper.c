@@ -25,6 +25,8 @@ static const FnTask task2ptr = task2;
 static DataContext* task1dataPassedIn;
 static DataContext* task2dataPassedIn;
 
+// TODO, test for overflow conditions
+
 // Set up
 void setUp(void)
 {

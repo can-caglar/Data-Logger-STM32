@@ -13,7 +13,7 @@ typedef struct SSTask_t
     bool enabled;
     bool isPeriodic;
     uint32_t period;
-    uint64_t nextCall;
+    uint32_t nextCall;
 } SSTask_t;
 
 // Task database
@@ -21,7 +21,7 @@ static SSTask_t ssTasks[MAX_TASKS];
 static uint8_t taskCounter = 0;
 
 // Internal state variable
-static uint64_t schedulerTime = 0;
+static uint32_t schedulerTime = 0;
 
 // Initialises internal variables to 0
 void SerialSnooper_Init(void)

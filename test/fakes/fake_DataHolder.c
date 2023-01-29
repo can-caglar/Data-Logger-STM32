@@ -1,7 +1,7 @@
 #include "fake_DataHolder.h"
 #include <string.h>
 
-static uint64_t fakeTime = 0;
+static uint32_t fakeTime = 0;
 static int isThereNewData = 0;
 static uint8_t latestData = 0;
 
@@ -11,17 +11,17 @@ static char timestampString[MAX_FILE_NAME] = { 0 };
 
 static int fakeDataContext = 0;
 
-void fakeSetTime(uint64_t newTime)
+void fakeSetTime(uint32_t newTime)
 {
     fakeTime = newTime;
 }
 
-uint64_t DH_GetTime(const DataContext* data)
+uint32_t DH_GetTime(const DataContext* data)
 {
     return fakeTime;
 }
 
-int DH_IsThereNewData(const DataContext* data)
+uint8_t DH_IsThereNewData(const DataContext* data)
 {
     return isThereNewData;
 }
