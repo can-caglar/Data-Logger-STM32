@@ -4,6 +4,7 @@
 #include "MyCircularBuffer.h"
 #include "mock_stm32f0xx_hal.h"
 #include "mock_MyTimeString.h"
+#include "mock_MySD.h"
 
 void successfulInit(void);
 
@@ -21,6 +22,7 @@ void test_initShallRefreshCircBuffer(void)
     HAL_GetTick_IgnoreAndReturn(0);
     MyTimeString_GetTimeStamp_IgnoreAndReturn(0);
     MyTimeString_GetFileName_IgnoreAndReturn(0);
+    MySD_getOpenedFileSize_IgnoreAndReturn(0);
 
     DataContext* data = DH_RefreshData();
     
@@ -43,6 +45,7 @@ void test_DH_RefreshData(void)
     HAL_GetTick_ExpectAndReturn(timetoReturn);
     MyTimeString_GetTimeStamp_ExpectAndReturn(timeStamp);
     MyTimeString_GetFileName_ExpectAndReturn(filename);
+    MySD_getOpenedFileSize_ExpectAndReturn(100);
 
     // Test function
     DataContext* data = DH_RefreshData();
@@ -53,6 +56,7 @@ void test_DH_RefreshData(void)
     TEST_ASSERT_EQUAL_UINT32(timetoReturn, DH_GetTime(data));
     TEST_ASSERT_EQUAL_STRING(timeStamp, DH_GetTimestampString(data));
     TEST_ASSERT_EQUAL_STRING(filename, DH_GetFileName(data));
+    TEST_ASSERT_EQUAL_INT(100, DH_GetOpenedFileSize(data));
 }
 
 void test_DH_CircBuffer(void)
@@ -60,6 +64,7 @@ void test_DH_CircBuffer(void)
     HAL_GetTick_IgnoreAndReturn(0);
     MyTimeString_GetTimeStamp_IgnoreAndReturn(0);
     MyTimeString_GetFileName_IgnoreAndReturn(0);
+    MySD_getOpenedFileSize_IgnoreAndReturn(0);
 
     MyCircularBuffer_write('a');
     MyCircularBuffer_write('b');

@@ -1,11 +1,13 @@
 #include "DataHolder.h"
 #include "MyCircularBuffer.h"
 #include "MyTimeString.h"
+#include "MySD.h"
 #include "stm32f0xx_hal.h"
 
 struct DataContext
 {
     uint32_t tNow;
+    FSIZE_t fileSize;
     uint8_t isThereNewData;
     uint8_t theLatestData;
     const char* fileName;
@@ -31,6 +33,7 @@ DataContext* DH_RefreshData(void)
     thisContext.theLatestData = MyCircularBuffer_read();
     thisContext.timestampStr = MyTimeString_GetTimeStamp();
     thisContext.fileName = MyTimeString_GetFileName();
+    thisContext.fileSize = MySD_getOpenedFileSize(); // not initted it, problem?
 
     return &thisContext;
 }
@@ -76,6 +79,15 @@ const char* DH_GetTimestampString(const DataContext* data)
     if (data)
     {
         return data->timestampStr;
+    }
+    return 0;
+}
+
+uint32_t DH_GetOpenedFileSize(const DataContext* data)
+{
+    if (data)
+    {
+        return data->fileSize;
     }
     return 0;
 }
