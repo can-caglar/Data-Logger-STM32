@@ -6,16 +6,18 @@
 #define SO_SUCCESS 0
 #define SO_FAIL 1
 
-typedef struct SubjectData_t
+typedef struct DataContext DataContext;
+// temporary, to delete:
+typedef struct DataContext
 {
     int isEmpty;
     char circBufData;
-} SubjectData_t;
+} DataContext;
 
 
 int SystemOperations_Init(void);
 int SystemOperations_OpenLogFile(void);
-void notifySdCardWriter(const SubjectData_t* data);
-void notifySdCardFlusher(const SubjectData_t* data);
+void notifySdCardWriter(const DataContext* data);
+void notifySdCardFlusher(const DataContext* data);
 
 #endif

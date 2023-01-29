@@ -4,6 +4,7 @@
 #include "MyCircularBuffer.h"
 #include "stm32f0xx_hal.h"
 #include "SerialSnooper.h"
+#include "DataHolder.h"
 
 #define MAX_BUF 32
 #define FLUSH_TIME_MS   500
@@ -46,9 +47,10 @@ int SystemOperations_OpenLogFile()
 }
 
 
-void notifySdCardWriter(const SubjectData_t* data)
+void notifySdCardWriter(const DataContext* data)
 {
-    if (!data->isEmpty)
+    int thereIsNewData = DH_IsThereNewData(data); // !data->isEmpty;
+    if (thereIsNewData)
     {
         // get top item from circular buffer
         uint8_t val = MyCircularBuffer_read();
@@ -66,7 +68,7 @@ void notifySdCardWriter(const SubjectData_t* data)
     }
 }
 
-void notifySdCardFlusher(const SubjectData_t* data)
+void notifySdCardFlusher(const DataContext* data)
 {
     // Device may be unplugged at any moment.
     // Flush every 500 ms.

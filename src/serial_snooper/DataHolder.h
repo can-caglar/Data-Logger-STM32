@@ -6,5 +6,6 @@
 typedef struct DataContext DataContext;
 
 uint64_t DH_GetTime(DataContext* data);
+int DH_IsThereNewData(DataContext* data);
 
 #endif

@@ -4,6 +4,9 @@
 #include "mock_MyTimeString.h"
 #include "mock_stm32f0xx_hal.h"
 #include "mock_MyCircularBuffer.h"
+#include "fake_DataHolder.h"
+
+DataContext* dataPtr = 0;
 
 typedef enum
 {
@@ -23,48 +26,51 @@ void test_successInit(void)
 
 void test_notifySdCardDoesNothingWhenBufferIsEmpty(void)
 {
-    SubjectData_t data = {.isEmpty = 1};
+    DataContext data = {.isEmpty = 1};
+    fakeSetIsThereNewData(0);
 
-    notifySdCardWriter(&data);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
+    notifySdCardWriter(dataPtr);
 }
 
 void test_notifySdCard_FirstTimeWritesTimestampAndByteToSD(void)
 {
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
+    fakeSetIsThereNewData(1);
 
     MyCircularBuffer_read_ExpectAndReturn(data.circBufData);
     MyTimeString_GetTimeStamp_ExpectAndReturn("example");    // get timestamp
     MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
     MySD_Write_ExpectAndReturn(&data.circBufData, 1, FR_OK);
     
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 void test_notifySdCard_WriteSD_CROrLFAtEndWillAddTimestamp(void)
 {
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
+    fakeSetIsThereNewData(1);
 
     successfulInit();
 
     // first character shall always be timestamped
     uint8_t byteWritten = 'q';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
     
     // with \r, this shall not be timestamped
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // // any other character after the \r will be timestamped
     byteWritten = 'a';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // another character, no timestamp
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 
@@ -72,56 +78,59 @@ void test_notifySdCard_WriteSD_ConstantCRorLFWillAddTS(void)
 {
     successfulInit();
 
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
+    fakeSetIsThereNewData(1);
 
     // first character shall always be timestamped
     uint8_t byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 
 void test_notifySdCardWriter_WriteSD_RespectsCRLF(void)
 {
     successfulInit();
+    fakeSetIsThereNewData(1);
 
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
 
     // first character shall always be timestamped
     uint8_t byteWritten = 'a';
     uint8_t nextByte = '\r';
     expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\r';
     nextByte = '\n';
     expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\n';
     nextByte = 'q';
     expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     nextByte = 'q';
     expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 
 void test_SerialSnooper_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
 {
     successfulInit();
+    fakeSetIsThereNewData(1);
 
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
 
     HAL_GetTick_IgnoreAndReturn(0);
 
@@ -129,23 +138,25 @@ void test_SerialSnooper_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
     uint8_t byteWritten = 'a';
     uint8_t nextByte = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     byteWritten = '\n';
     byteWritten = 'q';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
 {
     successfulInit();
+    fakeSetIsThereNewData(0);
 
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
+    fakeSetIsThereNewData(1);
 
     HAL_GetTick_IgnoreAndReturn(0);
 
@@ -153,36 +164,36 @@ void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
     // '[Timestamp]: a'
     uint8_t byteWritten = 'a';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r'
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r\n'
     byteWritten = '\n';
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r\n'
     // '[Timestamp]: \r'
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r\n'
     // '[Timestamp]: \r\n'
     byteWritten = '\n';
     expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r\n'
     // '[Timestamp]: \r\n'
     // '[Timestamp]: \r'
     byteWritten = '\r';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 
     // '[Timestamp]: a\r\n'
     // '[Timestamp]: \r\n'
@@ -190,34 +201,34 @@ void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
     // '[Timestamp]: a'
     byteWritten = 'a';
     expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    notifySdCardWriter(&data);
+    notifySdCardWriter(dataPtr);
 }
 
 
 void test_sdCardFlusher_FlushesEvery500ms(void)
 {
     successfulInit();
-    SubjectData_t data = {.isEmpty = 0, .circBufData = 'c'};
+    DataContext data = {.isEmpty = 0, .circBufData = 'c'};
 
     uint8_t byteWritten = 0x2;
 
     HAL_GetTick_ExpectAndReturn(0);
 
-    notifySdCardFlusher(&data);
+    notifySdCardFlusher(dataPtr);
 
     HAL_GetTick_ExpectAndReturn(400);
 
-    notifySdCardFlusher(&data);
+    notifySdCardFlusher(dataPtr);
 
     HAL_GetTick_ExpectAndReturn(500);
     MySD_Flush_ExpectAndReturn(FR_OK);
     HAL_GetTick_ExpectAndReturn(500);
 
-    notifySdCardFlusher(&data);
+    notifySdCardFlusher(dataPtr);
 
     // won't call it again
     HAL_GetTick_ExpectAndReturn(510);
-    notifySdCardFlusher(&data);
+    notifySdCardFlusher(dataPtr);
 }
 
 void test_OpenLogFile_OpensOneFileClosesTheOther(void)
