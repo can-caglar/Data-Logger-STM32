@@ -3,14 +3,31 @@
 
 #include <stdint.h>
 
-typedef struct SubjectData_t
-{
-    uint64_t tNow;
-    uint8_t isEmpty;
-    uint8_t circBufData;
-} SubjectData_t;
+#ifndef bool
+#define bool uint8_t
+#define true 1
+#define false 0
+#endif
 
-int SerialSnooper_Init(void);
+enum
+{
+    SS_ERR_NONE,
+    SS_ERR_FAULT,
+};
+
+// Fw declare DataContext
+typedef struct DataContext DataContext;
+
+// Fn pointer for grabbing data
+typedef DataContext* (*FnGetData)(void);
+
+// Scheduler task function pointer
+typedef void (*FnTask)(DataContext* data);
+
+void SerialSnooper_Init(FnGetData fnGetData);
 void SerialSnooper_Run(void);
+
+int SerialSnooper_AddTask(FnTask func, 
+    uint32_t period, bool periodic, bool enabled);
 
 #endif
