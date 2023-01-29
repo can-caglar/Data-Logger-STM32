@@ -205,6 +205,24 @@ void test_ThereIsALimitToHowManyFunctionsToAdd(void)
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
     // Task 2 isn't
     TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
+}
+
+void test_OneShotTasksAreCalledOnce(void)
+{
+    const int period = 100;
+
+    SerialSnooper_AddTask(task1ptr, period, false, true);
+
+    fakeSetTime(100);
+    SerialSnooper_Run();
+
+    // expect to be called
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+
+    // should not be called anymore
+    fakeSetTime(200);
+    SerialSnooper_Run();
+    TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
 }
 
@@ -279,17 +297,14 @@ frequency we decide during the dependency injection
 - In the end, the scheduler will call the tasks when it's their time
 and pass in the time to them
 
-- [ ] Has a DataStore
-- [ ] Gets DataHandle* from DataStore
-- [ ] Passes this to Tasks
-- [ ] Tasks are function pointers with periods for how often, oneshot and enable/disable
+- [x] Has a DataStore
+- [x] Gets DataHandle* from DataStore
+- [x] Passes this to Tasks
+- [x] Tasks are function pointers with periods for how often, oneshot and enable/disable
 to call (may take longer depending on time of other tasks)
-- [ ] Tasks are initialised with addTask(fnPointer, period, oneshot)
-- [ ] There is a maximum number of tasks fails if could not add task
-- [ ] If a function pointer already exists, will update its period and oneshot
-- [ ] If doesnt exist, will add to list
+- [ ] Oneshot tasks are called only once
+- [x] Tasks are initialised with addTask(fnPointer, period, oneshot)
+- [x] There is a maximum number of tasks fails if could not add task
+- [x] If a function pointer already exists, will just add task
 
-// Extras
-- [ ] Function can be removed which will just NULL its fn pointer.
-    This maybe not necessary for now
 */

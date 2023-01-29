@@ -11,6 +11,7 @@ typedef struct SSTask_t
 {
     FnTask fnPtr;
     bool enabled;
+    bool isPeriodic;
     uint32_t period;
     uint64_t nextCall;
 } SSTask_t;
@@ -51,6 +52,10 @@ void SerialSnooper_Run(void)
             {
                 thisTask->fnPtr(data);
                 thisTask->nextCall = schedulerTime + thisTask->period;
+                if (thisTask->isPeriodic == false)
+                {
+                    thisTask->enabled = false;
+                }
             }
         }
     }
@@ -67,6 +72,7 @@ int SerialSnooper_AddTask(FnTask func,
         ssTasks[taskCounter].enabled = enabled;
         ssTasks[taskCounter].period = period;
         ssTasks[taskCounter].nextCall = schedulerTime + period;
+        ssTasks[taskCounter].isPeriodic = periodic;
         taskCounter++;
     }
     else
