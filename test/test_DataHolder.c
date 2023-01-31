@@ -6,90 +6,66 @@
 #include "mock_MyTimeString.h"
 #include "mock_MySD.h"
 
-void successfulInit(void);
+void resetCircularBuffer(void);
 
-void setUp(void)
+void test_isThereNewDataDependsOnCircularBuffer(void)
 {
-    successfulInit();
-}
+    resetCircularBuffer();
 
-void test_initShallRefreshCircBuffer(void)
-{
+    // No scenario
+    TEST_ASSERT_EQUAL_INT(0, DH_IsThereNewData());
+
+    // Yes scenario
     MyCircularBuffer_write('a');
 
-    successfulInit();
-
-    HAL_GetTick_IgnoreAndReturn(0);
-    MyTimeString_GetTimeStamp_IgnoreAndReturn(0);
-    MyTimeString_GetFileName_IgnoreAndReturn(0);
-    MySD_getOpenedFileSize_IgnoreAndReturn(0);
-
-    DataContext* data = DH_RefreshData();
-    
-    TEST_ASSERT_EQUAL_CHAR(0, DH_GetLatestData(data));
+    TEST_ASSERT_EQUAL_INT(1, DH_IsThereNewData());
 }
 
-void test_badInit(void)
+void test_getLatestDataReturnsAndPopsTheOldestDataInCircBuf(void)
 {
-    MyTimeString_Init_ExpectAndReturn(1);
-    TEST_ASSERT_EQUAL_INT(1,DH_Init());
-}
-
-void test_DH_RefreshData(void)
-{
-    const uint32_t timetoReturn = 77;
-    const char* timeStamp = "[00:10:12]";
-    const char* filename = "fileName.txt";
-
-    // Set up data
-    HAL_GetTick_ExpectAndReturn(timetoReturn);
-    MyTimeString_GetTimeStamp_ExpectAndReturn(timeStamp);
-    MyTimeString_GetFileName_ExpectAndReturn(filename);
-    MySD_getOpenedFileSize_ExpectAndReturn(100);
-
-    // Test function
-    DataContext* data = DH_RefreshData();
-
-    // See expectations
-    TEST_ASSERT_EQUAL_CHAR(0, DH_GetLatestData(data));
-    TEST_ASSERT_EQUAL_CHAR(0, DH_IsThereNewData(data));
-    TEST_ASSERT_EQUAL_UINT32(timetoReturn, DH_GetTime(data));
-    TEST_ASSERT_EQUAL_STRING(timeStamp, DH_GetTimestampString(data));
-    TEST_ASSERT_EQUAL_STRING(filename, DH_GetFileName(data));
-    TEST_ASSERT_EQUAL_INT(100, DH_GetOpenedFileSize(data));
-}
-
-void test_DH_CircBuffer(void)
-{
-    HAL_GetTick_IgnoreAndReturn(0);
-    MyTimeString_GetTimeStamp_IgnoreAndReturn(0);
-    MyTimeString_GetFileName_IgnoreAndReturn(0);
-    MySD_getOpenedFileSize_IgnoreAndReturn(0);
+    resetCircularBuffer();
 
     MyCircularBuffer_write('a');
     MyCircularBuffer_write('b');
+    MyCircularBuffer_write('c');
 
-    DataContext* data = DH_RefreshData();
-
-    TEST_ASSERT_EQUAL_CHAR('a', DH_GetLatestData(data));
-   // TEST_ASSERT_EQUAL_INT(1, DH_IsThereNewData(data));
+    TEST_ASSERT_EQUAL_CHAR('a', DH_GetLatestData());
+    TEST_ASSERT_EQUAL_CHAR('b', DH_GetLatestData());
+    TEST_ASSERT_EQUAL_CHAR('c', DH_GetLatestData());
 }
 
-void test_DH_NullData(void)
+void test_getFilenameDelegatesToMyTimeString(void)
 {
-    DataContext* data = NULL;
+    const char* fileName = "filename.txt";
 
-    TEST_ASSERT_EQUAL_CHAR(0, DH_GetLatestData(data));
-    TEST_ASSERT_EQUAL_UINT32(0, DH_GetTime(data));
-    TEST_ASSERT_EQUAL_STRING(0, DH_GetTimestampString(data));
-    TEST_ASSERT_EQUAL_STRING(0, DH_GetFileName(data));
+    MyTimeString_GetFileName_ExpectAndReturn(fileName);
+
+    TEST_ASSERT_EQUAL_STRING(fileName, DH_GetFileName());
+}
+
+void test_getFileStampStringDelegatesToMyTimeString(void)
+{
+    const char* fileName = "[10-10-10]";
+
+    MyTimeString_GetTimeStamp_ExpectAndReturn(fileName);
+
+    TEST_ASSERT_EQUAL_STRING(fileName, DH_GetTimestampString());
+}
+
+void test_getOpenedFileSizeGetsItFromMySD(void)
+{
+    uint32_t fakeFileSize = 1024;
+
+    MySD_getOpenedFileSize_ExpectAndReturn(fakeFileSize);
+
+    TEST_ASSERT_EQUAL_UINT32(fakeFileSize, DH_GetOpenedFileSize());
 }
 
 
-/* Helpers */
+// Helpers
 
-void successfulInit(void)
+void resetCircularBuffer(void)
 {
-    MyTimeString_Init_ExpectAndReturn(0);
-    DH_Init();
+    MyCircularBuffer_close(); // close incase one was open
+    MyCircularBuffer_init();  // inits an empty circ buffer
 }
