@@ -1,0 +1,185 @@
+#include "unity.h"
+#include "fake_SDCard.h"
+#include <string.h>
+
+// Expecting that all newly opened files are files that
+// were created for the first time.
+const char expectedNewlyOpenFileData[FAKE_MAX_FILE_SIZE] = { 0 };
+
+void setUp(void)
+{
+    fake_SDCard_reset();
+}
+
+void test_SdCardNumFilesOpenDepends(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_numFilesOpen());
+
+    MySD_Init("file.txt");
+
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
+
+    MySD_Close();
+
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_numFilesOpen());
+}
+
+void test_fake_SDCard_reset_willResetEverything(void)
+{
+    MySD_Init("file.txt");
+    MySD_WriteString("hello");
+    MySD_Flush();
+    
+    // The reset
+    fake_SDCard_reset();
+
+    // The tests
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_numFilesOpen());    
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());    
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(expectedNewlyOpenFileData, fake_SDCard_getFileData(), FAKE_MAX_FILE_SIZE);
+
+    MySD_Flush();   // flush again shall not flush anything
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(expectedNewlyOpenFileData, fake_SDCard_getFileData(), FAKE_MAX_FILE_SIZE);
+}
+
+void test_fake_SDCard_reset_willResetFilePointer(void)
+{
+    const char* testStr = "hello";
+
+    MySD_Init("file.txt");
+    MySD_WriteString(testStr);
+    MySD_Flush();
+    
+    // The reset
+    fake_SDCard_reset();
+
+    // Write again
+    MySD_Init("file.txt");
+    MySD_WriteString(testStr);
+    MySD_Flush();
+
+    // Expect the same
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(testStr, 
+        fake_SDCard_getFileData(), sizeof(testStr));
+}
+
+
+void test_SdCardOpenFileNameCanBeAccessedAndChangesAccordingly(void)
+{
+    // initially no name
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
+
+    MySD_Init("newfile.txt");
+
+    TEST_ASSERT_EQUAL_STRING("newfile.txt", fake_SDCard_getOpenFileName());
+
+    MySD_Init("newfile2.txt");
+
+    TEST_ASSERT_EQUAL_STRING("newfile2.txt", fake_SDCard_getOpenFileName());
+}
+
+void test_SdCardClosedFileHasNoName(void)
+{
+    MySD_Init("newfile.txt");
+
+    MySD_Close();
+
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
+}
+
+void test_SdCardDataWontBeWrittenUntilFlushed(void)
+{
+    MySD_Init("file.txt");
+    MySD_WriteString("hello");
+
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(expectedNewlyOpenFileData, 
+        fake_SDCard_getFileData(), FAKE_MAX_FILE_SIZE);
+}
+
+void test_SdCardDataWillBeWrittenWhenFlushedUsingWriteStringAPI(void)
+{
+    const char thisStr[] = "hello";
+    MySD_Init("file.txt");
+    MySD_WriteString(thisStr);
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(thisStr, 
+        fake_SDCard_getFileData(), strlen(thisStr));
+}
+
+void test_SdCardDataWillBeWrittenWhenFlushedUsingWriteByteAPI(void)
+{
+    const char thisStr[] = "hello";
+    MySD_Init("file.txt");
+    MySD_Write(thisStr, strlen(thisStr));
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(thisStr, 
+        fake_SDCard_getFileData(), strlen(thisStr));
+}
+
+void test_SdCardDataWriteMultipleTimesConcatenates(void)
+{
+    const char thisStr[20] = "hello";
+    const char str2[] = " world!";
+
+    MySD_Init("file.txt");
+    MySD_Write(thisStr, strlen(thisStr));
+    MySD_Write(str2, strlen(str2));
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("hello world!", 
+        fake_SDCard_getFileData(), strlen(thisStr));
+}
+
+void test_SdCardWriteDataWith0sAlsoGetsWritten(void)
+{
+    const uint8_t expectedData[] = {0, 1, 2, 0, 3};
+    uint8_t size = sizeof(expectedData);
+
+    MySD_Init("file.txt");
+    MySD_Write(expectedData, size);
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedData, 
+        fake_SDCard_getFileData(), size);
+}
+
+void test_SdCardFileSizeCanBeFaked(void)
+{
+    uint32_t size_20mb = 20000000;
+    uint32_t size_5byte = 5;
+
+    fake_SDCard_setFileSize(size_20mb);
+
+    TEST_ASSERT_EQUAL_UINT32(size_20mb, MySD_getOpenedFileSize());
+
+    fake_SDCard_setFileSize(size_5byte);
+
+    TEST_ASSERT_EQUAL_UINT32(size_5byte, MySD_getOpenedFileSize());
+}
+
+void test_writeToNonOpenFileDoesNothing(void)
+{
+    // Do not open file:  MySD_Init("file.txt");
+    MySD_WriteString("hello!");
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
+}
+
+
+/* 
+The fake SD module shall hold an internal state
+for the data written to the SD card.
+
+- [x] It shall be able to tell how many files are open.
+- [x] Closing a file will reduce number of files open
+- [x] Opening a file should close old file and open new one
+- [x] It can return the name of the file that is currently open.
+- [x] It shall be able to write to an open file and read from it.
+- [x] Writing to a file that is not open does not write to file
+- [x] File size is set by the module
+- [x] The data will not be written to file unless flushed
+
+*/
