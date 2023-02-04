@@ -4,6 +4,6 @@
 
 - [ ] Variable names (namely make MVC pattern more obvious)
 - [ ] Reduce size of program
-- [ ] Do not read circ buf if it's empty
-- [ ] Remove context argument from data holder, it doesn't need it
-    - [ ] Remove refresh too. and give data if/when requested
+- [x] Do not read circ buf if it's empty
+- [x] Remove context argument from data holder, it doesn't need it
+    - [x] Remove refresh too. and give data if/when requested

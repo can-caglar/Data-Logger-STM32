@@ -56,13 +56,13 @@ void SystemOperations_OpenLogFile(void)
 }
 
 
-void notifySdCardWriter(void)
+void SystemOperations_WriteSD(void)
 {
     uint8_t thereIsNewData = DH_IsThereNewData();
     if (thereIsNewData)
     {
         // get top item from circular buffer
-        uint8_t val = DH_GetLatestData(); //MyCircularBuffer_read();
+        uint8_t val = DH_GetLatestData();
         // parse it (determine if need to timestamp)
         if (timestampThisLine(val))
         {
@@ -77,8 +77,7 @@ void notifySdCardWriter(void)
     }
 }
 
-#include <stdio.h>
-void notifySdCardFlusher(void)
+void SystemOperations_FlushSD(void)
 {
     // Device may be unplugged at any moment.
     // Flush every so often.

@@ -12,7 +12,7 @@
 
 int SystemOperations_Init(void);
 void SystemOperations_OpenLogFile(void);
-void notifySdCardWriter(void);
-void notifySdCardFlusher(void);
+void SystemOperations_WriteSD(void);
+void SystemOperations_FlushSD(void);
 
 #endif
