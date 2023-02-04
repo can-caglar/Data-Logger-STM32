@@ -2,12 +2,16 @@
 #include "MyApp.h"
 #include "mock_MyCLI.h"
 #include "mock_AppDecider.h"
-#include "mock_MyScheduler.h"
 #include "mock_main.h"
 #include "Loop.h"
 
+#include "MyScheduler.h"
+#include "fake_stm32f0xx_hal.h"
+
 // Helpers
 void expectMySchedulerInitHelper(void);
+
+/* Tests for the CLI App */
 
 void test_App_CLI(void)
 {
@@ -26,20 +30,20 @@ void test_App_CLI(void)
     runApp();
 }
 
-void test_App_SnoopingSuccess(void)
+
+/* Tests for the Serial Snooping App */
+
+void test_App_ShallOpenAFileAndDoNothingWithIt(void)
 {
-    const int loopCount = 3;
-    LOOP_COUNT(loopCount);  // expecting 3 times round the loop
+    LOOP_COUNT(1);  // expecting X times round the loop
 
     expectMySchedulerInitHelper();
 
-    // expecting this to be looped
-    for (int i = 0; i < loopCount; i++)
-    {
-        MyScheduler_Run_Expect();
-    }
-
     runApp();
+
+    // char* dataInSD = fakeSD_Debrief();
+
+    // TEST_ASSERT_EQUAL("", dataInSD);
 }
 
 /*********** Helpers ***********/
@@ -50,6 +54,12 @@ void expectMySchedulerInitHelper(void)
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
     CubeMX_SystemInit_Expect(CMX_UART);
-
-    MyScheduler_Init_Expect();
 }
+
+/*
+TODO: 
+    Perhaps begin from scratch.
+
+    Write some tests, maybe then create the fake modules.
+
+*/

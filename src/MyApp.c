@@ -2,7 +2,7 @@
 #include "MyCLI.h"
 #include "Loop.h"
 #include "AppDecider.h"
-#include "SerialSnooper.h"
+#include "MyScheduler.h"
 
 #include "main.h"
 
@@ -21,6 +21,7 @@ int runApp(void)
     
     if (AppDecider_Decide() == APP_CLI)
     {
+        // The CLI application
         MyCLI_Init();
         LOOP
         {
@@ -29,11 +30,10 @@ int runApp(void)
     }
     else
     {
+        // The Serial Snooping application
         CubeMX_SystemInit(CMX_UART);
-        MyScheduler_Init();
         LOOP
         {
-            MyScheduler_Run();
         }
     }
 }
