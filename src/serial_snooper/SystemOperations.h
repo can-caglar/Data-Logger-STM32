@@ -10,11 +10,9 @@
 #define FILE_SIZE_LOWER_THRESHOLD   10000000
 #define FLUSH_TIME_MS   30000
 
-typedef struct DataContext DataContext;
-
 int SystemOperations_Init(void);
-void SystemOperations_OpenLogFile(const DataContext* data);
-void notifySdCardWriter(const DataContext* data);
-void notifySdCardFlusher(const DataContext* data);
+void SystemOperations_OpenLogFile(void);
+void notifySdCardWriter(void);
+void notifySdCardFlusher(void);
 
 #endif

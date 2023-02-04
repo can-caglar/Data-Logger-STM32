@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "SerialSnooper.h"
 #include "fake_DataHolder.h"
+#include "fake_stm32f0xx_hal.h"
 #include "unity_helper.h"
 #include <stdint.h>
 
@@ -10,20 +11,15 @@ static uint8_t fnGetDataCalled = 0;
 
 // Tasks for testing
 static void resetTaskData(void);
-static void task1(DataContext* data);
-static void task2(DataContext* data);
+static void task1(void);
+static void task2(void);
 static uint8_t wasTask1Called(void);    // auto clears state
 static uint8_t wasTask2Called(void);    // auto clears state
-static int getTask1DataPassedIn(void);  // auto clears state
-static int getTask2DataPassedIn(void);  // auto clears state
-static DataContext* fnForGettingData(void);
 static const int fakeDataContext = 777;
 
 // Test functions
 static const FnTask task1ptr = task1;
 static const FnTask task2ptr = task2;
-static DataContext* task1dataPassedIn;
-static DataContext* task2dataPassedIn;
 
 // TODO, test for overflow conditions
 
@@ -32,7 +28,6 @@ void setUp(void)
 {
     SerialSnooper_Init();
     resetTaskData();
-    fakeSetTime(0);
 }
 
 void test_NoTaskAddedWontCallAnyTasks(void)
@@ -78,40 +73,23 @@ void test_AddTask_MultipleTasksCanBeAddedWillCallSequentially(void)
     }
 }
 
-void test_SchedulerWillGrabDataAndPassToTasks(void)
-{
-    SerialSnooper_Init();
-
-    // Set up a fake context to be returned
-    fakeSetDataContext((DataContext*)fakeDataContext);
-
-    // add some task
-    SerialSnooper_AddTask(task1ptr, 0, true, true);
-
-    // run the function under test
-    SerialSnooper_Run();
-
-    // task should be passed in the data grabbed
-    TEST_ASSERT_EQUAL_INT(fakeDataContext, getTask1DataPassedIn());
-}
-
 void test_SchedulerWillOnlyCallTaskWhenItsTheRightTime(void)
 {
     const int period = 100;
     SerialSnooper_AddTask(task1ptr, period, true, true);
 
     // Not time yet, don't call
-    fakeSetTime(period - 1);
+    setHalGetTickReturnValue(period - 1);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
     // Now's the exact time, should be called
-    fakeSetTime(period);
+    setHalGetTickReturnValue(period);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // Not time again, don't call
-    fakeSetTime(period + 1);
+    setHalGetTickReturnValue(period + 1);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
@@ -122,7 +100,7 @@ void test_SchedulerWillCallIfItIsLateToCall(void)
     SerialSnooper_AddTask(task1ptr, period, true, true);
 
     // Late
-    fakeSetTime(period + 1);
+    setHalGetTickReturnValue(period + 1);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
@@ -136,13 +114,13 @@ void test_SchedulerWithTwoTasksKnowsWhenToCallThem(void)
     SerialSnooper_AddTask(task2ptr, period2, true, true);
 
     // Task 1 time to call
-    fakeSetTime(period1);
+    setHalGetTickReturnValue(period1);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
 
     // Task 2 time to call
-    fakeSetTime(period2);
+    setHalGetTickReturnValue(period2);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
@@ -154,7 +132,7 @@ void test_AddingTaskAfterInitialisation(void)
     const int period = 100;
 
     // Scheduler already running
-    fakeSetTime(startTime);
+    setHalGetTickReturnValue(startTime);
     SerialSnooper_Run();
 
     // Task added afterwards
@@ -174,19 +152,19 @@ void test_AddingSameFunctionAgainCreatesMultipleEntriesInScheduler(void)
     SerialSnooper_AddTask(task1ptr, period2, true, true);
 
     // period1 has elapsed, should call function
-    fakeSetTime(period1);
+    setHalGetTickReturnValue(period1);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    fakeSetTime(period2);
+    setHalGetTickReturnValue(period2);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    fakeSetTime(period1 * 2);
+    setHalGetTickReturnValue(period1 * 2);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    fakeSetTime(period2 * 2);
+    setHalGetTickReturnValue(period2 * 2);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
@@ -217,14 +195,14 @@ void test_OneShotTasksAreCalledOnce(void)
 
     SerialSnooper_AddTask(task1ptr, period, false, true);
 
-    fakeSetTime(100);
+    setHalGetTickReturnValue(100);
     SerialSnooper_Run();
 
     // expect to be called
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // should not be called anymore
-    fakeSetTime(200);
+    setHalGetTickReturnValue(200);
     SerialSnooper_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
@@ -232,16 +210,14 @@ void test_OneShotTasksAreCalledOnce(void)
 
 /* Helpers */
 
-void task1(DataContext* data)
+void task1(void)
 {
     task1Called = 1;
-    task1dataPassedIn = data;
 }
 
-void task2(DataContext* data)
+void task2(void)
 {
     task2Called = 1;
-    task2dataPassedIn = data;
 }
 
 static void resetTaskData(void)
@@ -249,14 +225,6 @@ static void resetTaskData(void)
     task1Called = 0;
     task2Called = 0;
     fnGetDataCalled = 0;
-    task1dataPassedIn = 0;
-    task2dataPassedIn = 0;
-}
-
-static DataContext* fnForGettingData(void)
-{
-    // return some fake fata
-    return (DataContext*)fakeDataContext;
 }
 
 static uint8_t wasTask1Called(void)
@@ -273,19 +241,6 @@ static uint8_t wasTask2Called(void)
     return ret;
 }
 
-static int getTask1DataPassedIn(void)
-{
-    int ret = (int)task1dataPassedIn;
-    task1dataPassedIn = 0;
-    return ret;
-}
-
-static int getTask2DataPassedIn(void)
-{
-    int ret = (int)task2dataPassedIn;
-    task2dataPassedIn = 0;
-    return ret;
-}
 
 /*
 - This module will be a scheduler

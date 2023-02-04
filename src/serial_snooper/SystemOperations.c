@@ -24,12 +24,12 @@ int SystemOperations_Init(void)
     return SO_SUCCESS;
 }   
 
-void SystemOperations_OpenLogFile(const DataContext* data)
+void SystemOperations_OpenLogFile(void)
 {
     // get size of file
-    uint32_t dataSize = DH_GetOpenedFileSize(data);
+    uint32_t dataSize = DH_GetOpenedFileSize();
     // find out if we have data to handle
-    uint8_t newDataToHandle = DH_IsThereNewData(data);
+    uint8_t newDataToHandle = DH_IsThereNewData();
     // open new file if size is greater than maximum allowed
     uint8_t maxDataSizeReached = (dataSize >= MAX_FILE_SIZE);
     uint8_t lowerBoundSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
@@ -39,7 +39,7 @@ void SystemOperations_OpenLogFile(const DataContext* data)
     if (!aFileIsOpen || maxDataSizeReached || openNewFileEarly)
     {
         // get file name
-        const char* fileName = DH_GetFileName(data);
+        const char* fileName = DH_GetFileName();
 
         // open file
         FRESULT err = MySD_Init(fileName);
@@ -56,18 +56,18 @@ void SystemOperations_OpenLogFile(const DataContext* data)
 }
 
 
-void notifySdCardWriter(const DataContext* data)
+void notifySdCardWriter(void)
 {
-    uint8_t thereIsNewData = DH_IsThereNewData(data);
+    uint8_t thereIsNewData = DH_IsThereNewData();
     if (thereIsNewData)
     {
         // get top item from circular buffer
-        uint8_t val = DH_GetLatestData(data); //MyCircularBuffer_read();
+        uint8_t val = DH_GetLatestData(); //MyCircularBuffer_read();
         // parse it (determine if need to timestamp)
         if (timestampThisLine(val))
         {
             // write timestamp
-            const char* ts = DH_GetTimestampString(data);
+            const char* ts = DH_GetTimestampString();
             MySD_WriteString(ts);
             status &= ~STATUS_TIMESTAMP;
         }
@@ -77,11 +77,12 @@ void notifySdCardWriter(const DataContext* data)
     }
 }
 
-void notifySdCardFlusher(const DataContext* data)
+#include <stdio.h>
+void notifySdCardFlusher(void)
 {
     // Device may be unplugged at any moment.
-    // Flush every 500 ms.
-    uint32_t tNow = DH_GetTime(data);
+    // Flush every so often.
+    uint32_t tNow = HAL_GetTick();
     if (tNow >= (lastTimeFlushed + FLUSH_TIME_MS))
     {
         MySD_Flush();

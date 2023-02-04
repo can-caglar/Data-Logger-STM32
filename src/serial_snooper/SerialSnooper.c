@@ -5,6 +5,7 @@ Call this in a tight loop.
 
 #include "SerialSnooper.h"
 #include "DataHolder.h"
+#include "stm32f0xx_hal.h"
 #include <string.h>
 
 typedef struct SSTask_t
@@ -32,15 +33,10 @@ void SerialSnooper_Init(void)
 }
 
 // Run the scheduler
-// Grabs DataContext from DataHolder including the current time
-// Calls tasks when it is their time and passes in datacontext to them
+// Calls tasks when it is their time
 void SerialSnooper_Run(void)
 {
-    DataContext* data = NULL;
-    schedulerTime = DH_GetTime(data);
-
-    // Grab data
-    data = DH_RefreshData();
+    schedulerTime = HAL_GetTick();
 
     // Do the scheduling
     for (uint8_t i = 0; i < taskCounter; i++)
@@ -52,7 +48,7 @@ void SerialSnooper_Run(void)
             if (schedulerTime >= thisTask->nextCall)
             {
                 // it's time to call it, so call it...
-                thisTask->fnPtr(data);
+                thisTask->fnPtr();
                 thisTask->nextCall = schedulerTime + thisTask->period;
                 // disable if it was a one-shot
                 if (thisTask->isPeriodic == false)

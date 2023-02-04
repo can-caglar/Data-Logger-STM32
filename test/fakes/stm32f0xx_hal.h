@@ -1,5 +1,10 @@
-#ifndef MY_FAKE_STM32F4XX_HAL_H
-#define MY_FAKE_STM32F4XX_HAL_H
+#ifndef MY_OTHER_STM32F4XX_HAL_H
+#define MY_OTHER_STM32F4XX_HAL_H
+
+// Including this to make the code compile
+// Compiler issues occur when
+// trying to grab this from the stm32 toolchain
+// due to the existence of other files.
 
 #include "stm32f0xx_hal_conf.h"
 
