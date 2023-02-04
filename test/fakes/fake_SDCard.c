@@ -39,6 +39,11 @@ void fake_SDCard_setFileSize(FSIZE_t newFileSize)
     openFileSize = newFileSize;
 }
 
+int fake_SDCard_isFileEmpty(void)
+{
+    return filePointer == 0;
+}
+
 FSIZE_t fake_SDCard_getFileSize(void)
 {
     return openFileSize;   

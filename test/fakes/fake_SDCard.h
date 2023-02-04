@@ -10,5 +10,6 @@ int fake_SDCard_numFilesOpen(void);
 const char* fake_SDCard_getOpenFileName(void);
 const char* fake_SDCard_getFileData(void);
 void fake_SDCard_setFileSize(FSIZE_t newFileSize);
+int fake_SDCard_isFileEmpty(void);
 
 #endif
