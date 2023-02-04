@@ -8,7 +8,7 @@
 
 #define MAX_FILE_SIZE   20000000
 #define FILE_SIZE_LOWER_THRESHOLD   10000000
-#define FLUSH_TIME_MS   30000
+#define FLUSH_TIME_MS   500
 
 int SystemOperations_Init(void);
 void SystemOperations_OpenLogFile(void);

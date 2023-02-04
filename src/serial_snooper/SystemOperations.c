@@ -30,15 +30,15 @@ void SystemOperations_OpenLogFile(void)
     uint32_t dataSize = DH_GetOpenedFileSize();
     // find out if we have data to handle
     uint8_t newDataToHandle = DH_IsThereNewData();
-    // open new file if size is greater than maximum allowed
+    // open new file if the current one is too large
     uint8_t maxDataSizeReached = (dataSize >= MAX_FILE_SIZE);
     uint8_t lowerBoundSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
-    // open file "early" if system has no new data to handle
+    // open new file earlier if system has no new data to handle
     uint8_t openNewFileEarly = (lowerBoundSizeReached && !newDataToHandle);
-
+    // or open a file if none is open
     if (!aFileIsOpen || maxDataSizeReached || openNewFileEarly)
     {
-        // get file name
+        // get new file name
         const char* fileName = DH_GetFileName();
 
         // open file
@@ -55,9 +55,11 @@ void SystemOperations_OpenLogFile(void)
     }
 }
 
-
 void SystemOperations_WriteSD(void)
 {
+    // Write to SD card from a circular buffer
+    // Parse each letter one by one and determine if
+    // need to also write a timestamp.
     uint8_t thereIsNewData = DH_IsThereNewData();
     if (thereIsNewData)
     {
@@ -80,7 +82,7 @@ void SystemOperations_WriteSD(void)
 void SystemOperations_FlushSD(void)
 {
     // Device may be unplugged at any moment.
-    // Flush every so often.
+    // Flush every so often so no data is lost.
     uint32_t tNow = HAL_GetTick();
     if (tNow >= (lastTimeFlushed + FLUSH_TIME_MS))
     {

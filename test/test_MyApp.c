@@ -6,10 +6,8 @@
 #include "mock_main.h"
 #include "Loop.h"
 
-// TODO, incomplete module
-
 // Helpers
-void initSerialSnooperHelper(int error);
+void expectSerialSnooperInitHelper(void);
 
 void test_App_CLI(void)
 {
@@ -30,21 +28,23 @@ void test_App_CLI(void)
 
 void test_App_SnoopingSuccess(void)
 {
-    LOOP_COUNT(3);  // expecting 3 times round the loop
+    const int loopCount = 3;
+    LOOP_COUNT(loopCount);  // expecting 3 times round the loop
 
-    initSerialSnooperHelper(0);  // todo; magic number
+    expectSerialSnooperInitHelper();
 
-    // expecting 3 calls
-    SerialSnooper_Run_Expect();
-    SerialSnooper_Run_Expect();
-    SerialSnooper_Run_Expect();
+    // expecting this to be looped
+    for (int i = 0; i < loopCount; i++)
+    {
+        SerialSnooper_Run_Expect();
+    }
 
     runApp();
 }
 
 /*********** Helpers ***********/
 
-void initSerialSnooperHelper(int error)
+void expectSerialSnooperInitHelper(void)
 {
     CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
