@@ -34,19 +34,9 @@ const char* fake_SDCard_getFileData(void)
     return sdCardActualData;
 }
 
-void fake_SDCard_setFileSize(FSIZE_t newFileSize)
-{
-    openFileSize = newFileSize;
-}
-
 int fake_SDCard_isFileEmpty(void)
 {
     return filePointer == 0;
-}
-
-FSIZE_t fake_SDCard_getFileSize(void)
-{
-    return openFileSize;   
 }
 
 FRESULT MySD_Init(const char* filename)
@@ -82,5 +72,5 @@ FRESULT MySD_Flush(void)
 
 FSIZE_t MySD_getOpenedFileSize(void)
 {
-    return openFileSize;
+    return filePointer;
 }

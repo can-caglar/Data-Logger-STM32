@@ -145,18 +145,18 @@ void test_SdCardWriteDataWith0sAlsoGetsWritten(void)
         fake_SDCard_getFileData(), size);
 }
 
-void test_SdCardFileSizeCanBeFaked(void)
+void test_SdCardFileSizeDependsOnAmountWritten(void)
 {
-    uint32_t size_20mb = 20000000;
-    uint32_t size_5byte = 5;
+    MySD_Init("file.txt");
+    
+    for (uint32_t i = 0; i < FAKE_MAX_FILE_SIZE; i++)
+    {
+        MySD_WriteString("a");
+    }
 
-    fake_SDCard_setFileSize(size_20mb);
+    MySD_Flush();
 
-    TEST_ASSERT_EQUAL_UINT32(size_20mb, MySD_getOpenedFileSize());
-
-    fake_SDCard_setFileSize(size_5byte);
-
-    TEST_ASSERT_EQUAL_UINT32(size_5byte, MySD_getOpenedFileSize());
+    TEST_ASSERT_EQUAL_UINT32(FAKE_MAX_FILE_SIZE, MySD_getOpenedFileSize());
 }
 
 void test_writeToNonOpenFileDoesNothing(void)
