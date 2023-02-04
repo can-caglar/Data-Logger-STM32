@@ -7,6 +7,8 @@
 
 #include "MyScheduler.h"
 #include "fake_stm32f0xx_hal.h"
+#include "fake_SDCard.h"
+#include "mock_MyTimeString.h"
 
 // Helpers
 void expectMySchedulerInitHelper(void);
@@ -36,14 +38,15 @@ void test_App_CLI(void)
 void test_App_ShallOpenAFileAndDoNothingWithIt(void)
 {
     LOOP_COUNT(1);  // expecting X times round the loop
+    
+    expectMySchedulerInitHelper();  // the init sequence
 
-    expectMySchedulerInitHelper();
+    fake_SDCard_reset();    // clean slate
 
     runApp();
 
-    // char* dataInSD = fakeSD_Debrief();
-
-    // TEST_ASSERT_EQUAL("", dataInSD);
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
 }
 
 /*********** Helpers ***********/

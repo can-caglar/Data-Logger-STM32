@@ -168,7 +168,6 @@ void test_writeToNonOpenFileDoesNothing(void)
     TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
 }
 
-
 /* 
 The fake SD module shall hold an internal state
 for the data written to the SD card.
