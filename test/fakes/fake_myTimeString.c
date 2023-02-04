@@ -1,5 +1,6 @@
 #include "fake_myTimeString.h"
 #include <string.h>
+#include <stdio.h>
 
 #define FAKE_SIZE_OF_STR 50
 
@@ -27,7 +28,7 @@ const char* MyTimeString_GetFileName(void)
     }
     else
     {
-        return "";
+        return NOT_INIT_STRING;
     }
 }
 
@@ -39,22 +40,16 @@ const char* MyTimeString_GetTimeStamp(void)
     }
     else
     {
-        return "";
+        return NOT_INIT_STRING;
     }
 }
 
 void fake_myTimeString_setFileName(const char* newName)
 {
-    if (initialised)
-    {
-        strcpy(fileName, newName);
-    }
+    strcpy(fileName, newName);
 }
 
 void fake_myTimeString_setTimestamp(const char* newTS)
 {
-    if (initialised)
-    {
-        strcpy(timeStamp, newTS);
-    }
+    strcpy(timeStamp, newTS);
 }

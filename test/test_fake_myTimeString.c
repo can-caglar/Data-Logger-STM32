@@ -32,23 +32,27 @@ void test_resetModuleLosesInit(void)
     // try setting file name again, expect it to act as if not initted
     fake_myTimeString_setFileName("abc");
 
-    TEST_ASSERT_EQUAL_STRING("", MyTimeString_GetFileName());
+    TEST_ASSERT_EQUAL_STRING(NOT_INIT_STRING, MyTimeString_GetFileName());
 }
 
 void test_moduleDoesNothingIfNotInitted(void)
 {
-    // no init
-    fake_myTimeString_setFileName("abc");
-    fake_myTimeString_setTimestamp("[1]");
+    // no init - // MyTimeString_Init();
 
-    TEST_ASSERT_EQUAL_STRING("", MyTimeString_GetFileName());
-    TEST_ASSERT_EQUAL_STRING("", MyTimeString_GetTimeStamp());
+    const char fakeName[] = "abc";
+    const char fakeStamp[] = "[1]";
+
+    fake_myTimeString_setFileName(fakeName);
+    fake_myTimeString_setTimestamp(fakeStamp);
+
+    TEST_ASSERT_EQUAL_STRING(NOT_INIT_STRING, MyTimeString_GetFileName());
+    TEST_ASSERT_EQUAL_STRING(NOT_INIT_STRING, MyTimeString_GetTimeStamp());
     
-    // Init after, should still have done nothing to data
+    // Init after, should return the data it would have been set to
     MyTimeString_Init();
 
-    TEST_ASSERT_EQUAL_STRING("", MyTimeString_GetFileName());
-    TEST_ASSERT_EQUAL_STRING("", MyTimeString_GetTimeStamp());
+    TEST_ASSERT_EQUAL_STRING(fakeName, MyTimeString_GetFileName());
+    TEST_ASSERT_EQUAL_STRING(fakeStamp, MyTimeString_GetTimeStamp());
 }
 
 void test_FileNameCanBeSet(void)
