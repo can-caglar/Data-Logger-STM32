@@ -1,10 +1,7 @@
 #include "SystemOperations.h"
 #include "MySD.h"
 #include "stm32f0xx_hal.h"
-#include "SerialSnooper.h"
 #include "DataHolder.h"
-
-#define MAX_BUF 32
 
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)

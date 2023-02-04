@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "SerialSnooper.h"
+#include "MyScheduler.h"
 #include "fake_DataHolder.h"
 #include "fake_stm32f0xx_hal.h"
 #include "unity_helper.h"
@@ -26,13 +26,13 @@ static const FnTask task2ptr = task2;
 // Set up
 void setUp(void)
 {
-    SerialSnooper_Init();
+    MyScheduler_Init();
     resetTaskData();
 }
 
 void test_NoTaskAddedWontCallAnyTasks(void)
 {
-    SerialSnooper_Run();
+    MyScheduler_Run();
 
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
@@ -40,34 +40,34 @@ void test_NoTaskAddedWontCallAnyTasks(void)
 
 void test_AddTask_TaskAddedAndIsEnabledWillBeCalledEverytimeIfPeriod0(void)
 {
-    SerialSnooper_AddTask(task1ptr, 0, true, true);
+    MyScheduler_AddTask(task1ptr, 0, true, true);
 
     // Run loop X times
     for (int i = 0; i < 3; i++)
     {
-        SerialSnooper_Run();
+        MyScheduler_Run();
         TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
     }
 }
 
 void test_AddTask_AddedTasksWhichAreDisabledWontBeCalled(void)
 {
-    SerialSnooper_AddTask(task1ptr, 0, true, false);
+    MyScheduler_AddTask(task1ptr, 0, true, false);
 
-    SerialSnooper_Run();
+    MyScheduler_Run();
 
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
 
 void test_AddTask_MultipleTasksCanBeAddedWillCallSequentially(void)
 {
-    SerialSnooper_AddTask(task1ptr, 0, true, true);
-    SerialSnooper_AddTask(task2ptr, 0, true, true);
+    MyScheduler_AddTask(task1ptr, 0, true, true);
+    MyScheduler_AddTask(task2ptr, 0, true, true);
 
     // Run loop X times
     for (int i = 0; i < 3; i++)
     {
-        SerialSnooper_Run();
+        MyScheduler_Run();
         TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
         TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
     }
@@ -76,32 +76,32 @@ void test_AddTask_MultipleTasksCanBeAddedWillCallSequentially(void)
 void test_SchedulerWillOnlyCallTaskWhenItsTheRightTime(void)
 {
     const int period = 100;
-    SerialSnooper_AddTask(task1ptr, period, true, true);
+    MyScheduler_AddTask(task1ptr, period, true, true);
 
     // Not time yet, don't call
     setHalGetTickReturnValue(period - 1);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
     // Now's the exact time, should be called
     setHalGetTickReturnValue(period);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // Not time again, don't call
     setHalGetTickReturnValue(period + 1);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
 
 void test_SchedulerWillCallIfItIsLateToCall(void)
 {
     const int period = 100;
-    SerialSnooper_AddTask(task1ptr, period, true, true);
+    MyScheduler_AddTask(task1ptr, period, true, true);
 
     // Late
     setHalGetTickReturnValue(period + 1);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
 
@@ -110,18 +110,18 @@ void test_SchedulerWithTwoTasksKnowsWhenToCallThem(void)
     const int period1 = 100;
     const int period2 = 150;
 
-    SerialSnooper_AddTask(task1ptr, period1, true, true);
-    SerialSnooper_AddTask(task2ptr, period2, true, true);
+    MyScheduler_AddTask(task1ptr, period1, true, true);
+    MyScheduler_AddTask(task2ptr, period2, true, true);
 
     // Task 1 time to call
     setHalGetTickReturnValue(period1);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
 
     // Task 2 time to call
     setHalGetTickReturnValue(period2);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
 }
@@ -133,13 +133,13 @@ void test_AddingTaskAfterInitialisation(void)
 
     // Scheduler already running
     setHalGetTickReturnValue(startTime);
-    SerialSnooper_Run();
+    MyScheduler_Run();
 
     // Task added afterwards
-    SerialSnooper_AddTask(task1ptr, period, true, true);
+    MyScheduler_AddTask(task1ptr, period, true, true);
 
     // Shouldn't call the task until "period" has elapsed from then
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
 
@@ -148,24 +148,24 @@ void test_AddingSameFunctionAgainCreatesMultipleEntriesInScheduler(void)
     const int period1 = 75;
     const int period2 = 100;
 
-    SerialSnooper_AddTask(task1ptr, period1, true, true);
-    SerialSnooper_AddTask(task1ptr, period2, true, true);
+    MyScheduler_AddTask(task1ptr, period1, true, true);
+    MyScheduler_AddTask(task1ptr, period2, true, true);
 
     // period1 has elapsed, should call function
     setHalGetTickReturnValue(period1);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     setHalGetTickReturnValue(period2);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     setHalGetTickReturnValue(period1 * 2);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     setHalGetTickReturnValue(period2 * 2);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
 
@@ -175,13 +175,13 @@ void test_ThereIsALimitToHowManyFunctionsToAdd(void)
     for (int i = 0; i < MAX_TASKS; i++)
     {
         TEST_ASSERT_EQUAL_INT(SS_ERR_NONE,
-            SerialSnooper_AddTask(task1ptr, 0, true, true));
+            MyScheduler_AddTask(task1ptr, 0, true, true));
     }
     // Anymore will just return an eror
     TEST_ASSERT_EQUAL_INT(SS_ERR_FAULT,
-        SerialSnooper_AddTask(task2ptr, 0, true, true));
+        MyScheduler_AddTask(task2ptr, 0, true, true));
 
-    SerialSnooper_Run();
+    MyScheduler_Run();
 
     // Task 1 is called
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
@@ -193,17 +193,17 @@ void test_OneShotTasksAreCalledOnce(void)
 {
     const int period = 100;
 
-    SerialSnooper_AddTask(task1ptr, period, false, true);
+    MyScheduler_AddTask(task1ptr, period, false, true);
 
     setHalGetTickReturnValue(100);
-    SerialSnooper_Run();
+    MyScheduler_Run();
 
     // expect to be called
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // should not be called anymore
     setHalGetTickReturnValue(200);
-    SerialSnooper_Run();
+    MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
 }

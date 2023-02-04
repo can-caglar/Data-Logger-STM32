@@ -2,7 +2,6 @@
 #define _UNITY_HELPER
 
 #include "MyGPIO.h"
-#include "SerialSnooper.h"
 
 void AssertEqualMyGPIO(MyGPIO expected, MyGPIO actual, unsigned short line);
 

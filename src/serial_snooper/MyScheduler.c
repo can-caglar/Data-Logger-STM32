@@ -3,7 +3,7 @@ The scheduling module.
 Call this in a tight loop.
 */
 
-#include "SerialSnooper.h"
+#include "MyScheduler.h"
 #include "DataHolder.h"
 #include "stm32f0xx_hal.h"
 #include <string.h>
@@ -25,7 +25,7 @@ static uint8_t taskCounter = 0;
 static uint32_t schedulerTime = 0;
 
 // Initialises internal variables to 0
-void SerialSnooper_Init(void)
+void MyScheduler_Init(void)
 {
     taskCounter = 0;
     schedulerTime = 0;
@@ -34,7 +34,7 @@ void SerialSnooper_Init(void)
 
 // Run the scheduler
 // Calls tasks when it is their time
-void SerialSnooper_Run(void)
+void MyScheduler_Run(void)
 {
     schedulerTime = HAL_GetTick();
 
@@ -61,7 +61,7 @@ void SerialSnooper_Run(void)
 }
 
 // Add task to scheduler
-int SerialSnooper_AddTask(FnTask func, 
+int MyScheduler_AddTask(FnTask func, 
     uint32_t period, bool periodic, bool enabled)
 {
     int err = SS_ERR_NONE;

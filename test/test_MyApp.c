@@ -2,12 +2,12 @@
 #include "MyApp.h"
 #include "mock_MyCLI.h"
 #include "mock_AppDecider.h"
-#include "mock_SerialSnooper.h"
+#include "mock_MyScheduler.h"
 #include "mock_main.h"
 #include "Loop.h"
 
 // Helpers
-void expectSerialSnooperInitHelper(void);
+void expectMySchedulerInitHelper(void);
 
 void test_App_CLI(void)
 {
@@ -31,12 +31,12 @@ void test_App_SnoopingSuccess(void)
     const int loopCount = 3;
     LOOP_COUNT(loopCount);  // expecting 3 times round the loop
 
-    expectSerialSnooperInitHelper();
+    expectMySchedulerInitHelper();
 
     // expecting this to be looped
     for (int i = 0; i < loopCount; i++)
     {
-        SerialSnooper_Run_Expect();
+        MyScheduler_Run_Expect();
     }
 
     runApp();
@@ -44,12 +44,12 @@ void test_App_SnoopingSuccess(void)
 
 /*********** Helpers ***********/
 
-void expectSerialSnooperInitHelper(void)
+void expectMySchedulerInitHelper(void)
 {
     CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
     CubeMX_SystemInit_Expect(CMX_UART);
 
-    SerialSnooper_Init_Expect();
+    MyScheduler_Init_Expect();
 }

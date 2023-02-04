@@ -1,5 +1,5 @@
-#ifndef SERIAL_SNOOPER_H
-#define SERIAL_SNOOPER_H
+#ifndef MY_SCHEDULER_H
+#define MY_SCHEDULER_H
 
 #include <stdint.h>
 
@@ -23,10 +23,10 @@ typedef struct DataContext DataContext;
 // Scheduler task function pointer
 typedef void (*FnTask)(void);
 
-void SerialSnooper_Init(void);
-void SerialSnooper_Run(void);
+void MyScheduler_Init(void);
+void MyScheduler_Run(void);
 
-int SerialSnooper_AddTask(FnTask func, 
+int MyScheduler_AddTask(FnTask func, 
     uint32_t period, bool periodic, bool enabled);
 
 #endif
