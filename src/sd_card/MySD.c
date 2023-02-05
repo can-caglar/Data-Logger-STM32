@@ -64,7 +64,7 @@ FRESULT MySD_Write(const uint8_t* buf, uint32_t len)
 
 FRESULT MySD_Flush(void)
 {
-    return f_sync(&file);
+    return FR_OK; //f_sync(&file);
 }
 
 FSIZE_t MySD_getOpenedFileSize(void)

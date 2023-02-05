@@ -52,6 +52,11 @@ void SystemOperations_OpenLogFile(void)
     }
 }
 
+#include <stdio.h>
+#include <string.h>
+char printStr2[20];
+extern UART_HandleTypeDef huart1;
+
 void SystemOperations_WriteSD(void)
 {
     // Write to SD card from a circular buffer
@@ -60,6 +65,8 @@ void SystemOperations_WriteSD(void)
     uint8_t thereIsNewData = DH_IsThereNewData();
     if (thereIsNewData)
     {
+        uint32_t tNow = HAL_GetTick();
+      
         // get top item from circular buffer
         uint8_t val = DH_GetLatestData();
         // parse it (determine if need to timestamp)
@@ -73,6 +80,14 @@ void SystemOperations_WriteSD(void)
         // write data to SD card
         MySD_Write(&val, 1);
         previousData = val;
+        
+        uint32_t tElapsed = HAL_GetTick() - tNow;
+        if (tElapsed > 50)
+        {
+          sprintf(printStr2, "WriteT = %u\n\r", tElapsed);
+          HAL_UART_Transmit(&huart1, printStr2, strlen(printStr2), 500);
+        }
+        
     }
 }
 
@@ -85,6 +100,12 @@ void SystemOperations_FlushSD(void)
     {
         MySD_Flush();
         lastTimeFlushed = tNow;
+    }
+    uint32_t tElapsed = HAL_GetTick() - tNow;
+    if (tElapsed > 50)
+    {
+      sprintf(printStr2, "FlushT = %u\n\r", tElapsed);
+      HAL_UART_Transmit(&huart1, printStr2, strlen(printStr2), 500);
     }
 }
 
