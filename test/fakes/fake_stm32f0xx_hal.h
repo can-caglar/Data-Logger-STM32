@@ -3,6 +3,7 @@
 
 #include "stm32f0xx_hal.h"
 
-void setHalGetTickReturnValue(uint32_t tick);
+void fake_halTick_setTickValue(uint32_t tick);
+void fake_halTick_enableAutoIncrement(uint32_t valueToIncrement);
 
 #endif

@@ -311,8 +311,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>1</oTime>
+            <Optim>3</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -447,11 +447,6 @@
               <FilePath>.\src\dip_switch\AppDecider.c</FilePath>
             </File>
             <File>
-              <FileName>SerialSnooper.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\serial_snooper\SerialSnooper.c</FilePath>
-            </File>
-            <File>
               <FileName>MyCircularBuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\circular_buffer\MyCircularBuffer.c</FilePath>
@@ -485,6 +480,11 @@
               <FileName>DataHolder.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\serial_snooper\DataHolder.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyScheduler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\serial_snooper\MyScheduler.c</FilePath>
             </File>
           </Files>
         </Group>

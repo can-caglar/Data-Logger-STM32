@@ -3,8 +3,11 @@
 #include "Loop.h"
 #include "AppDecider.h"
 #include "MyScheduler.h"
-
+#include "SystemOperations.h"
 #include "main.h"
+// perhaps below should be in the other modules only
+#include "MyTimeString.h"
+
 
 // Ceedling has its own main function
 #ifndef TEST
@@ -25,15 +28,25 @@ int runApp(void)
         MyCLI_Init();
         LOOP
         {
-             MyCLI_Run();
+            MyCLI_Run();
         }
     }
     else
     {
         // The Serial Snooping application
         CubeMX_SystemInit(CMX_UART);
+        MyScheduler_Init();
+        SystemOperations_Init();
+        MyTimeString_Init();
+        MyScheduler_AddTask(SystemOperations_OpenLogFile,
+            0, true, true);
+        MyScheduler_AddTask(SystemOperations_WriteSD, 
+            0, true, true);
+        MyScheduler_AddTask(SystemOperations_FlushSD,
+            0, true, true);
         LOOP
         {
+            MyScheduler_Run();
         }
     }
 }

@@ -21,13 +21,12 @@ static const int fakeDataContext = 777;
 static const FnTask task1ptr = task1;
 static const FnTask task2ptr = task2;
 
-// TODO, test for overflow conditions
-
 // Set up
 void setUp(void)
 {
     MyScheduler_Init();
     resetTaskData();
+    fake_halTick_enableAutoIncrement(0);
 }
 
 void test_NoTaskAddedWontCallAnyTasks(void)
@@ -79,17 +78,17 @@ void test_SchedulerWillOnlyCallTaskWhenItsTheRightTime(void)
     MyScheduler_AddTask(task1ptr, period, true, true);
 
     // Not time yet, don't call
-    setHalGetTickReturnValue(period - 1);
+    fake_halTick_setTickValue(period - 1);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 
     // Now's the exact time, should be called
-    setHalGetTickReturnValue(period);
+    fake_halTick_setTickValue(period);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // Not time again, don't call
-    setHalGetTickReturnValue(period + 1);
+    fake_halTick_setTickValue(period + 1);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
@@ -100,7 +99,7 @@ void test_SchedulerWillCallIfItIsLateToCall(void)
     MyScheduler_AddTask(task1ptr, period, true, true);
 
     // Late
-    setHalGetTickReturnValue(period + 1);
+    fake_halTick_setTickValue(period + 1);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
@@ -114,13 +113,13 @@ void test_SchedulerWithTwoTasksKnowsWhenToCallThem(void)
     MyScheduler_AddTask(task2ptr, period2, true, true);
 
     // Task 1 time to call
-    setHalGetTickReturnValue(period1);
+    fake_halTick_setTickValue(period1);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(0, wasTask2Called());
 
     // Task 2 time to call
-    setHalGetTickReturnValue(period2);
+    fake_halTick_setTickValue(period2);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
     TEST_ASSERT_EQUAL_INT(1, wasTask2Called());
@@ -132,7 +131,7 @@ void test_AddingTaskAfterInitialisation(void)
     const int period = 100;
 
     // Scheduler already running
-    setHalGetTickReturnValue(startTime);
+    fake_halTick_setTickValue(startTime);
     MyScheduler_Run();
 
     // Task added afterwards
@@ -152,19 +151,19 @@ void test_AddingSameFunctionAgainCreatesMultipleEntriesInScheduler(void)
     MyScheduler_AddTask(task1ptr, period2, true, true);
 
     // period1 has elapsed, should call function
-    setHalGetTickReturnValue(period1);
+    fake_halTick_setTickValue(period1);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    setHalGetTickReturnValue(period2);
+    fake_halTick_setTickValue(period2);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    setHalGetTickReturnValue(period1 * 2);
+    fake_halTick_setTickValue(period1 * 2);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
-    setHalGetTickReturnValue(period2 * 2);
+    fake_halTick_setTickValue(period2 * 2);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 }
@@ -195,18 +194,18 @@ void test_OneShotTasksAreCalledOnce(void)
 
     MyScheduler_AddTask(task1ptr, period, false, true);
 
-    setHalGetTickReturnValue(100);
+    fake_halTick_setTickValue(100);
     MyScheduler_Run();
 
     // expect to be called
     TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
 
     // should not be called anymore
-    setHalGetTickReturnValue(200);
+    fake_halTick_setTickValue(200);
     MyScheduler_Run();
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
-
 }
+
 
 /* Helpers */
 

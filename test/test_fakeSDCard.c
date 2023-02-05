@@ -37,6 +37,7 @@ void test_fake_SDCard_reset_willResetEverything(void)
     TEST_ASSERT_EQUAL_INT(0, fake_SDCard_numFilesOpen());    
     TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());    
     TEST_ASSERT_EQUAL_CHAR_ARRAY(expectedNewlyOpenFileData, fake_SDCard_getFileData(), FAKE_MAX_FILE_SIZE);
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_totalNumOfFilesOpened());
 
     MySD_Flush();   // flush again shall not flush anything
     TEST_ASSERT_EQUAL_CHAR_ARRAY(expectedNewlyOpenFileData, fake_SDCard_getFileData(), FAKE_MAX_FILE_SIZE);
@@ -55,6 +56,26 @@ void test_fake_SDCard_reset_willResetFilePointer(void)
 
     // Write again
     MySD_Init("file.txt");
+    MySD_WriteString(testStr);
+    MySD_Flush();
+
+    // Expect the same
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(testStr, 
+        fake_SDCard_getFileData(), sizeof(testStr));
+}
+
+void test_fake_SDCard_init_willResetFilePointer(void)
+{
+    const char* testStr = "hello";
+
+    MySD_Init("file.txt");
+    MySD_WriteString(testStr);
+    MySD_Flush();
+
+    // Write again
+    MySD_Init("file.txt");
+
+    TEST_ASSERT_EQUAL_INT(0, MySD_getOpenedFileSize());
     MySD_WriteString(testStr);
     MySD_Flush();
 
@@ -178,6 +199,28 @@ void test_sdCardIsEmptyCanBeQueried(void)
 
     TEST_ASSERT_EQUAL_INT(0, fake_SDCard_isFileEmpty());
 }
+
+void test_sdCardNumberOfFilesOpenedIncrementsEachCallToSDInit(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_totalNumOfFilesOpened());
+    
+    MySD_Init("file");
+    
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+
+    MySD_Init("file");
+
+    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
+}
+
+void test_ApiAlwaysReturnsFR_OK(void)
+{
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_WriteString("hello"));
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Init("file.txt"));
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Write("abc", 3));
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Flush());
+}
+
 
 /* 
 The fake SD module shall hold an internal state
