@@ -1,7 +1,5 @@
 #include "MyDipSwitch.h"
-// TODO: Should include "stm32f0xx_hal.h" ONLY!""
-#include "stm32f0xx_hal_gpio.h"
-#include "stm32f0xx_hal_rcc.h"
+#include "stm32f3xx_hal.h"
 #include "MyCommon.h"
 
 void MyDIP_Init()

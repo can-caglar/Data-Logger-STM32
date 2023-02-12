@@ -14,8 +14,8 @@
 /*
  * Define the Device Header File: 
  */
-#define CMSIS_device_header "stm32f0xx.h"
+#define CMSIS_device_header "stm32f3xx.h"
 
-#define RTE_DEVICE_STARTUP_STM32F0XX    /* Device Startup for STM32F0 */
+#define RTE_DEVICE_STARTUP_STM32F3XX    /* Device Startup for STM32F3 */
 
 #endif /* RTE_COMPONENTS_H */

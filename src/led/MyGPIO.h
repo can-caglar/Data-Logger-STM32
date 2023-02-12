@@ -1,7 +1,7 @@
 #ifndef MYGPIO_H
 #define MYGPIO_H
 
-#include "stm32f031x6.h"
+#include <stm32f303x8.h>
 #include "MyCommon.h"
 
 // TODO, move to common?

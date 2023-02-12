@@ -30,7 +30,7 @@
 
 #include <rt_misc.h> 
 
-#include <stm32f0xx.h> 
+#include <stm32f3xx.h> 
 
 #include "MyUSART.h"
 

@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include "MyUSART.h"
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx_hal.h"
 #include "main.h"
 
 extern UART_HandleTypeDef huart1;

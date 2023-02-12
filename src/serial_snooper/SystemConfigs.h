@@ -6,7 +6,7 @@
 #ifndef TEST
 #define MAX_FILE_SIZE   23068672
 #define FILE_SIZE_LOWER_THRESHOLD   20971520
-#define FLUSH_TIME_MS   10000
+#define FLUSH_TIME_MS   30000
 #else
 // Smaller values to make testing possible
 // Should be smaller than circular buf capacity

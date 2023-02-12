@@ -5,7 +5,7 @@ Call this in a tight loop.
 
 #include "MyScheduler.h"
 #include "DataHolder.h"
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx_hal.h"
 #include <string.h>
 
 typedef struct SSTask_t

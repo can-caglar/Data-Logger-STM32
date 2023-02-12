@@ -72,7 +72,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV2;
+  //RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();

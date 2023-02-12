@@ -1,6 +1,6 @@
 #include "ErrorIndicator.h"
 #include "MyCommon.h"
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx_hal.h"
 
 static uint8_t errorOccured = 0;
 

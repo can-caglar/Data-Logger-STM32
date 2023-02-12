@@ -2,7 +2,7 @@
 #define MY_USART_H_INCLUDED
 
 #include "MyCommon.h"
-#include <stm32f031x6.h>
+#include <stm32f303x8.h>
 #include <stddef.h>
 
 typedef enum

@@ -1,5 +1,5 @@
 #include "MyRTC.h"
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx_hal.h"
 #include "main.h"
 #include <string.h>
 
