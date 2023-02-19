@@ -145,7 +145,7 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
   */
-void USART1_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&huart1);
   huart1.pRxBuffPtr--;  // assuming the buffer got moved

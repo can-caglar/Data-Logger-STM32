@@ -2,7 +2,7 @@
 #include <string.h>
 
 // Max size must be power of 2 for fast ptr advancing
-#define SIZE_OF_BUF     2048
+#define SIZE_OF_BUF     8192
 #define MAX_SIZE    ((SIZE_OF_BUF) - 1)  // "wasting" a slot to tell apart full/empty
 #define ADVANCED(ptr) (((ptr) + 1) & (SIZE_OF_BUF - 1))
 

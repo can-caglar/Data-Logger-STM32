@@ -11,7 +11,12 @@
 - [ ] Understand fatfs better; it seems to buffer internally, 
     so perhaps writing 1 byte at a time is OK for performance
 - [ ] Upgrade processor to one with more RAM.
-    - Turn off FF_FS_TINY
-    - Update SPI speed if possible
-    - Increase circular buffer size
+    - [!] Update processor speed
+    - [ ] Update SPI speed
+    - [x] Increase circular buffer size
+    - [ ] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
+    - [x] Update USART (usart1 -> usart2, new alt func)
+    - [x] Check SD card library works
+    - [ ] Turn off FF_FS_TINY?
+    - [ ] Do a stress test with this new board
 
