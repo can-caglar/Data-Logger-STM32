@@ -7,16 +7,18 @@
 - [x] Do not read circ buf if it's empty
 - [x] Remove context argument from data holder, it doesn't need it
     - [x] Remove refresh too. and give data if/when requested
-- [ ] Upgrade uC so we can increase size of buffers
+- [x] Upgrade uC so we can increase size of buffers
 - [ ] Understand fatfs better; it seems to buffer internally, 
     so perhaps writing 1 byte at a time is OK for performance
 - [ ] Upgrade processor to one with more RAM.
-    - [!] Update processor speed
-    - [ ] Update SPI speed
+    - [x] Update processor speed
+    - [x] Update SPI speed
     - [x] Increase circular buffer size
-    - [ ] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
+    - [-] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
     - [x] Update USART (usart1 -> usart2, new alt func)
     - [x] Check SD card library works
     - [ ] Turn off FF_FS_TINY?
     - [ ] Do a stress test with this new board
+    - [ ] Use internal RTC
+    - [ ] Look into baud rate detection
 

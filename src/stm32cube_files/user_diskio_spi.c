@@ -35,8 +35,8 @@ extern SPI_HandleTypeDef SD_SPI_HANDLE;
 /* Function prototypes */
 
 //(Note that the _256 is used as a mask to clear the prescalar bits as it provides binary 111 in the correct position)
-#define FCLK_SLOW() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_128); }	/* Set SCLK = slow, approx 280 KBits/s*/
-#define FCLK_FAST() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_4); }	/* Set SCLK = fast, (was approx 4.5 MBits/s at prescale 8. Now running at 18) */
+#define FCLK_SLOW() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_256); }	/* Set SCLK = slow, approx 280 KBits/s*/
+#define FCLK_FAST() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_2); }	/* Set SCLK = fast, (was approx 4.5 MBits/s at prescale 8. Now running at 18) */
 
 #define CS_HIGH()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);}
 #define CS_LOW()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_RESET);}
@@ -296,17 +296,7 @@ BYTE send_cmd (		/* Return value: R1 resp (bit7==1:Failed to send) */
 	do {
 		res = xchg_spi(0xFF);
 	} while ((res & 0x80) && --n);
-    
-    #if 0
-    if (cmd == CMD8)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            BYTE someval = xchg_spi(0xFF);
-        }
-    }
-    #endif
-    
+
 	return res;							/* Return received response */
 }
 
