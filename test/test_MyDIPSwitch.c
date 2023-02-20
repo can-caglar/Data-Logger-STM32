@@ -1,7 +1,7 @@
 #include "unity.h"
 #include "unity_helper.h"
-#include "mock_stm32f0xx_hal_gpio.h"
-#include "mock_stm32f0xx_hal_rcc.h"
+#include "mock_stm32f3xx_hal_gpio.h"
+#include "mock_stm32f3xx_hal_rcc.h"
 #include "MyDipSwitch.h"
 #include "MyCommon.h"
 

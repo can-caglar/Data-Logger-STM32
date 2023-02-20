@@ -4,7 +4,7 @@
 #ifndef __STM32F4xx_HAL_GPIO_H
 #define __STM32F4xx_HAL_GPIO_H
 
-#include "stm32f0xx_hal_def.h"
+#include "stm32f3xx_hal_def.h"
 
 /** 
   * @brief   GPIO Init structure definition  

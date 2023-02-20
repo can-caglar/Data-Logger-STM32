@@ -15,6 +15,7 @@
         "new": "c",
         "functional": "c",
         "mock_myterminaluart.h": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "mock_mycircularbuffer.h": "c"
     }
 }

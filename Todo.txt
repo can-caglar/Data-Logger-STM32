@@ -18,7 +18,9 @@
     - [x] Update USART (usart1 -> usart2, new alt func)
     - [x] Check SD card library works
     - [ ] Turn off FF_FS_TINY?
-    - [ ] Do a stress test with this new board
-    - [ ] Use internal RTC
+    - [...] Do a stress test with this new board
+    - [-] Use internal RTC | No VBAT on this particular chip (LQFP32)
+        See page 31 LQFP32 pinout of STM32F303x6/x8 Datasheet.
     - [ ] Look into baud rate detection
-
+- [ ] Update tests
+- [ ] Test circular buffer capacity that is not a power of 2 to make it as large as possible.

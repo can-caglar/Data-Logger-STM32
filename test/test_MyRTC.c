@@ -1,8 +1,8 @@
 #include "unity.h"
 #include "MyRTC.h"
-#include "mock_stm32f0xx_hal_i2c.h"
+#include "mock_stm32f3xx_hal_i2c.h"
 #include "mock_main.h"
-#include "mock_stm32f0xx_hal.h"
+#include "mock_stm32f3xx_hal.h"
 #include <stdio.h>
 
 // Helpers

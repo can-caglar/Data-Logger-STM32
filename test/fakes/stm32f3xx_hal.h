@@ -6,7 +6,7 @@
 // trying to grab this from the stm32 toolchain
 // due to the existence of other files.
 
-#include "stm32f0xx_hal_conf.h"
+#include "stm32f3xx_hal_conf.h"
 
 typedef enum
 {

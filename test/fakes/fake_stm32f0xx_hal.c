@@ -1,7 +1,7 @@
 #ifndef MY_FAKE_FAKE_STM32F4XX_HAL_H
 #define MY_FAKE_FAKE_STM32F4XX_HAL_H
 
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx_hal.h"
 
 static uint32_t fakeHalGetTickVal;
 static uint32_t incrementVal;

@@ -1,6 +1,6 @@
 #include "unity.h"
-#include "mock_stm32f0xx_hal_gpio.h"
-#include "mock_stm32f0xx_hal_rcc.h"
+#include "mock_stm32f3xx_hal_gpio.h"
+#include "mock_stm32f3xx_hal_rcc.h"
 #include "ErrorIndicator.h"
 
 void test_1(void)

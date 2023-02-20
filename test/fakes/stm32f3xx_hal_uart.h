@@ -2,19 +2,19 @@
   Fake header
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef STM32F0xx_HAL_UART_H
-#define STM32F0xx_HAL_UART_H
+#ifndef STM32F3xx_HAL_UART_H
+#define STM32F3xx_HAL_UART_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "stm32f0xx_hal_dma.h" // have to do this for this to generate mocks
+#include "stm32f3xx_hal_dma.h" // have to do this for this to generate mocks
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal_def.h"
+#include "stm32f3xx_hal_def.h"
 
-/** @addtogroup STM32F0xx_HAL_Driver
+/** @addtogroup STM32F3xx_HAL_Driver
   * @{
   */
 
@@ -1470,7 +1470,7 @@ typedef  void (*pUART_RxEventCallbackTypeDef)
   */
 
 /* Include UART HAL Extended module */
-#include "stm32f0xx_hal_uart_ex.h"
+#include "stm32f3xx_hal_uart_ex.h"
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup UART_Exported_Functions UART Exported Functions
@@ -1614,6 +1614,6 @@ HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pDa
 }
 #endif
 
-#endif /* STM32F0xx_HAL_UART_H */
+#endif /* STM32F3xx_HAL_UART_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,7 +1,7 @@
 #include "unity.h"
-#include "stm32f0xx_it.h"
+#include "stm32f3xx_it.h"
 #include "exploding_fakes.h"
-#include "mock_stm32f0xx_hal_uart.h"
+#include "mock_stm32f3xx_hal_uart.h"
 #include "mock_MyCircularBuffer.h"
 #include "mock_MyTimeString.h"
 #include "mock_ErrorIndicator.h"
@@ -18,18 +18,18 @@ static void callWhenCircularBufferIs(CircularBufferState state);
 UART_HandleTypeDef huart1; // fake huart1
 const uint8_t fakeUartBuf = 8; // fake UART buffer
 
-void test_USART1_IRQHandler_normal_operation(void)
+void test_USART2_IRQHandler_normal_operation(void)
 {
     callWhenCircularBufferIs(NOT_FULL);
 
-    USART1_IRQHandler();
+    USART2_IRQHandler();
 }
 
-void test_USART1_IRQHandler_when_buffer_full_indicates_error(void)
+void test_USART2_IRQHandler_when_buffer_full_indicates_error(void)
 {
     callWhenCircularBufferIs(FULL);
 
-    USART1_IRQHandler();
+    USART2_IRQHandler();
 }
 
 static void callWhenCircularBufferIs(CircularBufferState state)

@@ -1,8 +1,8 @@
 #include "unity.h"
 #include "LED.h"
 #include "unity_helper.h"  // TODO: update me?
-#include "mock_stm32f0xx_hal_gpio.h"
-#include "mock_stm32f0xx_hal_rcc.h"
+#include "mock_stm32f3xx_hal_gpio.h"
+#include "mock_stm32f3xx_hal_rcc.h"
 
 void test_LedInitWillInitialiseCorrectPort(void)
 {

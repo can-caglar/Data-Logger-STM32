@@ -2,7 +2,7 @@
 #include "SystemOperations.h"
 #include "mock_MySD.h"
 #include "mock_MyTimeString.h"
-#include "mock_stm32f0xx_hal.h"
+#include "mock_stm32f3xx_hal.h"
 #include "mock_MyCircularBuffer.h"
 #include "fake_DataHolder.h"
 

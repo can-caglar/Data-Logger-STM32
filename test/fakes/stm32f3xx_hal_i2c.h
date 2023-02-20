@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    stm32f0xx_hal_i2c.h
+  * @file    stm32f3xx_hal_i2c.h
   * @author  MCD Application Team
   * @brief   Header file of I2C HAL module.
   ******************************************************************************
@@ -18,19 +18,19 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef STM32F0xx_HAL_I2C_H
-#define STM32F0xx_HAL_I2C_H
+#ifndef STM32F3xx_HAL_I2C_H
+#define STM32F3xx_HAL_I2C_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "stm32f0xx_hal_dma.h" // have to do this for this to generate mocks
+#include "stm32f3xx_hal_dma.h" // have to do this for this to generate mocks
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal_def.h"
+#include "stm32f3xx_hal_def.h"
 
-/** @addtogroup STM32F0xx_HAL_Driver
+/** @addtogroup STM32F3xx_HAL_Driver
   * @{
   */
 
@@ -587,7 +587,7 @@ typedef  void (*pI2C_AddrCallbackTypeDef)(I2C_HandleTypeDef *hi2c, uint8_t Trans
   */
 
 /* Include I2C HAL Extended module */
-#include "stm32f0xx_hal_i2c_ex.h"
+#include "stm32f3xx_hal_i2c_ex.h"
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup I2C_Exported_Functions
@@ -817,7 +817,7 @@ uint32_t             HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);
 /** @defgroup I2C_Private_Functions I2C Private Functions
   * @{
   */
-/* Private functions are defined in stm32f0xx_hal_i2c.c file */
+/* Private functions are defined in stm32f3xx_hal_i2c.c file */
 /**
   * @}
   */
@@ -835,6 +835,6 @@ uint32_t             HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);
 #endif
 
 
-#endif /* STM32F0xx_HAL_I2C_H */
+#endif /* STM32F3xx_HAL_I2C_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

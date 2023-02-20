@@ -1,7 +1,7 @@
 #ifndef MY_FAKE_STM32F4XX_HAL_CORTEX_H
 #define MY_FAKE_STM32F4XX_HAL_CORTEX_H
 
-#include "stm32f0xx_hal_def.h"
+#include "stm32f3xx_hal_def.h"
 
 void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority);
 void HAL_NVIC_EnableIRQ(IRQn_Type IRQn);
