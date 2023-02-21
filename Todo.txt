@@ -14,13 +14,20 @@
     - [x] Update processor speed
     - [x] Update SPI speed
     - [x] Increase circular buffer size
-    - [-] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
+    - [ ] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
+        - [ ] Remove the solder bridge SB16 else I2C and SPI will clash.
+    - [ ] Remove solder bridge to allow the device to be plugged into the wall
     - [x] Update USART (usart1 -> usart2, new alt func)
     - [x] Check SD card library works
-    - [ ] Turn off FF_FS_TINY?
-    - [...] Do a stress test with this new board
+    - [ ] Write a benchmarking test for the SD card - what is the write throughput?
+        - Sending 1 byte per loop, vs 512, vs 1024, 2048, vs 4096
+        - Turn off FF_FS_TINY?
+        - Try higher SPI speed
+        - Run the test a few times, perhaps 5 times each and get an average
     - [-] Use internal RTC | No VBAT on this particular chip (LQFP32)
-        See page 31 LQFP32 pinout of STM32F303x6/x8 Datasheet.
-    - [ ] Look into baud rate detection
-- [ ] Update tests
-- [ ] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
+        See page 31 LQFP32 pinout of STM32F303x6/x8 Datasheet for this info.
+    - [ ] Research baud rate detection
+    - [ ] Research the 4Kb of CCM RAM we have on this chip.
+- [x] Update tests so they pass again with this new chip
+- [x] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
+    

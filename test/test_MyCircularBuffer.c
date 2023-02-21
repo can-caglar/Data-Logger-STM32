@@ -3,7 +3,6 @@
 
 #define MAX_SIZE (MyCircularBuffer_getCapacity())
 
-uint8_t isPowerOfTwo(uint32_t num);
 void fillCircularBuffer(uint32_t amountOfData, uint8_t filledItem);
 void drainCircularBuffer(uint32_t amountOfDataToDrain);
 void emptyEntireCircularBuffer(void);
@@ -16,12 +15,6 @@ void setUp(void)
 void tearDown(void)
 {
     MyCircularBuffer_close();
-}
-
-void test_capacityIsPowerOfTwo(void)
-{
-    // circular buffer shall "waste" a slot to tell full apart from empty
-    TEST_ASSERT_TRUE(isPowerOfTwo(MAX_SIZE + 1));
 }
 
 void test_startsEmptyAndNotFull(void)
@@ -156,23 +149,6 @@ void test_circularBufferSizeIncrementsBy1EachWriteWhenStartingFromFullBuffer(voi
 }
 
 /******************** Helper functions and their tests *************/
-
-uint8_t isPowerOfTwo(uint32_t num)
-{
-    return (num != 0) && ((num & (num - 1)) == 0);
-}
-
-void test_isPowerOfTwo(void)
-{
-    TEST_ASSERT_EQUAL(0, isPowerOfTwo(0));
-    TEST_ASSERT_EQUAL(0, isPowerOfTwo(6));
-    TEST_ASSERT_EQUAL(0, isPowerOfTwo(130));
-
-    TEST_ASSERT_EQUAL(1, isPowerOfTwo(1));
-    TEST_ASSERT_EQUAL(1, isPowerOfTwo(2));
-    TEST_ASSERT_EQUAL(1, isPowerOfTwo(1024));
-    TEST_ASSERT_EQUAL(1, isPowerOfTwo(131072));
-}
 
 void fillCircularBuffer(uint32_t amountOfData, uint8_t filledItem)
 {
