@@ -30,4 +30,5 @@
     - [ ] Research the 4Kb of CCM RAM we have on this chip.
 - [x] Update tests so they pass again with this new chip
 - [x] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
+- [ ] Research closing file when power disconnected
     
