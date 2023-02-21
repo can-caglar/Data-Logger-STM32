@@ -9,6 +9,10 @@ one was open.
 #include "fatfs.h"
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
+
+static const uint8_t debugEnabled = 0;
+#define MY_LOG(x) if (debugEnabled) printf(x)
 
 static int numFilesOpen;
 static int totalNumFilesOpened;
@@ -16,7 +20,9 @@ static char openFileName[20];
 static char sdCardActualData[FAKE_MAX_FILE_SIZE];
 static char sdCardCachedData[FAKE_MAX_FILE_SIZE];
 static FSIZE_t openFileSize = 0;
-static uint32_t filePointer = 0;
+static uint32_t filePointer = 0;    // non flushed
+static uint32_t actualFilePointer = 0;    // actual
+static FRESULT toReturn = FR_OK;
 
 int fake_SDCard_reset(void)
 {
@@ -25,7 +31,9 @@ int fake_SDCard_reset(void)
     memset(sdCardActualData, 0, sizeof(sdCardActualData));
     memset(sdCardCachedData, 0, sizeof(sdCardCachedData));
     filePointer = 0;
+    actualFilePointer = 0;
     totalNumFilesOpened = 0;
+    toReturn = FR_OK;
 }
 
 int fake_SDCard_numFilesOpen(void)
@@ -55,11 +63,15 @@ int fake_SDCard_totalNumOfFilesOpened(void)
 
 FRESULT MySD_Init(const char* filename)
 {
-    numFilesOpen = 1;
-    strcpy(openFileName, filename);
-    totalNumFilesOpened++;
-    filePointer = 0;
-    return FR_OK;
+    if (toReturn == FR_OK)
+    {
+        numFilesOpen = 1;
+        strcpy(openFileName, filename);
+        totalNumFilesOpened++;
+        filePointer = 0;
+        actualFilePointer = 0;
+    }
+    return toReturn;
 }
 
 void MySD_Close(void)
@@ -70,27 +82,49 @@ void MySD_Close(void)
 
 FRESULT MySD_WriteString(const char* buf)
 {
-    MySD_Write(buf, strlen(buf));
-    return FR_OK;
+    MY_LOG("FakeSDCard MySD_WriteString called\n");
+    if (toReturn == FR_OK)
+    {
+        MySD_Write(buf, strlen(buf));
+    }
+    return toReturn;
 }
 
 FRESULT MySD_Write(const uint8_t* buf, uint32_t len)
 {
-    if (numFilesOpen == 1)
+    MY_LOG("FakeSDCard MySD_Write called\n");
+    if (toReturn == FR_OK)
     {
-        memcpy(sdCardCachedData + filePointer, buf, len);
-        filePointer += len;
+        if (numFilesOpen == 1)
+        {
+            // copies data to global that is pretending
+            // to be the sd card storage!
+            memcpy(sdCardCachedData + filePointer, buf, len);
+            filePointer += len;
+        }
     }
-    return FR_OK;
+    return toReturn;
 }
 
 FRESULT MySD_Flush(void)
 {
-    memcpy(sdCardActualData, sdCardCachedData, FAKE_MAX_FILE_SIZE);
-    return FR_OK;
+    MY_LOG("FakeSDCard MySD_Flush called\n");
+    if (toReturn == FR_OK)
+    {
+        memcpy(sdCardActualData, sdCardCachedData, FAKE_MAX_FILE_SIZE);
+        actualFilePointer = filePointer;
+    }
+    return toReturn;
 }
 
+// Note: known bug, file size will incrementy
+// even though it's not flushed!
 FSIZE_t MySD_getOpenedFileSize(void)
 {
-    return filePointer;
+    return actualFilePointer;
+}
+
+void fake_SDCard_toReturn(FRESULT newResult)
+{
+    toReturn = newResult;
 }

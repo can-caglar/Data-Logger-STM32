@@ -1,33 +1,45 @@
 #include "unity.h"
 #include "SystemOperations.h"
-#include "mock_MySD.h"
-#include "mock_MyTimeString.h"
+// #include "mock_MySD.h"
+// #include "mock_MyTimeString.h"
 #include "mock_stm32f3xx_hal.h"
-#include "mock_MyCircularBuffer.h"
-#include "fake_DataHolder.h"
+//#include "mock_MyCircularBuffer.h"
+//#include "fake_DataHolder.h"
 
-typedef enum
-{
-    DONT_EXPECT_TIMESTAMP,
-    EXPECT_TIMESTAMP,
-} ExpectTimestamp_e;
+#include "fake_SDCard.h"
+#include "fake_myTimeString.h"
+#include "MyCircularBuffer.h"
+#include "DataHolder.h"
 
-enum
-{
-    WITH_SUCCESS,
-    WITH_FAILURE,
-};
+#include <string.h>
+
+#define TEST_TIMESTAMP "[Timestamp]"
 
 static void successfulInit(void);
-static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTimestamp_e expectTimestamp);
 static void expectToOpenAFile(int withSuccessOrFailure);
 static void setNewHALTime(uint32_t newTime);  // TODO, test what happens when overflows
+static void circBufWriteString(const char* str);
+static void doWriteSD(int amountOfTimes);
+static void inputStream(const char* str);
 
 // Tests
 
 void setUp(void)
 {
     SystemOperations_Init();
+    // Reset circular buffer
+    MyCircularBuffer_close();
+    MyCircularBuffer_init();
+    // reset fake sd card module
+    fake_SDCard_reset();
+    // init timestamp module
+    MyTimeString_Init();
+}
+
+void tearDown(void)
+{
+    MySD_Close();
+    fake_myTimeString_reset();
 }
 
 void test_successInit(void)
@@ -35,255 +47,204 @@ void test_successInit(void)
     successfulInit();
 }
 
-void test_notifySdCardDoesNothingWhenBufferIsEmpty(void)
+void test_WriteSD_DoesNotWriteIfSDCardNotInitialised(void)
 {
-    fakeSetIsThereNewData(0);
+    MyCircularBuffer_write('a');
 
     SystemOperations_WriteSD();
 
-    SystemOperations_WriteSD();
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL(1, fake_SDCard_isFileEmpty());
 }
 
-void test_notifySdCard_FirstTimeWritesTimestampAndByteToSD(void)
+void test_WriteSD_DoesNotWriteWhenBufferIsEmpty(void)
 {
-    uint8_t ch = 'c';
-    fakeSetIsThereNewData(1);
-    fakeSetLatestData(ch);
-    fakeSetTimestampString("example");
+    // Circ buf empty
 
-    MySD_WriteString_ExpectAndReturn("example", FR_OK);      // write it to SD
-    MySD_Write_ExpectAndReturn(&ch, 1, FR_OK);
+    doWriteSD(1);
+
+    TEST_ASSERT_EQUAL(1, fake_SDCard_isFileEmpty());
+}
+
+void test_WriteSD_TimestampsAndSendsByte(void)
+{
+    fake_myTimeString_setTimestamp("[Timestamp]");
+
+    MySD_Init("file.txt");
+    inputStream("c");
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]c", fake_SDCard_getFileData());
+}
+
+void test_WriteSD_CROrLFAtEndWillAddTimestamp(void)
+{
+    fake_myTimeString_setTimestamp("[Timestamp]");
     
-    SystemOperations_WriteSD();
+    MySD_Init("file.txt");
+    inputStream("hi\rho");
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]hi\r[Timestamp]ho", fake_SDCard_getFileData());
 }
 
-void test_notifySdCard_WriteSD_CROrLFAtEndWillAddTimestamp(void)
+void test_WriteSD_ConstantCRorLFWillAddTS(void)
 {
-    fakeSetIsThereNewData(1);
-    fakeSetLatestData('c');
-
-    successfulInit();
-
-    // first character shall always be timestamped
-    uint8_t byteWritten = 'q';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    fake_myTimeString_setTimestamp("[Timestamp]");
     
-    // with \r, this shall not be timestamped
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    MySD_Init("file.txt");
+    inputStream("\r\r\r");
+    MySD_Flush();
 
-    // // any other character after the \r will be timestamped
-    byteWritten = 'a';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // another character, no timestamp
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]\r[Timestamp]\r[Timestamp]\r", fake_SDCard_getFileData());
 }
 
-
-void test_notifySdCard_WriteSD_ConstantCRorLFWillAddTS(void)
+void test_WriteSD_RespectsCRLF(void)
 {
-    successfulInit();
+    fake_myTimeString_setTimestamp("[Timestamp]");
+    MySD_Init("file.txt");
 
-    fakeSetIsThereNewData(1);
+    MySD_Init("file.txt");
+    inputStream("hi\r\nthere");
+    MySD_Flush();
 
-    // first character shall always be timestamped
-    uint8_t byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]hi\r\n[Timestamp]there", fake_SDCard_getFileData());
 }
 
 
-void test_notifySdCardWriter_WriteSD_RespectsCRLF(void)
+void test_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
 {
-    successfulInit();
-    fakeSetIsThereNewData(1);
+    fake_myTimeString_setTimestamp("[Timestamp]");
 
-    // first character shall always be timestamped
-    uint8_t byteWritten = 'a';
-    uint8_t nextByte = '\r';
-    expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    MySD_Init("file.txt");
+    inputStream("hi\r");
+    inputStream("\nthere");
+    MySD_Flush();
 
-    byteWritten = '\r';
-    nextByte = '\n';
-    expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    byteWritten = '\n';
-    nextByte = 'q';
-    expectSerialSnooper(&byteWritten, &nextByte, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    nextByte = 'q';
-    expectSerialSnooper(&byteWritten, &nextByte, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]hi\r\n[Timestamp]there", fake_SDCard_getFileData());
 }
 
-
-void test_SerialSnooper_WriteSD_RespectsCRLFEvenWhenNotQueuedInCircBuf(void)
+void test_WriteSD_RespectsMultipleCRLFCombinationsByMakingNewLines(void)
 {
-    successfulInit();
-    fakeSetIsThereNewData(1);
+    fake_myTimeString_setTimestamp("[Timestamp]");
 
-    // first character shall always be timestamped
-    uint8_t byteWritten = 'a';
-    uint8_t nextByte = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    MySD_Init("file.txt");
+    inputStream("hi\r\n\r\n\rthere");
+    MySD_Flush();
 
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    byteWritten = '\n';
-    byteWritten = 'q';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
+    TEST_ASSERT_EQUAL_STRING("[Timestamp]hi\r\n"
+                            "[Timestamp]\r\n"
+                            "[Timestamp]\r"
+                            "[Timestamp]there", 
+                            fake_SDCard_getFileData());
 }
-
-void test_sdCardWriter_WriteSD_RespectsMultipleCRLFByMakingNewLine(void)
-{
-    successfulInit();
-    fakeSetIsThereNewData(1);
-
-    // first character shall always be timestamped
-    // '[Timestamp]: a'
-    uint8_t byteWritten = 'a';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r'
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r\n'
-    byteWritten = '\n';
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r\n'
-    // '[Timestamp]: \r'
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r\n'
-    // '[Timestamp]: \r\n'
-    byteWritten = '\n';
-    expectSerialSnooper(&byteWritten, NULL, DONT_EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r\n'
-    // '[Timestamp]: \r\n'
-    // '[Timestamp]: \r'
-    byteWritten = '\r';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-
-    // '[Timestamp]: a\r\n'
-    // '[Timestamp]: \r\n'
-    // '[Timestamp]: \r'
-    // '[Timestamp]: a'
-    byteWritten = 'a';
-    expectSerialSnooper(&byteWritten, NULL, EXPECT_TIMESTAMP);
-    SystemOperations_WriteSD();
-}
-
 
 void test_sdCardFlusher_FlushesEveryFLUSH_TIME_MS(void)
 {
-    successfulInit();
+    fake_myTimeString_setTimestamp("");
+
+    MySD_Init("file.txt");
+    inputStream("hello");
 
     setNewHALTime(0);
 
-    SystemOperations_FlushSD();  // don't expect flush
+    // don't expect flush
+    SystemOperations_FlushSD();  
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
 
     setNewHALTime(FLUSH_TIME_MS / 2);
 
+    // don't expect flush
     SystemOperations_FlushSD();  // don't expect flush
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
 
     setNewHALTime(FLUSH_TIME_MS);
 
-    MySD_Flush_ExpectAndReturn(FR_OK);  // expect flush
-    
+    // expect flush
     SystemOperations_FlushSD();
+    TEST_ASSERT_EQUAL_STRING("hello", fake_SDCard_getFileData());
+
+    inputStream("hi");
+
+    setNewHALTime(FLUSH_TIME_MS * 1.5);
 
     // won't call it again
-    setNewHALTime(FLUSH_TIME_MS * 1.5);
     SystemOperations_FlushSD();
+    TEST_ASSERT_EQUAL_STRING("hello", fake_SDCard_getFileData());
 }
+
 
 void test_OpenLogFile_OpensOneFileClosesTheOtherWhenNoFileOpen(void)
 {
-    expectToOpenAFile(WITH_SUCCESS);
-
     // first time round
     SystemOperations_OpenLogFile();
 
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
+
     // a file is already open, should do nothing
     SystemOperations_OpenLogFile();
+
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
 }
 
 void test_OpenLogFile_TriesAgainIfOpenFailed(void)
 {
-    expectToOpenAFile(WITH_FAILURE);
-
+    // First time fail
+    fake_SDCard_toReturn(FR_DISK_ERR);
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(0, fake_SDCard_totalNumOfFilesOpened());
 
     // second time round, tries again
-    expectToOpenAFile(WITH_SUCCESS);
-
+    fake_SDCard_toReturn(FR_OK);
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
 }
 
 void test_OpenLogFile_OpensAnotherFileIfSizeAboveLimit(void)
 {
-    // gets name of file from time string
-    expectToOpenAFile(WITH_SUCCESS);
-
+    // Open log file
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
 
-    // update the file size
-    fakeSetFileSize(MAX_FILE_SIZE);
-    fakeSetIsThereNewData(1);  // say we have data
-
+    // update the file size with MAX data
+    char data[MAX_FILE_SIZE];
+    memset(data, 'x', MAX_FILE_SIZE);
+    data[MAX_FILE_SIZE] = '\0';
+    inputStream(data);
+    MySD_Flush();
+    TEST_ASSERT_EQUAL(MAX_FILE_SIZE, MySD_getOpenedFileSize());
+    
     // expect to open a new file since max size reached
-    expectToOpenAFile(WITH_SUCCESS);
-
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
 }
 
 void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
 {
-    // expect to open new file
-    expectToOpenAFile(WITH_SUCCESS);
+    // Open log file
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
 
-    // update the file size to low threshold
-    fakeSetFileSize(FILE_SIZE_LOWER_THRESHOLD);
-    // but we have data in buffer
-    fakeSetIsThereNewData(1); 
+    // Update the file size with FILE_SIZE_LOWER_THRESHOLD data
+    char data[FILE_SIZE_LOWER_THRESHOLD];
+    memset(data, 'x', FILE_SIZE_LOWER_THRESHOLD);
+    data[FILE_SIZE_LOWER_THRESHOLD] = '\0';
+    inputStream(data);
+    MySD_Flush();
+    TEST_ASSERT_EQUAL(FILE_SIZE_LOWER_THRESHOLD, MySD_getOpenedFileSize());
 
-    // new data available, don't expect to open a new file
+    // Fill up circular buffer so it isn't empty
+    MyCircularBuffer_write('a');
+    
+    // don't expect new file as buffer not empty
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
 
-    fakeSetIsThereNewData(0); // no new data, expect to open now
-    expectToOpenAFile(WITH_SUCCESS);
+    // expect new file since no new data
+    MyCircularBuffer_read();
     SystemOperations_OpenLogFile();
+    TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
 }
 
 // Helper functions
@@ -295,34 +256,38 @@ void successfulInit(void)
     TEST_ASSERT_EQUAL(SO_SUCCESS, res);
 }
 
-static void expectSerialSnooper(uint8_t* thisValue, uint8_t* nextVal, ExpectTimestamp_e expectTimestamp)
-{
-    // first character shall always be timestamped
-    fakeSetLatestData(*thisValue);
-
-    if (expectTimestamp == EXPECT_TIMESTAMP)
-    {
-        fakeSetTimestampString("[26-11-22]");
-        MySD_WriteString_ExpectAndReturn("[26-11-22]", FR_OK);      // write it to SD
-    }
-    MySD_Write_ExpectAndReturn(thisValue, 1, FR_OK);
-}
-
-static void expectToOpenAFile(int withSuccessOrFailure)
-{
-    int err = (withSuccessOrFailure == WITH_SUCCESS) ?
-        FR_OK : FR_DISK_ERR;
-
-    // gets name of file from time string
-    fakeSetFileName("hi.txt");
-
-    // open file
-    MySD_Init_ExpectAndReturn("hi.txt", err);
-}
-
 static void setNewHALTime(uint32_t newTime)
 {
     HAL_GetTick_ExpectAndReturn(newTime);
+}
+
+static void circBufWriteString(const char* str)
+{
+    while (*str)
+    {
+        MyCircularBuffer_write(*str++);
+    }
+}
+
+static void doWriteSD(int amountOfTimes)
+{
+    MySD_Init("test");  // sd card has to be initialised first
+    for (int i = 0; i < amountOfTimes; i++)
+    {
+        SystemOperations_WriteSD();
+    }
+    MySD_Flush();   // flush the data else remains in sd cache
+}
+
+static void inputStream(const char* testStr)
+{
+    circBufWriteString(testStr);
+    int stringLen = strlen(testStr);
+
+    for (int i = 0; i < stringLen; i++)
+    {
+        SystemOperations_WriteSD();
+    }
 }
 
 /*

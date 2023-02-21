@@ -64,6 +64,17 @@ void test_fake_SDCard_reset_willResetFilePointer(void)
         fake_SDCard_getFileData(), sizeof(testStr));
 }
 
+void test_fake_SDCard_reset_willResetActualFilePointer(void)
+{
+    MySD_Init("file.txt");
+    MySD_WriteString("hi");
+    MySD_Flush();
+
+    fake_SDCard_reset();
+
+    TEST_ASSERT_EQUAL_INT(0, MySD_getOpenedFileSize());
+}
+
 void test_fake_SDCard_init_willResetFilePointer(void)
 {
     const char* testStr = "hello";
@@ -83,7 +94,6 @@ void test_fake_SDCard_init_willResetFilePointer(void)
     TEST_ASSERT_EQUAL_CHAR_ARRAY(testStr, 
         fake_SDCard_getFileData(), sizeof(testStr));
 }
-
 
 void test_SdCardOpenFileNameCanBeAccessedAndChangesAccordingly(void)
 {
@@ -213,12 +223,72 @@ void test_sdCardNumberOfFilesOpenedIncrementsEachCallToSDInit(void)
     TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
 }
 
-void test_ApiAlwaysReturnsFR_OK(void)
+void test_ApiAlwaysReturnsWhatWeWant(void)
+{
+    fake_SDCard_toReturn(FR_DISK_ERR);
+
+    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, MySD_Init("file.txt"));
+    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, MySD_WriteString("hello"));
+    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, MySD_Write("abc", 3));
+    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, MySD_Flush());
+}
+
+void test_ApiAlwaysReturnsFR_OK_afterInit(void)
 {
     TEST_ASSERT_EQUAL_INT(FR_OK, MySD_WriteString("hello"));
     TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Init("file.txt"));
     TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Write("abc", 3));
     TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Flush());
+}
+
+void test_IfReturningErrorInitDoesNothing(void)
+{
+    fake_SDCard_toReturn(FR_DISK_ERR);
+    MySD_Init("file.txt");
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_numFilesOpen());
+}
+
+void test_IfReturningErrorFlushDoesNothing(void)
+{
+    MySD_Init("file.txt");
+    MySD_WriteString("hello");
+
+    fake_SDCard_toReturn(FR_DISK_ERR);
+    MySD_Flush();
+
+    // And this should do nothing
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
+}
+
+void test_IfReturningErrorWriteDoesNothing(void)
+{
+    MySD_Init("file.txt");
+
+    fake_SDCard_toReturn(FR_DISK_ERR);
+    MySD_WriteString("hello");
+    MySD_Write("hi", 2);
+
+    fake_SDCard_toReturn(FR_OK);
+    MySD_Flush();
+
+    // And this should do nothing
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
+}
+
+void test_FileSizeIncrementOnlyAfterFlush(void)
+{
+    MySD_Init("file.txt");
+    MySD_WriteString("hi");
+
+    // size shall be 0
+    TEST_ASSERT_EQUAL_INT(0, MySD_getOpenedFileSize());
+
+    MySD_Flush();
+
+    // size is now updated
+    TEST_ASSERT_EQUAL_INT(2, MySD_getOpenedFileSize());
 }
 
 
