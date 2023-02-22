@@ -249,7 +249,6 @@ void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
 
 // Helper functions
 
-
 void successfulInit(void)
 {
     int res = SystemOperations_Init();

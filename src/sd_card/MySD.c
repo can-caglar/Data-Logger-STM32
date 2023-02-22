@@ -7,10 +7,13 @@ static FATFS FatFs; // fats handle
 static FIL file; // fats handle
 static const BYTE writeMode = FA_WRITE | FA_OPEN_APPEND;
 static uint8_t mounted;
+static uint8_t sendBuf[WRITE_BUFFER_SIZE];
+static uint32_t sendBufIndex = 0;
 
 FRESULT MySD_Init(const char* filename)
 {
     FRESULT err = FR_OK;
+    sendBufIndex = 0;
     
     if (mounted == 0)
     {
@@ -46,18 +49,33 @@ void MySD_Close(void)
 // Pass in a c-string, the function will calculate length
 FRESULT MySD_WriteString(const char* buf)
 {
-    int sizeOfBuf = strlen(buf);
-    FRESULT err = MySD_Write((const uint8_t*)buf, sizeOfBuf);
-    return err;
+    return MySD_Write((uint8_t*)buf, strlen(buf));
 }
 
 FRESULT MySD_Write(const uint8_t* buf, uint32_t len)
 {
+    // Buffer the data, only send 1024 chunks.
+    FRESULT err = FR_OK;
     unsigned int bytesWrote = 0;
-    FRESULT err = f_write(&file, buf, len, &bytesWrote);
-    if (err == FR_OK)
+    uint32_t charactersLeftToSend = len;
+    while (charactersLeftToSend)
     {
-        led_toggle();
+        for (int i = 0; (i < len) && (sendBufIndex < WRITE_BUFFER_SIZE) && (charactersLeftToSend); i++)
+        {
+            sendBuf[sendBufIndex] = *buf;
+            sendBufIndex++;
+            charactersLeftToSend--;
+        }
+
+        if (sendBufIndex == WRITE_BUFFER_SIZE)
+        {
+            err = f_write(&file, sendBuf, sendBufIndex, &bytesWrote);
+            sendBufIndex = 0;
+            if (err == FR_OK)
+            {
+                led_toggle();
+            }
+        }
     }
     return err;
 }

@@ -4,6 +4,12 @@
 #include "fatfs.h"
 #include <stdint.h>
 
+#ifdef TEST
+#define WRITE_BUFFER_SIZE 20
+#else
+#define WRITE_BUFFER_SIZE 2048
+#endif
+
 FRESULT MySD_Init(const char* filename);
 void MySD_Close(void);
 FRESULT MySD_WriteString(const char* buf);
