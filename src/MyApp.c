@@ -10,6 +10,7 @@
 #include "MyCircularBuffer.h"
 #include <stdio.h>
 #include "stm32f3xx.h"
+#include "MySD.h"
 
 // Ceedling has its own main function
 #ifndef TEST
@@ -23,9 +24,10 @@ typedef enum TEST_e
 {
   TEST_DEFAULT_PROGRAM,
   TEST_CIRC_BUF,
+  TEST_SD_WRITE,
 } TEST_e;
 
-TEST_e test = TEST_CIRC_BUF;
+TEST_e test = TEST_SD_WRITE;
 uint32_t tNow;
 uint32_t tElapsed;
 
@@ -59,9 +61,9 @@ int runApp(void)
         }
         break;
       }
-      
       case TEST_CIRC_BUF:
       {
+          // Testing how long it takes to fill up circular buffer
           SAFE_PRINT("Starting circular buffer test. Blast data via UART!\n\r");
           MyCircularBuffer_init();
           uint32_t bufSize = 0;
@@ -76,6 +78,34 @@ int runApp(void)
           tElapsed = HAL_GetTick() - tNow;
           bufSize = MyCircularBuffer_size();
           SAFE_PRINT_ARGS("Time to fill circular buffer %u ms | Total data: %u bytes\n\r", tElapsed, bufSize);
+          break;
+      }
+      case TEST_SD_WRITE:
+      {
+          // Testing how long of a delay causes the circ buf to get filled up
+          // during a write/flush cycle.
+          SAFE_PRINT("Starting SD write test. Test will end when circular buf is full.\n\r");
+          uint32_t maxDelay = 0;
+          uint32_t maxDelayIndex = 0;
+          uint32_t loopCount = 0;
+          MyCircularBuffer_init();
+
+          while (!MyCircularBuffer_isFull())
+          {
+            tNow = HAL_GetTick();
+            SystemOperations_OpenLogFile();
+            SystemOperations_WriteSD();
+            SystemOperations_FlushSD();
+            tElapsed = HAL_GetTick() - tNow;
+            loopCount++;
+            if (maxDelay < tElapsed)
+            {
+                maxDelay = tElapsed;
+                maxDelayIndex = loopCount;
+            }
+          }
+          SAFE_PRINT_ARGS("Max time delay = %u at maxDelayIndex = %u. Total loops = %u\n\r",
+             maxDelay, maxDelayIndex, loopCount);
           break;
       }
       default:
