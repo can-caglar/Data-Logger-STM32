@@ -87,10 +87,9 @@ MyTime MyRTC_ReadTime(void)
         time.hour = bcdToInt(time.hour & BM_HOURS);
         time.day = bcdToInt(time.day & BM_DAYS);
         time.month = bcdToInt(time.month & BM_MONTHS);
-        time.year = bcdToInt(time.year & BM_YEARS);
+        time.year = timeNow & 0x3F; // pseudo-random year //bcdToInt(time.year & BM_YEARS);
         time.weekday = bcdToInt(time.weekday & BM_WEEKDAYS);
     }
-    
     return time;
 }
 

@@ -27,8 +27,18 @@
 #define TEST_SD_WRITE
 // -----
 
-uint32_t tNow;
-uint32_t tElapsed;
+extern uint32_t tNow;
+extern uint32_t tElapsed;
+
+#ifdef TEST_SD_WRITE
+// Data being captured
+#define DELAY_WINDOW 32  // has to be power of 2 for quick wrapping
+extern uint32_t last_X_delays_greater_than_50ms[];
+extern uint32_t last_X_delays_time_occured[];
+extern uint32_t last_X_delays_circ_buf_size[];
+extern uint32_t arrayIndex;
+
+#endif
 
 /*
 int main(void)
@@ -79,35 +89,14 @@ int runApp(void)
       // Testing how long of a delay causes the circ buf to get filled up
       // during a write/flush cycle.
       SAFE_PRINT("Starting SD write test. Test will end when circular buf is full.\n\r");
-      uint32_t loopCount = 0;
       MyCircularBuffer_init();
-      
-      // Data being captured
-      #define DELAY_WINDOW 32  // has to be power of 2 for quick wrapping
-      static uint32_t last_X_delays_greater_than_50ms[DELAY_WINDOW];
-      static uint32_t last_X_delays_time_occured[DELAY_WINDOW];
-      static uint32_t last_X_delays_circ_buf_size[DELAY_WINDOW];
-      static uint32_t arrayIndex = 0;
 
       // The test
       while (!MyCircularBuffer_isFull())
       {
         SystemOperations_OpenLogFile();
         SystemOperations_FlushSD();
-
-        tNow = HAL_GetTick(); 
         SystemOperations_WriteSD();   // Record just the delay for writeSD
-        tElapsed = HAL_GetTick() - tNow;  // the reading for this loop
-
-        loopCount++;
-        if (tElapsed > 50)
-        {
-            last_X_delays_greater_than_50ms[arrayIndex] = tElapsed;
-            last_X_delays_time_occured[arrayIndex] = tNow;  // the time it happened
-            last_X_delays_circ_buf_size[arrayIndex] = MyCircularBuffer_size();
-            // increment array index
-            arrayIndex = (arrayIndex + 1) & (DELAY_WINDOW - 1); // a basic circular buffer
-        }
       }
       
       // test result output
