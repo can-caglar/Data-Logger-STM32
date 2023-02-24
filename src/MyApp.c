@@ -85,22 +85,26 @@ int runApp(void)
       // Data being captured
       #define DELAY_WINDOW 32  // has to be power of 2 for quick wrapping
       static uint32_t last_X_delays_greater_than_50ms[DELAY_WINDOW];
-      static uint32_t last_X_delays_loop_index[DELAY_WINDOW];
+      static uint32_t last_X_delays_time_occured[DELAY_WINDOW];
+      static uint32_t last_X_delays_circ_buf_size[DELAY_WINDOW];
       static uint32_t arrayIndex = 0;
 
       // The test
       while (!MyCircularBuffer_isFull())
       {
-        tNow = HAL_GetTick(); 
         SystemOperations_OpenLogFile();
         SystemOperations_FlushSD();
-        SystemOperations_WriteSD();
+
+        tNow = HAL_GetTick(); 
+        SystemOperations_WriteSD();   // Record just the delay for writeSD
         tElapsed = HAL_GetTick() - tNow;  // the reading for this loop
+
         loopCount++;
         if (tElapsed > 50)
         {
             last_X_delays_greater_than_50ms[arrayIndex] = tElapsed;
-            last_X_delays_loop_index[arrayIndex] = loopCount;
+            last_X_delays_time_occured[arrayIndex] = tNow;  // the time it happened
+            last_X_delays_circ_buf_size[arrayIndex] = MyCircularBuffer_size();
             // increment array index
             arrayIndex = (arrayIndex + 1) & (DELAY_WINDOW - 1); // a basic circular buffer
         }
@@ -110,8 +114,11 @@ int runApp(void)
       SAFE_PRINT("Printing results...\n\r");
       for (int i = 0; i < DELAY_WINDOW; i++)
       {
-        SAFE_PRINT_ARGS("[%u ms at loop %u], ", last_X_delays_greater_than_50ms[i], last_X_delays_loop_index[i]);
+        SAFE_PRINT_ARGS("[%u ms at time %u, bufsiz = %u], ", 
+          last_X_delays_greater_than_50ms[i], 
+          last_X_delays_time_occured[i],
+          last_X_delays_circ_buf_size[i]);
       }
-      SAFE_PRINT_ARGS("\r\nTotal loops = %u\n\r", loopCount);
+      SAFE_PRINT_ARGS("\r\nLast time measurement = %u\n\r", tNow);
     #endif
 }
