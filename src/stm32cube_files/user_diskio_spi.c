@@ -132,9 +132,10 @@ void xmit_spi_multi (
 	UINT btx			/* Number of bytes to send (even number) */
 )
 {
-	for(UINT i=0; i<btx; i++) {
-		xchg_spi(*(buff+i));
-	}
+	HAL_SPI_Transmit(&SD_SPI_HANDLE, (uint8_t*)buff, btx, 500);
+	// for(UINT i=0; i<btx; i++) {
+	// 	xchg_spi(*(buff+i));
+	// }
 }
 #endif
 
@@ -431,19 +432,6 @@ inline DRESULT USER_SPI_read (
 /* Write sector(s)                                                       */
 /*-----------------------------------------------------------------------*/
 
-//cc test add
-#include "MyCircularBuffer.h"
-uint32_t tNow;
-uint32_t tElapsed;
-
-// Data being captured
-#define DELAY_WINDOW 32  // has to be power of 2 for quick wrapping
-uint32_t last_X_delays_greater_than_50ms[DELAY_WINDOW];
-uint32_t last_X_delays_time_occured[DELAY_WINDOW];
-uint32_t last_X_delays_circ_buf_size[DELAY_WINDOW];
-uint32_t arrayIndex = 0;
-
-// CC test end
 #if _USE_WRITE
 inline DRESULT USER_SPI_write (
 	BYTE drv,			/* Physical drive number (0) */
@@ -458,30 +446,12 @@ inline DRESULT USER_SPI_write (
 
 	if (!(CardType & CT_BLOCK)) sector *= 512;	/* LBA ==> BA conversion (byte addressing cards) */
 
-	if (count == 1) 	/* Single sector write */
-  {
-    tNow = HAL_GetTick();
-    int a = send_cmd(CMD24, sector);
-    tElapsed = HAL_GetTick() - tNow;  // the reading for this loop
-		if (a == 0)	/* WRITE_BLOCK */
-    {
-      
-      if (xmit_datablock(buff, 0xFE))
-      {
-        count = 0;
-      }
-      
-    }
-    
-    if (tElapsed > 50)
-    {
-        last_X_delays_greater_than_50ms[arrayIndex] = tElapsed;
-        last_X_delays_time_occured[arrayIndex] = tNow;  // the time it happened
-        last_X_delays_circ_buf_size[arrayIndex] = MyCircularBuffer_size();
-        // increment array index
-        arrayIndex = (arrayIndex + 1) & (DELAY_WINDOW - 1); // a basic circular buffer
-    }
-  }
+	if (count == 1) {	/* Single sector write */
+		if ((send_cmd(CMD24, sector) == 0)	/* WRITE_BLOCK */
+			&& xmit_datablock(buff, 0xFE)) {
+			count = 0;
+		}
+	}
 	else {				/* Multiple sector write */
 		if (CardType & CT_SDC) send_cmd(ACMD23, count);	/* Predefine number of sectors */
 		if (send_cmd(CMD25, sector) == 0) {	/* WRITE_MULTIPLE_BLOCK */
