@@ -5,7 +5,7 @@
 
 #define INTRO_STR \
     "\r"\
-    "********* SERIAL SNOOPER V1.0 *********\r"\
+    "********* SERIAL SNOOPER V2.0 *********\r"\
     "Enter \"seeAll\" to see list of commands"
 
 void MyCLI_Run(void)

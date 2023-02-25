@@ -36,4 +36,6 @@
     - [ ] Research the 4Kb of CCM RAM we have on this chip.
 - [x] Update tests so they pass again with this new chip
 - [x] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
-    
+- [ ] Add system to save some configs to sd card
+    - [ ] Make it remember which file it wrote to last, and continue writing to that one
+- [ ] Run an overnight test with a different SD card- does the buffer overflow?
