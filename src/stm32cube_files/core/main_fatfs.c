@@ -48,7 +48,7 @@ void CubeMX_SystemInit(unsigned int sys)
   }
   if (sys & CMX_I2C)
   {
-    //MX_I2C1_Init();
+    MX_I2C1_Init();
   }
   
 }
@@ -59,14 +59,8 @@ void CubeMX_SystemInit(unsigned int sys)
   */
 void SystemClock_Config(void)
 {
-  // 8 MHz HSE, 8 MHz HSI.
-  // HSE enable hangs
-  
-  // todo: See if/why SPI clock speed can't be changed with this code below
-  
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -89,19 +83,13 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2; 
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
-  //PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-  //PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-  //if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  //{
-  //  Error_Handler();
-  //}
 }
 
 /**

@@ -1,6 +1,6 @@
 ---
 
-# Data Logger++ Tasks:
+# Data Logger V2 Tasks:
 
 - [ ] Variable names (namely make MVC pattern more obvious)
 - [x] Reduce size of program
@@ -11,13 +11,15 @@
 - [x] Understand fatfs better; it seems to buffer internally, 
     so perhaps writing 1 byte at a time is OK for performance
     - Benchmark shows the more we write, the faster the throughput.
-- [...] Upgrade processor to one with more RAM.
+- [x] Upgrade processor to one with more RAM.
     - [x] Update processor speed
     - [x] Update SPI speed
     - [x] Increase circular buffer size
-    - [!] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
-        - [!] Remove the solder bridge SB16 else I2C and SPI will clash.
-    - [!] Remove solder bridge to allow the device to be plugged into the wall
+    - [x] Update I2C wiring (PB7 SDA, PB6 SCL, AF4)
+        - [!] Remove the solder bridge SB16 AND SB18 else I2C and SPI will clash.
+    - [...] Remove solder bridge to allow the device to be plugged into the wall
+        - Won't work as the current consumption with new processor and code is over 100mA (as per user manual)
+        - Going to look into adding a separate connector.
     - [x] Update USART (usart1 -> usart2, new alt func)
     - [x] Check SD card library works
     - [x] Write a benchmarking test for the SD card - what is the write throughput?
@@ -33,9 +35,12 @@
         - Another way could be to wire RX line to a timer pin 
             with input capture. Take X measurements. 
             Smallest will likely be baud rate.
-    - [ ] Research the 4Kb of CCM RAM we have on this chip.
+    - [-] Research the 4Kb of CCM RAM we have on this chip. | Currently do not need to
 - [x] Update tests so they pass again with this new chip
 - [x] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
-- [ ] Add system to save some configs to sd card
-    - [ ] Make it remember which file it wrote to last, and continue writing to that one
 - [ ] Run an overnight test with a different SD card- does the buffer overflow?
+
+Data logger V3:
+
+- [ ] Add system to save some configs to sd card, and read configs from sd card
+    - [ ] Make it remember which file it wrote to last, and continue writing to that one

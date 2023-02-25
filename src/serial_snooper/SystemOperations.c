@@ -55,7 +55,7 @@ void SystemOperations_OpenLogFile(void)
 void SystemOperations_WriteSD(void)
 {
     // Write to SD card from a circular buffer
-// Parse each letter one by one and determine if
+    // Parse each letter one by one and determine if
     // need to also write a timestamp.
     uint8_t thereIsNewData = DH_IsThereNewData();
     if (thereIsNewData)
