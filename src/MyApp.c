@@ -23,7 +23,7 @@ uint32_t tEnd;
 uint32_t tElapsed;
 uint32_t tElapsedMax = 0;
 float averageTime;
-float kbps;
+float kBps;
 
 uint32_t tBegin2;
 uint32_t tEnd2;
@@ -31,8 +31,8 @@ uint32_t tElapsed2;
 
 #define MAX_BUF_SIZE 4096
 uint8_t buf[MAX_BUF_SIZE];
-const uint16_t writeAmount = 1024;
-const int testRunAmount = 3000;
+const uint16_t writeAmount = 1;
+const int testRunAmount = 300;
 
 /*
 int main(void)
@@ -47,8 +47,9 @@ int runApp(void)
     memset(buf, 'X', MAX_BUF_SIZE);
     
     // test begin
-    printf("------------\n\rStarting test. Write amount : %u\n\r", writeAmount);
+    printf("------------\n\rStarting test. Write amount : %u bytes\n\r", writeAmount);
     MySD_Init("test.txt");
+    HAL_Delay(500); // wait for file to open
     
     // Begin timer
     tBegin = HAL_GetTick();
@@ -80,10 +81,10 @@ int runApp(void)
     // Calculate benchmark data
     tElapsed = tEnd - tBegin;
     averageTime = (float)tElapsed / testRunAmount;
-    kbps = MAX_BUF_SIZE / averageTime;
+    kBps = MAX_BUF_SIZE / averageTime;
     // Print data
-    printf("Total time = %u ms, average = %f ms, data written = %u bits \n\r", tElapsed, averageTime, totalDataWrittenCounter);
-    printf("Data rate = %f kbits per second. Max delay writing = %u ms\n\r", kbps, tElapsedMax);
+    printf("Total time = %u ms, average = %f ms, data written = %u bytes \n\r", tElapsed, averageTime, totalDataWrittenCounter);
+    printf("Data rate = %f kbytes per second. Max delay writing = %u ms\n\r", kBps, tElapsedMax);
     
     printf("End of test\n\r");
 }
