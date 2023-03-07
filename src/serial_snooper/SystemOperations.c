@@ -9,14 +9,14 @@
 static uint8_t previousData;
 static uint32_t lastTimeFlushed;
 static uint8_t status;
-static uint8_t aFileIsOpen = 0;
+static uint8_t bAFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
-    aFileIsOpen = 0;
+    bAFileIsOpen = 0;
 
     return SO_SUCCESS;
 }   
@@ -26,14 +26,14 @@ void SystemOperations_OpenLogFile(void)
     // get size of file
     uint32_t dataSize = DH_GetOpenedFileSize();
     // find out if we have data to handle
-    uint8_t newDataToHandle = DH_IsThereNewData();
+    uint8_t bThereIsNewDataToHandle = DH_IsThereNewData();
     // open new file if the current one is too large
-    uint8_t maxDataSizeReached = (dataSize >= MAX_FILE_SIZE);
-    uint8_t lowerBoundSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
+    uint8_t bMaxFileSizeReached = (dataSize >= MAX_FILE_SIZE);
+    uint8_t bLowerBoundaryFileSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
     // open new file earlier if system has no new data to handle
-    uint8_t openNewFileEarly = (lowerBoundSizeReached && !newDataToHandle);
+    uint8_t bOpenNewFileEarly = (bLowerBoundaryFileSizeReached && !bThereIsNewDataToHandle);
     // or open a file if none is open
-    if (!aFileIsOpen || maxDataSizeReached || openNewFileEarly)
+    if (!bAFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
     {
         // get new file name
         const char* fileName = DH_GetFileName();
@@ -43,11 +43,11 @@ void SystemOperations_OpenLogFile(void)
 
         if (err == FR_OK)
         {
-            aFileIsOpen = 1;
+            bAFileIsOpen = 1;
         }
         else
         {
-            aFileIsOpen = 0;
+            bAFileIsOpen = 0;
         }
     }
 }
@@ -57,8 +57,7 @@ void SystemOperations_WriteSD(void)
     // Write to SD card from a circular buffer
     // Parse each letter one by one and determine if
     // need to also write a timestamp.
-    uint8_t thereIsNewData = DH_IsThereNewData();
-    if (thereIsNewData)
+    if (DH_IsThereNewData())
     {
         // get top item from circular buffer
         uint8_t val = DH_GetLatestData();

@@ -1,4 +1,4 @@
----
+***************************************************************************************************************************************************
 
 # Data Logger V2 Tasks:
 
@@ -40,7 +40,71 @@
 - [x] Test circular buffer capacity that is not a power of 2 to make it as large as possible.
 - [ ] Run an overnight test with a different SD card- does the buffer overflow?
 
-Data logger V3:
+***************************************************************************************************************************************************
 
-- [ ] Add system to save some configs to sd card, and read configs from sd card
-    - [ ] Make it remember which file it wrote to last, and continue writing to that one
+Data logger V3 (current):
+
+V2 behaviour: The Serial Snooper creates a log file on an SD card with a FAT32 file system. It will transfer UART received data 
+to a file on the SD card until it reaches a max size. A new file is created when this happens. A new file is also created upon a power cycle.
+UART baud rate is currently configured via DIP switches. 
+
+New in V3: 
+    - It will write to the same log file even after a power cycle.
+        - Need a way to know to re-open the file it was writing to last. Details can change in future easily, as long as architecture is right.
+            - Option 1: Since RTC has to work, we can just check the txt file that was written to last:
+                - Making assumption that the SD card was only used by SS (if not, we risk writing to a log file not created by us)
+            - Option 2: Save current log file name onto the SD card and retrieve on power cycle. If it doesn't exist, make a new one.
+                - This will likely need to be expanded in the future to save more details that retain on a power cycle.
+                - I.e. a file that holds a structure of data that needs to be parsed to get the information needed
+            - Need an abstraction for log file creator. Handles opening a log file, let it handle where and what name.
+            - Only 1 log file open at a time.
+    - Make system behaviour more defined: Error handling:
+        - We are making many assumptions. If any are not met, system may perform in inadvertant ways. Let's limit behaviour by calling error
+            handling code if some conditions are not met.
+        - Flash LED N number of times where N is number of LED blinks followed by a long delay, indefinitely.
+        - Errors:
+            - RTC not working, throw error - go to error handling code. 
+            - If SD card not initialised, throw error - go to error handling code. Flash LED N number of times.
+            - If SD card full
+
+    - The name given to the log files: currently it's based on RTC time- an 8 digit unit timestamp in hex.
+    - The naming convention of iterative log files: currently it's based on RTC but if RTC doesn't work it will keep opening the same 
+        file even if max size reached. - solved by error handling code which won't let system work without RTC (for now)
+    - Maximum number of log files - currently no maximum.
+    - Whether or not there is a Maximum
+    - What to do when the maximum log files is reached - shall be handled by error handling.
+    - What happens if SD card contains too many files already, is full, or has files with our naming conventions?
+
+- [ ] Continue writing to the same file even after a power cycle
+    - This gives the serial snooper a more predictable behaviour
+    - Reduces likelihood of creating too many files on the SD card which may cause issues when reading it from a PC
+    - [ ] Add system to retain information after power cycling and load this information on start-up.
+- [ ] Add ability to configure the Serial Snooper via a config file on the SD card.
+    - Max files
+    - File circular buffer (oldest file gets re-written)
+- [ ] Auto-baud rate detection
+
+***************************************************************************************************************************************************
+
+Data logger V4:
+
+Behaviour: 
+- We want the system to work even without an RTC.
+- Let SD card be used by other things, not just SS?
+- New configurable setting: Timestamping can be switched on or off. This is configured in the CLI and retained on the SD card.
+
+Option 1:
+    The logfiles should have a name that gives away which logfile was written to last.
+        - The software can then parse the file names to get the last file.
+        - This decouples the file naming from the RTC where in future if we want the system to work even if RTC power dies, it will work
+        - Example: sslog000.txt, sslog001.txt, sslog002.txt ... sslog999.txt
+        - Need an abstraction for the SD card storage itself where it knows which files are there, which configs etc?
+
+***************************************************************************************************************************************************
+
+Notes:
+    - Where the log files are stored on the SD card: currently it's stored in root
+        - abstractions:
+            - which log file to write to
+                - naming convention of log file: random? sequential?
+            - directory of log file
