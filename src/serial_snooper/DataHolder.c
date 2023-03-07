@@ -2,6 +2,7 @@
 #include "MyCircularBuffer.h"
 #include "MyTimeString.h"
 #include "MySD.h"
+#include "FileNameIterator.h"
 
 uint8_t DH_IsThereNewData(void)
 {
@@ -15,7 +16,10 @@ uint8_t DH_GetLatestData(void)
 
 const char* DH_GetFileName(void)
 {
-    return MyTimeString_GetFileName();
+    static char fileName[12];
+    FileNameIterator_next();
+    FileNameIterator_getName(fileName, 12);
+    return fileName;
 }
 
 const char* DH_GetTimestampString(void)

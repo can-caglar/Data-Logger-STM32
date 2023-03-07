@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "DataHolder.h"
 
+#include "FileNameIterator.h"
 #include "MyCircularBuffer.h"
 #include "mock_stm32f3xx_hal.h"
 #include "mock_MyTimeString.h"
@@ -34,13 +35,16 @@ void test_getLatestDataReturnsAndPopsTheOldestDataInCircBuf(void)
     TEST_ASSERT_EQUAL_CHAR('c', DH_GetLatestData());
 }
 
-void test_getFilenameDelegatesToMyTimeString(void)
+void test_getFilenameDelegatesToMyTimeStringGetNewNameEachTime(void)
 {
     const char* fileName = "filename.txt";
+    const char* fileName2 = "file2.txt";
 
     MyTimeString_GetFileName_ExpectAndReturn(fileName);
+    MyTimeString_GetFileName_ExpectAndReturn(fileName2);
 
     TEST_ASSERT_EQUAL_STRING(fileName, DH_GetFileName());
+    TEST_ASSERT_EQUAL_STRING(fileName2, DH_GetFileName());
 }
 
 void test_getFileStampStringDelegatesToMyTimeString(void)
