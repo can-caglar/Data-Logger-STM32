@@ -2,6 +2,7 @@
 #include "MySD.h"
 #include "stm32f3xx_hal.h"
 #include "DataHolder.h"
+#include "FileNameIterator.h"
 
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)
@@ -17,6 +18,8 @@ int SystemOperations_Init(void)
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
     bAFileIsOpen = 0;
+
+    FileNameIterator_init();
 
     return SO_SUCCESS;
 }   

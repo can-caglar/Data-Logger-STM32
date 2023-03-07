@@ -16,9 +16,9 @@ uint8_t DH_GetLatestData(void)
 
 const char* DH_GetFileName(void)
 {
-    static char fileName[12];
+    static char fileName[MAX_FILE_NAME];
     FileNameIterator_next();
-    FileNameIterator_getName(fileName, 12);
+    FileNameIterator_getName(fileName, MAX_FILE_NAME);
     return fileName;
 }
 

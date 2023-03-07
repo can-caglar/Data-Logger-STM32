@@ -1,15 +1,12 @@
 #include "unity.h"
 #include "SystemOperations.h"
-// #include "mock_MySD.h"
-// #include "mock_MyTimeString.h"
 #include "mock_stm32f3xx_hal.h"
-//#include "mock_MyCircularBuffer.h"
-//#include "fake_DataHolder.h"
 
 #include "fake_SDCard.h"
 #include "fake_myTimeString.h"
 #include "MyCircularBuffer.h"
 #include "DataHolder.h"
+#include "FileNameIterator.h"
 
 #include <string.h>
 
@@ -32,8 +29,6 @@ void setUp(void)
     MyCircularBuffer_init();
     // reset fake sd card module
     fake_SDCard_reset();
-    // init timestamp module
-    MyTimeString_Init();
 }
 
 void tearDown(void)

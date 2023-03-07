@@ -5,9 +5,6 @@
 #include "MyScheduler.h"
 #include "SystemOperations.h"
 #include "main.h"
-// perhaps below should be in the other modules only
-#include "MyTimeString.h"
-
 
 // Ceedling has its own main function
 #ifndef TEST
@@ -37,7 +34,6 @@ int runApp(void)
         CubeMX_SystemInit(CMX_UART);
         MyScheduler_Init();
         SystemOperations_Init();
-        MyTimeString_Init();
         MyScheduler_AddTask(SystemOperations_OpenLogFile,
             0, true, true);
         MyScheduler_AddTask(SystemOperations_WriteSD, 

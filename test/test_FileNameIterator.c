@@ -23,7 +23,6 @@ void test_setUp(void)
 
 void test_FileNameGet(void)
 {
-
     // initialise
     fake_myTimeString_setFileName("abc");
     FileNameIterator_init();
@@ -54,7 +53,7 @@ void test_FileNameNext(void)
     fake_myTimeString_setFileName("def");
     FileNameIterator_next();
 
-    // call twice after init shall return same str
+    // should get new string
     FileNameIterator_getName(fileName, TEST_MAX_BUF_SIZE);
     TEST_ASSERT_EQUAL_STRING("def", fileName);
 }

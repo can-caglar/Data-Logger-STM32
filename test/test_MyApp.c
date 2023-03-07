@@ -12,6 +12,7 @@
 #include "SystemOperations.h"
 #include "DataHolder.h"
 #include "MyCircularBuffer.h"
+#include "FileNameIterator.h"
 
 #include <string.h>
 
@@ -47,12 +48,12 @@ void test_App_OpeningNewFiles(void)
     setUp_SerialSnooperAppTests();
 
     // set up file name
-    fake_myTimeString_setFileName("somenewfile.txt");
+    fake_myTimeString_setFileName("newfile.txt");
 
     // First time running, open new file
     runApp();
 
-    TEST_ASSERT_EQUAL_STRING("somenewfile.txt", fake_SDCard_getOpenFileName());
+    TEST_ASSERT_EQUAL_STRING("newfile.txt", fake_SDCard_getOpenFileName());
     TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
 }
 
