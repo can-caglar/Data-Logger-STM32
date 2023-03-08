@@ -10,5 +10,6 @@ FRESULT MySD_WriteString(const char* buf);
 FRESULT MySD_Write(const uint8_t* buf, uint32_t len);
 FRESULT MySD_Flush(void);
 FSIZE_t MySD_getOpenedFileSize(void);
+FRESULT MySD_Read(uint8_t* buf, uint32_t len);
 
 #endif

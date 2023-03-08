@@ -37,9 +37,10 @@ void tearDown(void)
     fake_myTimeString_reset();
 }
 
-void test_successInit(void)
+void test_successInit_getsDataFromSD(void)
 {
-    successfulInit();
+    int res = SystemOperations_Init();
+    TEST_ASSERT_EQUAL(SO_SUCCESS, res);
 }
 
 void test_WriteSD_DoesNotWriteIfSDCardNotInitialised(void)
@@ -241,6 +242,13 @@ void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
     SystemOperations_OpenLogFile();
     TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
 }
+
+// void test_InitWillGetConfigsFromSD(void)
+// {
+//     SystemOperations_Init();
+
+//     //TEST_ASSERT_EQUAL_STRING(".ssdata", fake_SDCard_getOpenFileName());
+// }
 
 // Helper functions
 

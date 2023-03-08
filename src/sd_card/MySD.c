@@ -5,7 +5,7 @@
 
 static FATFS FatFs; // fats handle
 static FIL file; // fats handle
-static const BYTE writeMode = FA_WRITE | FA_OPEN_APPEND;
+static const BYTE writeMode = FA_WRITE | FA_READ | FA_OPEN_APPEND;
 static uint8_t mounted;
 
 FRESULT MySD_Init(const char* filename)
@@ -39,6 +39,8 @@ void MySD_Close(void)
     f_close(&file);
     f_mount(NULL, "", 0);
 
+    memset(&file, 0, sizeof(file));
+
     // Clear state variables
     mounted = 0;
 }
@@ -70,4 +72,11 @@ FRESULT MySD_Flush(void)
 FSIZE_t MySD_getOpenedFileSize(void)
 {
     return f_size(&file);
+}
+
+FRESULT MySD_Read(uint8_t* buf, uint32_t len)
+{
+    unsigned int bytesRead = 0;
+    FRESULT err = f_read(&file, buf, len, &bytesRead);
+    return err;
 }

@@ -10,14 +10,14 @@
 static uint8_t previousData;
 static uint32_t lastTimeFlushed;
 static uint8_t status;
-static uint8_t bAFileIsOpen = 0;
+static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
-    bAFileIsOpen = 0;
+    bLogFileIsOpen = 0;
 
     FileNameIterator_init();
 
@@ -36,7 +36,7 @@ void SystemOperations_OpenLogFile(void)
     // open new file earlier if system has no new data to handle
     uint8_t bOpenNewFileEarly = (bLowerBoundaryFileSizeReached && !bThereIsNewDataToHandle);
     // or open a file if none is open
-    if (!bAFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
+    if (!bLogFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
     {
         // get new file name
         const char* fileName = DH_GetFileName();
@@ -46,11 +46,11 @@ void SystemOperations_OpenLogFile(void)
 
         if (err == FR_OK)
         {
-            bAFileIsOpen = 1;
+            bLogFileIsOpen = 1;
         }
         else
         {
-            bAFileIsOpen = 0;
+            bLogFileIsOpen = 0;
         }
     }
 }

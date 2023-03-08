@@ -63,6 +63,7 @@ int fake_SDCard_totalNumOfFilesOpened(void)
 
 FRESULT MySD_Init(const char* filename)
 {
+    MY_LOG("FakeSDCard MySD_Init called\n");
     if (toReturn == FR_OK)
     {
         numFilesOpen = 1;
@@ -127,4 +128,24 @@ FSIZE_t MySD_getOpenedFileSize(void)
 void fake_SDCard_toReturn(FRESULT newResult)
 {
     toReturn = newResult;
+}
+
+FRESULT MySD_Read(uint8_t* buf, uint32_t len)
+{
+    if (toReturn == FR_OK)
+    {
+        if (numFilesOpen == 1)
+        {
+            memcpy(buf, sdCardActualData, len);
+        }
+    }
+    return toReturn;
+}
+
+// Writes to the fake file directly, bypassing the init, write, flush requirement
+// Recommended to reset module before and after use!
+void fake_SDCard_helperWriteFileData(const char* str, unsigned int len)
+{
+    //memset(sdCardActualData, 0, sizeof(sdCardActualData));
+    strncpy(sdCardActualData, str, len);
 }

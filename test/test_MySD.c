@@ -4,7 +4,7 @@
 #include "string.h"
 #include "mock_LED.h"
 
-// TODO: refactor tests
+static const BYTE g_Mode = FA_WRITE | FA_READ | FA_OPEN_APPEND;
 
 void setUp(void)
 {
@@ -22,10 +22,9 @@ void test_init_sd_when_all_ok(void)
 {
     FATFS FatFs = { 0 };
     FIL file = { 0 };
-    BYTE mode = FA_WRITE | FA_OPEN_APPEND;
 
     f_mount_ExpectAndReturn(&FatFs, "", 1, FR_OK);
-    f_open_ExpectAndReturn(&file, "testFile.txt", mode, FR_OK);
+    f_open_ExpectAndReturn(&file, "testFile.txt", g_Mode, FR_OK);
     led_init_Expect();
     led_on_Expect();
 
@@ -50,10 +49,9 @@ void test_init_sd_when_open_fails(void)
 {
     FATFS FatFs = { 0 };
     FIL file = { 0 };
-    BYTE mode = FA_WRITE | FA_OPEN_APPEND;
 
     f_mount_ExpectAndReturn(&FatFs, "", 1, FR_OK);
-    f_open_ExpectAndReturn(&file, "testFile.txt", mode, FR_NOT_READY);
+    f_open_ExpectAndReturn(&file, "testFile.txt", g_Mode, FR_NOT_READY);
 
     FRESULT err = MySD_Init("testFile.txt");
 
@@ -63,7 +61,6 @@ void test_init_sd_when_open_fails(void)
 void test_init_sd_twice_closes_file_opens_another(void)
 {
     FIL file = { 0 };
-    BYTE mode = FA_WRITE | FA_OPEN_APPEND;
 
     // The first call:
     f_mount_IgnoreAndReturn(FR_OK);
@@ -78,7 +75,7 @@ void test_init_sd_twice_closes_file_opens_another(void)
 
     // The second call:
     f_close_ExpectAndReturn(&file, FR_OK);
-    f_open_ExpectAndReturn(&file, "testFile2.txt", mode, FR_OK);
+    f_open_ExpectAndReturn(&file, "testFile2.txt", g_Mode, FR_OK);
     
     FRESULT err = MySD_Init("testFile2.txt");
 
@@ -164,11 +161,10 @@ void test_mysd_size(void)
     FIL fileWithSize = { 0 };   
     fileWithSize.obj.objsize = 33;
 
-    BYTE mode = FA_WRITE | FA_OPEN_APPEND;
 
     f_mount_IgnoreAndReturn(0);
     f_open_ExpectAndReturn(&file, 
-        "filename", mode, FR_OK);
+        "filename", g_Mode, FR_OK);
     // here's the hack, the encapsulated file will now
     // have a size of 33
     f_open_ReturnMemThruPtr_fp(&fileWithSize, sizeof(FIL));
@@ -180,6 +176,19 @@ void test_mysd_size(void)
     FSIZE_t size = MySD_getOpenedFileSize();
 
     TEST_ASSERT_EQUAL(33, size);
+}
+
+void test_read_ok(void)
+{
+    const uint8_t buflen = 6;
+    FIL file = { 0 };
+    char buf[6] = {0, 5, 6, 7, 8, 1};
+    unsigned int bytesRead = 0;
+
+    f_read_ExpectAndReturn(&file, buf, buflen, &bytesRead, FR_OK);
+
+    FRESULT err = MySD_Read(buf, buflen);
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
 }
 
 /*

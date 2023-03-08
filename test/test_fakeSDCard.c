@@ -291,6 +291,65 @@ void test_FileSizeIncrementOnlyAfterFlush(void)
     TEST_ASSERT_EQUAL_INT(2, MySD_getOpenedFileSize());
 }
 
+void test_ReadOnceFromSDReadsFromCard(void)
+{
+    char buf[10];
+
+    MySD_Init("file.txt");
+    MySD_WriteString("hi");
+    MySD_Flush();
+
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Read(buf, 10));
+
+    TEST_ASSERT_EQUAL_STRING("hi", buf);
+}
+
+void test_HelperFunctionToPutDataInSDCardAsIfItWasWrittenThereFromBefore(void)
+{
+    char buf[10] = {0};
+    const char* myStr = "hello";    // force write
+
+    // initially reads nothing
+    MySD_Init("file.txt");
+    MySD_Read(buf, 10);
+    TEST_ASSERT_EQUAL_STRING("", buf);
+
+    fake_SDCard_helperWriteFileData(myStr, strlen(myStr));
+
+    // reading it back, as though the file had this data already
+    MySD_Init("file.txt");
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Read(buf, 10));
+
+    TEST_ASSERT_EQUAL_STRING(myStr, buf);
+}
+
+void test_readWontReadIfError(void)
+{
+    char buf[10] = { 0 };
+
+    fake_SDCard_helperWriteFileData("hi", 3);
+
+    fake_SDCard_toReturn(FR_DISK_ERR);
+
+    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, MySD_Read(buf, 10));
+
+    TEST_ASSERT_EQUAL_STRING("", buf);
+}
+
+void test_readFromNonOpenFileDoesNothing(void)
+{
+    char buf[10] = { 0 };
+
+    // no init on purpose
+
+    fake_SDCard_helperWriteFileData("hi", 3);
+
+    MySD_Read(buf, 10);
+
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Read(buf, 10));
+
+    TEST_ASSERT_EQUAL_STRING("", buf);
+}
 
 /* 
 The fake SD module shall hold an internal state

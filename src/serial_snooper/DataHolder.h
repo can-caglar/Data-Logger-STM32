@@ -4,9 +4,8 @@
 #include <stdint.h>
 
 // Encapsulates the system information
-// needed for the serial snooper.
+// that is needed for the serial snooper.
 
-// uint32_t DH_GetTime(void); not encapsualting this, not directly relevant to data being logged
 uint8_t DH_IsThereNewData(void);
 uint8_t DH_GetLatestData(void);
 const char* DH_GetFileName(void);
