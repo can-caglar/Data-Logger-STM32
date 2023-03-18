@@ -2,7 +2,6 @@
 #include "MyTimeString.h"
 #include <string.h>
 
-static uint8_t bIsTimeStringInitialised = 0;
 static char fileName[MAX_FILE_NAME];    
 
 void FileNameIterator_init(void)

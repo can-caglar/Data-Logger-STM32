@@ -21,6 +21,12 @@ void test_setUp(void)
     resetFileNameForTest();
 }
 
+void test_fileSize(void)
+{
+    // 8.3 file name type with null ptr
+    TEST_ASSERT_EQUAL_INT(13, MAX_FILE_NAME);
+}
+
 void test_FileNameGet(void)
 {
     // initialise

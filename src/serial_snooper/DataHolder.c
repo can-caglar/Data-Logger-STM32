@@ -3,6 +3,7 @@
 #include "MyTimeString.h"
 #include "MySD.h"
 #include "FileNameIterator.h"
+#include <string.h>
 
 uint8_t DH_IsThereNewData(void)
 {
@@ -17,6 +18,7 @@ uint8_t DH_GetLatestData(void)
 const char* DH_GetFileName(void)
 {
     static char fileName[MAX_FILE_NAME];
+    memset(fileName, 0, MAX_FILE_NAME);
     FileNameIterator_next();
     FileNameIterator_getName(fileName, MAX_FILE_NAME);
     return fileName;

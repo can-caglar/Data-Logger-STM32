@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // 8.3 standard + null terminate
-#define MAX_FILE_NAME   12
+#define MAX_FILE_NAME   13
 
 void FileNameIterator_init(void);
 void FileNameIterator_getName(char* str, uint8_t maxSize);

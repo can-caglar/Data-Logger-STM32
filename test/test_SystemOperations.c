@@ -12,7 +12,6 @@
 
 #define TEST_TIMESTAMP "[Timestamp]"
 
-static void successfulInit(void);
 static void expectToOpenAFile(int withSuccessOrFailure);
 static void setNewHALTime(uint32_t newTime);  // TODO, test what happens when overflows
 static void circBufWriteString(const char* str);
@@ -23,7 +22,9 @@ static void inputStream(const char* str);
 
 void setUp(void)
 {
+    // init just to reset internal variables
     SystemOperations_Init();
+    // then reset all fakes and lower level modules
     // Reset circular buffer
     MyCircularBuffer_close();
     MyCircularBuffer_init();
@@ -35,12 +36,6 @@ void tearDown(void)
 {
     MySD_Close();
     fake_myTimeString_reset();
-}
-
-void test_successInit_getsDataFromSD(void)
-{
-    int res = SystemOperations_Init();
-    TEST_ASSERT_EQUAL(SO_SUCCESS, res);
 }
 
 void test_WriteSD_DoesNotWriteIfSDCardNotInitialised(void)
@@ -243,21 +238,64 @@ void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
     TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
 }
 
-// void test_InitWillGetConfigsFromSD(void)
-// {
-//     SystemOperations_Init();
+void test_InitWillGetConfigsFromSD(void)
+{
+    const char* fname = "myFile.txt";
+    fake_SDCard_helperWriteFileData(fname, strlen(fname));
 
-//     //TEST_ASSERT_EQUAL_STRING(".ssdata", fake_SDCard_getOpenFileName());
-// }
+    SystemOperations_Init();
+
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("ssdata", fake_SDCard_getOpenFileName());
+
+    // first file opened
+    SystemOperations_OpenLogFile();
+
+    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("myFile.txt", fake_SDCard_getOpenFileName());
+}
+
+void test_InitWillGetDefaultsIfConfigsFromSDCorrupt(void)
+{
+    // prepare fake returns
+    const char* fname = "myFile.txt";
+    fake_SDCard_helperWriteFileData(fname, strlen(fname));
+    fake_SDCard_toReturn(FR_DISK_ERR);
+    fake_myTimeString_setFileName("timestr");
+
+    SystemOperations_Init();
+
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
+
+    // first file opened
+    fake_SDCard_toReturn(FR_OK);
+    SystemOperations_OpenLogFile();
+
+    TEST_ASSERT_EQUAL_STRING("timestr", fake_SDCard_getOpenFileName());
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+}
+
+void test_OpeningFilesSavesFileNameToSD(void)
+{
+    TEST_IGNORE();
+
+    fake_myTimeString_setFileName("timestr");
+
+    SystemOperations_Init();
+
+    const char* onSdCard = fake_SDCard_getFileData();
+
+    TEST_ASSERT_EQUAL_STRING("", onSdCard);
+
+    SystemOperations_OpenLogFile();
+
+    onSdCard = fake_SDCard_getFileData();
+
+    TEST_ASSERT_EQUAL_STRING("timestr", onSdCard);
+}
 
 // Helper functions
-
-
-void successfulInit(void)
-{
-    int res = SystemOperations_Init();
-    TEST_ASSERT_EQUAL(SO_SUCCESS, res);
-}
 
 static void setNewHALTime(uint32_t newTime)
 {

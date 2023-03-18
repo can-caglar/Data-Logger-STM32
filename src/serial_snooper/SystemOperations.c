@@ -3,6 +3,8 @@
 #include "stm32f3xx_hal.h"
 #include "DataHolder.h"
 #include "FileNameIterator.h"
+#include <string.h>
+#include <stdio.h>
 
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)
@@ -12,34 +14,38 @@ static uint32_t lastTimeFlushed;
 static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
+static char fileName[MAX_FILE_NAME];
+
+#define CONFIG_FILE_NAME    "ssdata"
 
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
     lastTimeFlushed = 0;
     bLogFileIsOpen = 0;
-
+    memset(fileName, 0, sizeof(fileName));
     FileNameIterator_init();
+    MySD_Init(CONFIG_FILE_NAME);
+    MySD_Read((uint8_t*)fileName, MAX_FILE_NAME);
 
     return SO_SUCCESS;
 }   
 
 void SystemOperations_OpenLogFile(void)
 {
-    // get size of file
     uint32_t dataSize = DH_GetOpenedFileSize();
-    // find out if we have data to handle
     uint8_t bThereIsNewDataToHandle = DH_IsThereNewData();
-    // open new file if the current one is too large
     uint8_t bMaxFileSizeReached = (dataSize >= MAX_FILE_SIZE);
     uint8_t bLowerBoundaryFileSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
-    // open new file earlier if system has no new data to handle
     uint8_t bOpenNewFileEarly = (bLowerBoundaryFileSizeReached && !bThereIsNewDataToHandle);
-    // or open a file if none is open
+    
     if (!bLogFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
     {
-        // get new file name
-        const char* fileName = DH_GetFileName();
+        if (bLogFileIsOpen || (fileName[0] == '\0'))
+        {
+            // generate a new file name
+            strncpy(fileName, DH_GetFileName(), MAX_FILE_NAME);
+        }
 
         // open file
         FRESULT err = MySD_Init(fileName);

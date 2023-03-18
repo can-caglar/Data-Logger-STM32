@@ -16,10 +16,13 @@
 
 #include <string.h>
 
+#define MIN_FILES_OPENED 2
+
 // Helpers
 void expectMySchedulerInitHelper(void);
 void setUp_SerialSnooperAppTests(void);
 void streamNewData(char* data);
+void fillDataBuffer(unsigned int amount);
 
 /* Tests for the CLI App */
 
@@ -101,7 +104,7 @@ void test_App_ShallWriteAllDataToSDAsLongAsItIsFlushing(void)
         fake_SDCard_getFileData());
 }
 
-void test_App_ShallOpenOneFileOnlyIfNoNewData(void)
+void test_App_OpensOneFileToReadAndOneToWrite(void)
 {
     setUp_SerialSnooperAppTests();
     
@@ -109,7 +112,7 @@ void test_App_ShallOpenOneFileOnlyIfNoNewData(void)
 
     runApp();
 
-    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED, fake_SDCard_totalNumOfFilesOpened());
 }
 
 void test_App_ShallOpenANewFileAfterUpperLimitWhenData(void)
@@ -118,31 +121,40 @@ void test_App_ShallOpenANewFileAfterUpperLimitWhenData(void)
     
     LOOP_COUNT(MAX_FILE_SIZE + 10); // configure to run some amount of times
 
-    for (int i = 0; i < MAX_FILE_SIZE; i++)
-    {
-        streamNewData("b");
-    }
+    fillDataBuffer(MAX_FILE_SIZE);
+
     runApp();
 
-    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED + 1, fake_SDCard_totalNumOfFilesOpened());
 }
 
 void test_App_ShallOpenANewFileAfterLowerLimitWhenNoData(void)
 {
     setUp_SerialSnooperAppTests();
     
-    // loop "upper limit" amount of times for creating a new file
     LOOP_COUNT(MAX_FILE_SIZE + 10); // configure to run some amount of times
 
-    // fill up data up to lower limit only
-    for (int i = 0; i < FILE_SIZE_LOWER_THRESHOLD; i++)
-    {
-        streamNewData("b");
-    }
+    fillDataBuffer(FILE_SIZE_LOWER_THRESHOLD);
 
     runApp();
 
-    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED + 1, fake_SDCard_totalNumOfFilesOpened());
+}
+
+void test_firstFileOpenedIsOneReadFromSDCard(void)
+{
+    setUp_SerialSnooperAppTests();
+
+    fake_myTimeString_setFileName("ABC");
+    fake_SDCard_helperWriteFileData("prevFile", 9);
+
+    LOOP_COUNT(10); // configure to run some amount of times
+
+    runApp();
+
+    const char* name = fake_SDCard_getOpenFileName();
+
+    TEST_ASSERT_EQUAL_STRING("prevFile", name);
 }
 
 /*********** Helpers ***********/
@@ -177,6 +189,15 @@ void streamNewData(char* data)
     {
         MyCircularBuffer_write(*data);
         data++;
+    }
+}
+
+void fillDataBuffer(unsigned int amount)
+{
+    // fill up data up to lower limit only
+    for (int i = 0; i < amount; i++)
+    {
+        streamNewData("b");
     }
 }
 
