@@ -16,6 +16,22 @@
         "functional": "c",
         "mock_myterminaluart.h": "c",
         "xutility": "c",
-        "mock_mycircularbuffer.h": "c"
+        "mock_mycircularbuffer.h": "c",
+        "typeinfo": "c",
+        "cctype": "c",
+        "cfloat": "c",
+        "climits": "c",
+        "cmath": "c",
+        "cstdarg": "c",
+        "cstdint": "c",
+        "cstdio": "c",
+        "cstdlib": "c",
+        "cstring": "c",
+        "cwchar": "c",
+        "exception": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "initializer_list": "c",
+        "*.tcc": "c"
     }
 }
