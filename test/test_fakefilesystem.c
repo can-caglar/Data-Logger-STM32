@@ -29,7 +29,7 @@ void test_fileIsOpenOnceOpened(void)
     TEST_ASSERT_TRUE(fakefilesystem_isOpen("file"));
 }
 
-void test_fileIsClosedOnceClosed(void)
+void test_fileIsNotOpenOnceClosed(void)
 {
     fakefilesystem_openFile("file");
     
@@ -38,14 +38,27 @@ void test_fileIsClosedOnceClosed(void)
     TEST_ASSERT_FALSE(fakefilesystem_isOpen("file"));
 }
 
-void test_multipleFilesCanBeOpened(void)
+void test_queryMultipleFilesCanBeOpened(void)
+{
+    fakefilesystem_openFile("fileOpen1");
+    fakefilesystem_openFile("fileOpen2");
+    fakefilesystem_openFile("fileOpen3");
+
+    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen1"));
+    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen2"));
+    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen3"));
+}
+
+void test_queryMultipleFilesCanBeClosed(void)
 {
     fakefilesystem_openFile("fileOpen1");
     fakefilesystem_openFile("fileOpen2");
 
-    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen1"));
-    //TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen2"));
-    //TEST_ASSERT_FALSE(fakefilesystem_isOpen("file2"));
+    fakefilesystem_closeFile("fileOpen1");
+    TEST_ASSERT_FALSE(fakefilesystem_isOpen("fileOpen1"));
+
+    fakefilesystem_closeFile("fileOpen2");
+    TEST_ASSERT_FALSE(fakefilesystem_isOpen("fileOpen2"));
 }
 
 /*

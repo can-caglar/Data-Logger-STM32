@@ -29,8 +29,7 @@ InternalState_t internalState;
 
 /* Private functions */
 File_t* findFile(char* fileName);
-void openFile(char* fileName);
-void closeFile(File_t* fileName);
+File_t* findEmptyFileSlot(void);
 
 /* Public function declarations */
 
@@ -41,7 +40,7 @@ void fakefilesystem_open(void)
 
 void fakefilesystem_close(void)
 {
-    
+    memset(&internalState, 0, sizeof(internalState));
 }
 
 int fakefilesystem_getsize(char* name)
@@ -61,43 +60,17 @@ int fakefilesystem_isOpen(char* fileName)
 
 void fakefilesystem_openFile(char* fileName)
 {
-    if (!fakefilesystem_isOpen(fileName))
-    {
-        openFile(fileName);
-    }
+    File_t* emptyFile = findEmptyFileSlot();
+    strncpy(emptyFile->name, fileName, MAX_FILENAME);
 }
 
 void fakefilesystem_closeFile(char* fileName)
 {
     File_t* file = findFile(fileName);
-    if (file)
-    {
-        closeFile(file);
-    }
+    memset(file->name, 0, MAX_FILENAME);
 }
 
 /* Private function definitions */
-
-void openFile(char* fileName)
-{
-    int index = 0;
-    // look for empty index
-    for (int i = 0; i < MAX_FILES; i++)
-    {
-        if (strcmp(internalState.files[i].name, "") == 0)
-        {
-            index = i;
-            break;
-        }
-    }
-    // write file name in index
-    strncpy(internalState.files[index].name, fileName, MAX_FILENAME);
-}
-
-void closeFile(File_t* file)
-{
-    memset(file->name, 0, MAX_FILENAME);
-}
 
 File_t* findFile(char* fileName)
 {
@@ -105,6 +78,20 @@ File_t* findFile(char* fileName)
     for (int i = 0; i < MAX_FILES; i++)
     {
         if (strcmp(fileName, internalState.files[i].name) == 0)
+        {
+            file = &internalState.files[i];
+            break;
+        }
+    }
+    return file;
+}
+
+File_t* findEmptyFileSlot(void)
+{
+    File_t* file = NULL;
+    for (int i = 0; i < MAX_FILES; i++)
+    {
+        if (strcmp(internalState.files[i].name, "") == 0)
         {
             file = &internalState.files[i];
             break;
