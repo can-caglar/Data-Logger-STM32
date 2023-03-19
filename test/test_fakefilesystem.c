@@ -130,19 +130,15 @@ void test_deletedFileLosesAllDataEvenAfterRecreated(void)
 
 
 /*
-- [ ] Want to have files that persist data
-    - [ ] Want to read data
-    - [ ] Want to write data
-- [ ] Files must be opened before writing or reading
-- [ ] Files are opened at index 0
-- [ ] File index can be changed:
-    - Begin: 0
-    - End: -1
-    - Val = num > 0
+- [...] Want to have files that persist data
+    - [...] Want to read data
+    - [...] Want to write data
+- [x] Files must be created before writing or reading
+- [x] Files will write from beginning
+- [x] Files will read from beginning
+- [ ] File will keep appending to end each write
 - [ ] Want to know size of file
-- [ ] Want to be able to write to any location in file
-- [ ] Want to be able to clear data in a file
-- [ ] Want to be able to get size of file
-- [ ] Want to have multiple files at same time
-- [ ] Files are to be known by their names
+- [x] Want to be able to delete file
+- [x] Want to have multiple files at same time
+- [x] Files are to be known by their names
 */
