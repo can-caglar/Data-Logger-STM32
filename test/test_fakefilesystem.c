@@ -61,18 +61,47 @@ void test_queryMultipleFilesCanBeClosed(void)
     TEST_ASSERT_FALSE(fakefilesystem_isOpen("fileOpen2"));
 }
 
-/*
-void test_sizeOfFileIncrementsOnlyWhenItsOpen(void)
+void test_openFileHasNoDataToBeginWithAfterInit(void)
 {
-    fakefilesystem_writeTo("file", "abc");
+    fakefilesystem_openFile("file");
 
-    TEST_ASSERT_EQUAL_INT(0, fakefilesystem_getsize("file"));
-
-    fakefilesystem_open("file", 0);
-
-    //TEST_ASSERT_EQUAL_INT(strlen("abc"), fakefilesystem_getsize("file"));
+    const char* fileData = fakefilesystem_readfile("file");
+    
+    TEST_ASSERT_EQUAL_STRING("", fileData);
 }
-*/
+
+void test_readingAClosedFileReturnsNULL(void)
+{
+    fakefilesystem_openFile("file");
+
+    fakefilesystem_closeFile("file");
+
+    const char* fileData = fakefilesystem_readfile("file");
+
+    TEST_ASSERT_EQUAL(NULL, fileData);
+}
+
+void test_dataWrittenToFileCanBeReadBackExactly(void)
+{
+    fakefilesystem_openFile("file");
+
+    fakefilesystem_writeFile("file", "hey");
+
+    const char* fileData = fakefilesystem_readfile("file");
+
+    TEST_ASSERT_EQUAL_STRING("hey", fileData);
+}
+
+void test_writingAClosedFileDoesNothing(void)
+{
+    fakefilesystem_writeFile("file", "hey");
+
+    fakefilesystem_openFile("file");
+
+    const char* fileData = fakefilesystem_readfile("file");
+
+    TEST_ASSERT_EQUAL_STRING("", fileData);
+}
 
 /*
 - [ ] Want to have files that persist data

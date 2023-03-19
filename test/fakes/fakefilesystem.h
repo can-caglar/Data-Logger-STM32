@@ -5,9 +5,11 @@
 
 void fakefilesystem_open(void);
 void fakefilesystem_close(void);
-int fakefilesystem_getsize(char* fileName);
-int fakefilesystem_isOpen(char* fileName);
-void fakefilesystem_openFile(char* fileName);
-void fakefilesystem_closeFile(char* fileName);
+int fakefilesystem_getsize(const char* fileName);
+int fakefilesystem_isOpen(const char* fileName);
+void fakefilesystem_openFile(const char* fileName);
+void fakefilesystem_closeFile(const char* fileName);
+const char* fakefilesystem_readfile(const char* fileName);
+void fakefilesystem_writeFile(const char* fileName, const char* data);
 
 #endif

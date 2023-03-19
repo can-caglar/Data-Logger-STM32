@@ -13,11 +13,13 @@ typedef uint8_t bool;
 #endif
 
 #define MAX_FILENAME 13
+#define MAX_FILESIZE 50
 #define MAX_FILES   20
 
 typedef struct
 {
     char name[MAX_FILENAME];
+    char data[MAX_FILESIZE];
 } File_t;
 
 typedef struct
@@ -28,7 +30,7 @@ typedef struct
 InternalState_t internalState;
 
 /* Private functions */
-File_t* findFile(char* fileName);
+File_t* findFile(const char* fileName);
 File_t* findEmptyFileSlot(void);
 
 /* Public function declarations */
@@ -43,12 +45,12 @@ void fakefilesystem_close(void)
     memset(&internalState, 0, sizeof(internalState));
 }
 
-int fakefilesystem_getsize(char* name)
+int fakefilesystem_getsize(const char* name)
 {
     return 0;
 }
 
-int fakefilesystem_isOpen(char* fileName)
+int fakefilesystem_isOpen(const char* fileName)
 {
     bool isOpen = false;
     if (findFile(fileName))
@@ -58,21 +60,40 @@ int fakefilesystem_isOpen(char* fileName)
     return isOpen;
 }
 
-void fakefilesystem_openFile(char* fileName)
+void fakefilesystem_openFile(const char* fileName)
 {
-    File_t* emptyFile = findEmptyFileSlot();
-    strncpy(emptyFile->name, fileName, MAX_FILENAME);
+    File_t* fileSlot = findEmptyFileSlot();
+    strncpy(fileSlot->name, fileName, MAX_FILENAME);
 }
 
-void fakefilesystem_closeFile(char* fileName)
+void fakefilesystem_closeFile(const char* fileName)
 {
     File_t* file = findFile(fileName);
     memset(file->name, 0, MAX_FILENAME);
 }
 
+const char* fakefilesystem_readfile(const char* fileName)
+{
+    File_t* file;
+    if ( (file = findFile(fileName) ))
+    {
+        return file->data;
+    }
+    return NULL;
+}
+
+void fakefilesystem_writeFile(const char* fileName, const char* data)
+{
+    if (fakefilesystem_isOpen(fileName))
+    {
+        File_t* file = findFile(fileName);
+        strcpy(file->data, data);
+    }
+}
+
 /* Private function definitions */
 
-File_t* findFile(char* fileName)
+File_t* findFile(const char* fileName)
 {
     File_t* file = NULL;
     for (int i = 0; i < MAX_FILES; i++)
