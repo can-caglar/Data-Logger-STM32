@@ -50,26 +50,31 @@ int fakefilesystem_getsize(const char* name)
     return 0;
 }
 
-int fakefilesystem_isOpen(const char* fileName)
+int fakefilesystem_exists(const char* fileName)
 {
+    File_t* file = findFile(fileName);
     bool isOpen = false;
-    if (findFile(fileName))
+    if (file)
     {
         isOpen = true;
     }
     return isOpen;
 }
 
-void fakefilesystem_openFile(const char* fileName)
-{
-    File_t* fileSlot = findEmptyFileSlot();
-    strncpy(fileSlot->name, fileName, MAX_FILENAME);
-}
-
-void fakefilesystem_closeFile(const char* fileName)
+void fakefilesystem_createFile(const char* fileName)
 {
     File_t* file = findFile(fileName);
-    memset(file->name, 0, MAX_FILENAME);
+    if (file == NULL)
+    {
+        file = findEmptyFileSlot();
+    }
+    strncpy(file->name, fileName, MAX_FILENAME);
+}
+
+void fakefilesystem_deleteFile(const char* fileName)
+{
+    File_t* file = findFile(fileName);
+    memset(file, 0, sizeof(*file));
 }
 
 const char* fakefilesystem_readfile(const char* fileName)
@@ -84,7 +89,7 @@ const char* fakefilesystem_readfile(const char* fileName)
 
 void fakefilesystem_writeFile(const char* fileName, const char* data)
 {
-    if (fakefilesystem_isOpen(fileName))
+    if (fakefilesystem_exists(fileName))
     {
         File_t* file = findFile(fileName);
         strcpy(file->data, data);

@@ -17,64 +17,64 @@ void test_sizeOfFileThatDoesntExistIs0(void)
     TEST_ASSERT_EQUAL_INT(0, fakefilesystem_getsize("file"));
 }
 
-void test_fileIsNotOpenAfterInit(void)
+void test_fileDoesNotExistAfterInit(void)
 {
-    TEST_ASSERT_FALSE(fakefilesystem_isOpen("file"));
+    TEST_ASSERT_FALSE(fakefilesystem_exists("file"));
 }
 
-void test_fileIsOpenOnceOpened(void)
+void test_fileExistsOnceCreated(void)
 {
-    fakefilesystem_openFile("file");
+    fakefilesystem_createFile("file");
 
-    TEST_ASSERT_TRUE(fakefilesystem_isOpen("file"));
+    TEST_ASSERT_TRUE(fakefilesystem_exists("file"));
 }
 
-void test_fileIsNotOpenOnceClosed(void)
+void test_fileDoesNotExistOnceDeleted(void)
 {
-    fakefilesystem_openFile("file");
+    fakefilesystem_createFile("file");
     
-    fakefilesystem_closeFile("file");
+    fakefilesystem_deleteFile("file");
 
-    TEST_ASSERT_FALSE(fakefilesystem_isOpen("file"));
+    TEST_ASSERT_FALSE(fakefilesystem_exists("file"));
 }
 
-void test_queryMultipleFilesCanBeOpened(void)
+void test_queryMultipleFilesCanBeCreated(void)
 {
-    fakefilesystem_openFile("fileOpen1");
-    fakefilesystem_openFile("fileOpen2");
-    fakefilesystem_openFile("fileOpen3");
+    fakefilesystem_createFile("fileOpen1");
+    fakefilesystem_createFile("fileOpen2");
+    fakefilesystem_createFile("fileOpen3");
 
-    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen1"));
-    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen2"));
-    TEST_ASSERT_TRUE(fakefilesystem_isOpen("fileOpen3"));
+    TEST_ASSERT_TRUE(fakefilesystem_exists("fileOpen1"));
+    TEST_ASSERT_TRUE(fakefilesystem_exists("fileOpen2"));
+    TEST_ASSERT_TRUE(fakefilesystem_exists("fileOpen3"));
 }
 
-void test_queryMultipleFilesCanBeClosed(void)
+void test_queryMultipleFilesCanBeDeleted(void)
 {
-    fakefilesystem_openFile("fileOpen1");
-    fakefilesystem_openFile("fileOpen2");
+    fakefilesystem_createFile("fileOpen1");
+    fakefilesystem_createFile("fileOpen2");
 
-    fakefilesystem_closeFile("fileOpen1");
-    TEST_ASSERT_FALSE(fakefilesystem_isOpen("fileOpen1"));
+    fakefilesystem_deleteFile("fileOpen1");
+    TEST_ASSERT_FALSE(fakefilesystem_exists("fileOpen1"));
 
-    fakefilesystem_closeFile("fileOpen2");
-    TEST_ASSERT_FALSE(fakefilesystem_isOpen("fileOpen2"));
+    fakefilesystem_deleteFile("fileOpen2");
+    TEST_ASSERT_FALSE(fakefilesystem_exists("fileOpen2"));
 }
 
-void test_openFileHasNoDataToBeginWithAfterInit(void)
+void test_createdFileHasNoDataToBeginWithAfterInit(void)
 {
-    fakefilesystem_openFile("file");
+    fakefilesystem_createFile("file");
 
     const char* fileData = fakefilesystem_readfile("file");
     
     TEST_ASSERT_EQUAL_STRING("", fileData);
 }
 
-void test_readingAClosedFileReturnsNULL(void)
+void test_readingADeletedFileReturnsNULL(void)
 {
-    fakefilesystem_openFile("file");
+    fakefilesystem_createFile("file");
 
-    fakefilesystem_closeFile("file");
+    fakefilesystem_deleteFile("file");
 
     const char* fileData = fakefilesystem_readfile("file");
 
@@ -83,7 +83,7 @@ void test_readingAClosedFileReturnsNULL(void)
 
 void test_dataWrittenToFileCanBeReadBackExactly(void)
 {
-    fakefilesystem_openFile("file");
+    fakefilesystem_createFile("file");
 
     fakefilesystem_writeFile("file", "hey");
 
@@ -92,16 +92,42 @@ void test_dataWrittenToFileCanBeReadBackExactly(void)
     TEST_ASSERT_EQUAL_STRING("hey", fileData);
 }
 
-void test_writingAClosedFileDoesNothing(void)
+void test_writingToADeletedFileDoesNotWriteAnythingToIt(void)
 {
+    fakefilesystem_createFile("file");
     fakefilesystem_writeFile("file", "hey");
+    fakefilesystem_deleteFile("file");
 
-    fakefilesystem_openFile("file");
-
+    fakefilesystem_createFile("file");
     const char* fileData = fakefilesystem_readfile("file");
-
+    
     TEST_ASSERT_EQUAL_STRING("", fileData);
 }
+
+void test_createdFileOnlyHasToBeDeletedOnceToNotExist(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_createFile("file");
+
+    fakefilesystem_deleteFile("file");
+
+    TEST_ASSERT_FALSE(fakefilesystem_exists("file"));
+}
+
+void test_deletedFileLosesAllDataEvenAfterRecreated(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "hey");
+    const char* fileData = fakefilesystem_readfile("file");
+    TEST_ASSERT_EQUAL_STRING("hey", fileData);
+
+    fakefilesystem_deleteFile("file");
+    fakefilesystem_createFile("file");
+
+    fileData = fakefilesystem_readfile("file");
+    TEST_ASSERT_EQUAL_STRING("", fileData);
+}
+
 
 /*
 - [ ] Want to have files that persist data
