@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdint.h>
 
-/* Useful defines */
-
 typedef uint8_t bool;
 #ifndef true
 #define true 1
@@ -12,53 +10,46 @@ typedef uint8_t bool;
 #define false 0
 #endif
 
-#define MAX_FILENAME 13
-#define MAX_FILESIZE 50
-#define MAX_FILES   20
-
-typedef struct
+typedef struct File_t
 {
-    char name[MAX_FILENAME];
-    char data[MAX_FILESIZE];
+    char name[FFS_MAX_FILENAME];
+    char data[FFS_MAX_FILESIZE];
+    int fileSize;
 } File_t;
-
-typedef struct
+typedef struct InternalState_t
 {
-    File_t files[MAX_FILES];
+    File_t files[FFS_MAX_FILES];
 } InternalState_t;
 
-InternalState_t internalState;
+// Module variables
+static InternalState_t internalState;
 
 /* Private functions */
+
 File_t* findFile(const char* fileName);
 File_t* findEmptyFileSlot(void);
 
-/* Public function declarations */
+/* Public function definitions */
 
-void fakefilesystem_open(void)
-{
-    
-}
-
-void fakefilesystem_close(void)
+void fakefilesystem_reset(void)
 {
     memset(&internalState, 0, sizeof(internalState));
 }
 
-int fakefilesystem_getsize(const char* name)
+int fakefilesystem_fileExists(const char* fileName)
 {
-    return 0;
+    return findFile(fileName) != NULL;
 }
 
-int fakefilesystem_exists(const char* fileName)
+int fakefilesystem_fileSize(const char* name)
 {
-    File_t* file = findFile(fileName);
-    bool isOpen = false;
+    int size = 0;
+    File_t* file = findFile(name);
     if (file)
     {
-        isOpen = true;
+        size = file->fileSize;
     }
-    return isOpen;
+    return size;
 }
 
 void fakefilesystem_createFile(const char* fileName)
@@ -67,8 +58,8 @@ void fakefilesystem_createFile(const char* fileName)
     if (file == NULL)
     {
         file = findEmptyFileSlot();
+        strncpy(file->name, fileName, FFS_MAX_FILENAME);
     }
-    strncpy(file->name, fileName, MAX_FILENAME);
 }
 
 void fakefilesystem_deleteFile(const char* fileName)
@@ -79,8 +70,8 @@ void fakefilesystem_deleteFile(const char* fileName)
 
 const char* fakefilesystem_readfile(const char* fileName)
 {
-    File_t* file;
-    if ( (file = findFile(fileName) ))
+    File_t* file = findFile(fileName);
+    if (file)
     {
         return file->data;
     }
@@ -89,10 +80,12 @@ const char* fakefilesystem_readfile(const char* fileName)
 
 void fakefilesystem_writeFile(const char* fileName, const char* data)
 {
-    if (fakefilesystem_exists(fileName))
+    File_t* file = findFile(fileName);
+    if (file != NULL)
     {
-        File_t* file = findFile(fileName);
-        strcpy(file->data, data);
+        char* writeIndex = file->data + file->fileSize;
+        strcpy(writeIndex, data);
+        file->fileSize = strlen(file->data);
     }
 }
 
@@ -101,7 +94,7 @@ void fakefilesystem_writeFile(const char* fileName, const char* data)
 File_t* findFile(const char* fileName)
 {
     File_t* file = NULL;
-    for (int i = 0; i < MAX_FILES; i++)
+    for (int i = 0; i < FFS_MAX_FILES; i++)
     {
         if (strcmp(fileName, internalState.files[i].name) == 0)
         {
@@ -115,7 +108,7 @@ File_t* findFile(const char* fileName)
 File_t* findEmptyFileSlot(void)
 {
     File_t* file = NULL;
-    for (int i = 0; i < MAX_FILES; i++)
+    for (int i = 0; i < FFS_MAX_FILES; i++)
     {
         if (strcmp(internalState.files[i].name, "") == 0)
         {
