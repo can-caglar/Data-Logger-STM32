@@ -82,3 +82,5 @@
 *.pass
 *.out
 build/test/*
+build/artifacts/*
+build/gcov/*

@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "fakefilesystem.h"
 #include <string.h>
+#include <stdio.h>
 
 void setUp(void)
 {
