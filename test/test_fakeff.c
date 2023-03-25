@@ -110,6 +110,30 @@ void test_OpenFileISWrittenToWhenWriteOptionIsEnabled(void)
     TEST_ASSERT_EQUAL_STRING("ab", myBuffRead);
 }
 
+void test_openingSameFileTwiceReturnsError(void)
+{
+    // not sure exactly how fatfs handles this,
+    // but we won't allow it
+    TEST_IGNORE();
+}
+
+void test_writingTwiceToSameFile(void)
+{
+    TEST_IGNORE();
+}
+
+void test_writingToTwoFilesOpenAtSameTime(void)
+{
+    TEST_IGNORE();
+}
+
+void test_writingVeryLongMessageToFile(void)
+{
+    TEST_IGNORE();
+}
+
+
+
 /*
 Fake FatFS module
     Simulate the FATFS module make it easy to 
@@ -129,6 +153,7 @@ FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode); // Open or create a file
 - [x] Return error if invalid path. FR_INVALID_DRIVE
 - [x] Return success if non-null fp passed in
 - [x] Return success if valid file path
+- [ ] Opening same file twice
 
 FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br);			// Read data from the file
 - [ ] Reading a file before it is opened returns FR_NOT_OPENED

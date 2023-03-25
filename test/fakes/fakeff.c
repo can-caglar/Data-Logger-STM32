@@ -1,18 +1,25 @@
 #include "fakeff.h"
 #include <string.h>
 #include "fakefilesystem.h"
+#include "stdlib.h"
+
+typedef struct FakeFile_t
+{
+    FIL* fp;
+    char internalBuffer[200];
+    int bufCount;
+    char filename[20];
+} FakeFile_t;
 
 static struct
 {
     int mounted;
-    char internalBuffer[200];
-    int bufCount;
-    char filename[20];
 } internalState;
 
 void fakeff_reset(void)
 {
     memset(&internalState, 0, sizeof(internalState));
+    fakefilesystem_reset();
 }
 
 FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode)
@@ -33,8 +40,11 @@ FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode)
     if (ret == FR_OK)
     {
         fp->flag = mode;
-        strcpy(internalState.filename, path);
-        fakefilesystem_createFile(path);
+        // create a new file object
+        FakeFile_t* thisFile = calloc(1, sizeof(FakeFile_t));
+        fp->obj.fs = (FATFS*)thisFile;
+        strcpy(thisFile->filename, path);
+        fakefilesystem_createFile(thisFile->filename);
     }
     return ret;
 }
@@ -50,7 +60,8 @@ FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw)
     if (fp->flag & FA_WRITE)
     {
         *bw = btw;
-        strncpy(internalState.internalBuffer,
+        FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
+        strncpy(thisFile->internalBuffer,
             buff, btw);
         return FR_OK;
     }
@@ -59,7 +70,8 @@ FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw)
 
 FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br)
 {
-    const char* data = fakefilesystem_readfile(internalState.filename);
+    FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
+    const char* data = fakefilesystem_readfile(thisFile->filename);
     strncpy(buff, data, btr);
     *br = btr;
     return FR_OK;
@@ -67,7 +79,8 @@ FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br)
 
 FRESULT f_sync (FIL* fp)
 {
-    fakefilesystem_writeFile(internalState.filename,
-        internalState.internalBuffer);
+    FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
+    fakefilesystem_writeFile(thisFile->filename,
+        thisFile->internalBuffer);
     return FR_OK;
 }
