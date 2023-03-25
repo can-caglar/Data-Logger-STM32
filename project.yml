@@ -106,6 +106,8 @@
   :test: []
   :release: []
 
+# ceedling test:all gcov:all utils:gcov
+# gcov myfile.c -c -b -o build/gcov/out
 :plugins:
   :load_paths:
     - "#{Ceedling.load_path}"

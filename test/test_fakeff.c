@@ -2,154 +2,160 @@
 #include "fakeff.h"
 #include <string.h>
 
+// included only to make ceedling compile this dependency
+// do not use in tests to prevent tests coupling to fakefilesystem internals
+#include "fakefilesystem.h"
+
+#define DONT_CARE   0
+
 void setUp(void)
 {
-    fakeff_init();
+    fakeff_reset();
 }
 
 void tearDown(void)
 {
-    fakeff_destroy();
 }
 
-// Helper functions
-static FRESULT helper_failToOpenFile(void);
-
-void test_OpeningFileWithNULLReturnsError(void)
+void test_openReturnsErrorIfNotMounted(void)
 {
-    FRESULT result = helper_failToOpenFile();
-
-    TEST_ASSERT_EQUAL(FR_INVALID_PARAMETER, result);
+    FIL myFile;
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE, f_open(&myFile, "0:", FA_READ));
 }
 
-void test_OpeningFileWithProperFilePointerReturnsSuccess(void)
+void test_openReturnsErrorIfMountedButNULLFilePointerPassedIn(void)
 {
-    FIL file;
-    FRESULT result = f_open(&file, "", FA_WRITE);
-    TEST_ASSERT_EQUAL(FR_OK, result);
+    FATFS fatfs;
+    TEST_ASSERT_EQUAL_INT(FR_OK, f_mount(&fatfs, "0:", DONT_CARE));
+
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(NULL, "path", FA_READ));
 }
 
-void test_AfterInitAllDataIsZero(void)
+void test_openReturnsErrorIfMountedAndValidFilePointerButNULLPath(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, fakeff_numFilesOpen());
+    FATFS fatfs;
+    FIL myFile;
+    f_mount(&fatfs, "0:", DONT_CARE);
+
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(&myFile, NULL, FA_READ));
 }
 
-void test_FilesOpenIncreasesByOneWhenAFileIsOpened(void)
+void test_openReturnsErrorIfMountedAndValidFilePointerButBadPath(void)
 {
-    FIL file;
+    FATFS fatfs;
+    FIL myFile;
+    f_mount(&fatfs, "0:", DONT_CARE);
 
-    f_open(&file, "", FA_WRITE);
-
-    uint32_t numFilesOpen = fakeff_numFilesOpen();
-
-    TEST_ASSERT_EQUAL(1, numFilesOpen);
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(&myFile, "", FA_READ));
 }
 
-void test_FilesOpenDoesNotIncreaseIfFailed(void)
+void test_openSuccessIfMountedAndValidFilePointerAndPathPassedIn(void)
 {
-    FIL file;
+    FATFS fatfs;
+    FIL myFile;
+    f_mount(&fatfs, "0:", DONT_CARE);
+
+    TEST_ASSERT_EQUAL_INT(FR_OK, f_open(&myFile, "abc", FA_READ));
+}
+
+void test_OpenFileCannotBeWrittenToUnlessWriteOptionEnabled(void)
+{
+    FATFS fatfs;
+    FIL myFile = { 0 };
+    char myBuff[20] = {'a', 'b'};
+    char myBuffRead[20] = { 0 };
+    memset(myBuffRead, 'X', 19);
+    UINT byteCount;
+
+    f_mount(&fatfs, "0:", DONT_CARE);
+    f_open(&myFile, "abc", FA_READ);
+
+    TEST_ASSERT_EQUAL_INT(FR_DENIED,
+        f_write(&myFile, myBuff, 20, &byteCount));
     
-    helper_failToOpenFile();
-
-    int filesOpen = fakeff_numFilesOpen();
-    TEST_ASSERT_EQUAL(0, filesOpen);
-}
-
-void test_OpeningAnAlreadyOpenFileDoesNotIncrementCounter(void)
-{
-    FIL file;
-
-    f_open(&file, "", FA_WRITE);
-    TEST_ASSERT_EQUAL(FR_DISK_ERR, f_open(&file, "", FA_WRITE));
-
-    int filesOpen = fakeff_numFilesOpen();
-    TEST_ASSERT_EQUAL(1, filesOpen);
-}
-
-void test_OpeningMultipleFilesIncrementsCounter(void)
-{
-    FIL file;
-    FIL file2;
-
-    f_open(&file, "", FA_WRITE);
-    TEST_ASSERT_EQUAL(FR_OK, f_open(&file2, "", FA_WRITE));
-
-    int filesOpen = fakeff_numFilesOpen();
-    TEST_ASSERT_EQUAL(2, filesOpen);
-}
-
-void test_Write(void)
-{
-    TEST_IGNORE();
-
-    FIL file;
-    char* toWrite = "abcdef";
-    UINT bytesWritten = 0;
-
-    f_open(&file, "", FA_WRITE);
+    TEST_ASSERT_EQUAL_INT(0, byteCount);
     
-    TEST_ASSERT_EQUAL(FR_OK, 
-        f_write(&file, toWrite, strlen(toWrite), &bytesWritten));
-
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_read(&myFile, myBuffRead, 20, &byteCount));
+    
+    TEST_ASSERT_EQUAL_STRING("", myBuffRead);
 }
 
-// **************************** Helpers ****************************
-
-FRESULT helper_failToOpenFile(void)
+void test_OpenFileISWrittenToWhenWriteOptionIsEnabled(void)
 {
-    return f_open(NULL, "", FA_WRITE);
-}
+    FATFS fatfs = { 0 };
+    FIL myFile = { 0 };
+    char myBuff[20] = {'a', 'b'};
+    char myBuffRead[20] = { 0 };
+    memset(myBuffRead, 'X', 19);
+    UINT byteCount;
 
+    f_mount(&fatfs, "0:", DONT_CARE);
+    f_open(&myFile, "abc", FA_READ | FA_WRITE);
+
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_write(&myFile, myBuff, 20, &byteCount));
+    
+    TEST_ASSERT_EQUAL_INT(20, byteCount);
+    byteCount = 0;
+
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_sync(&myFile));
+    
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_read(&myFile, myBuffRead, 20, &byteCount));
+
+    TEST_ASSERT_EQUAL_INT(20, byteCount);
+    
+    TEST_ASSERT_EQUAL_STRING("ab", myBuffRead);
+}
 
 /*
 Fake FatFS module
-    Simulate an SD card to make it easy to 
-    write tests and verify results
+    Simulate the FATFS module make it easy to 
+    write tests and verify results.
+
+    - Returns error codes as FatFS would do
+    - Writes / reads files
 
 From Fatfs:
 
-- [ ] I want to know what files are open (names)
-- [ ] I want to know what the data is on my file
-- [ ] I want access to the size of the file
+FRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt);			// Mount/Unmount a logical drive
+- [...] If this is not called first, all other implemented functions in API return FR_INVALID_DRIVE
 
 FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode); // Open or create a file
-- [x] A file can be opened, returns success if non-null file pointer passed in
-- [x] Number of files currently open can be ascertained
-    - [x] Increases by 1 if opened
-    - [x] Doesn't if not opened
-- [x] Multiple files can be opened. Current max is two.
-- [ ] Number of files opened in total can be ascertained
-
-FRESULT f_close (FIL* fp);											// Close an open file object
-- [ ] Closing an open file returns success
-- [ ] Closing a file that was not previously opened returns error code
-- [ ] Number of files currently open is reduced if success
-- [ ] Data is stored in cache and not written to until flush occurs.
-- [ ] Flushes cached data
-
-FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw);	// Write data to the file
-- [ ] A closed file cannot be written to
-- [ ] Writing to an open file will write data in buff to the file
+- [x] Return error if not mounted. FR_INVALID_DRIVE
+- [x] Return error if null fp passed in. FR_INVALID_OBJECT
+- [x] Return error if invalid path. FR_INVALID_DRIVE
+- [x] Return success if non-null fp passed in
+- [x] Return success if valid file path
 
 FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br);			// Read data from the file
-- [ ] A closed file can not be read from (returns error)
-- [ ] Reading from an open file will read its contents: from the beginning each time
-- [ ] Can append to end depending on how file is opened
-- [ ] Can rewrite everything depending on how file is opened
+- [ ] Reading a file before it is opened returns FR_NOT_OPENED
+- [ ] Reading a file that was not opened with FA_READ access code returns FR_DENIED
+- [ ] Reading a file that is opened with correct access code returns data in file
 
+FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw);	// Write data to the file
+- [ ] Writing to a file before it is opened returns FR_NOT_OPENED
+- [ ] Writing to a file before it is opened does not write anything
+- [ ] Writing to an open file will write data at end of the file
+- [ ] Writing to data to a file opened to overwrite will overwrite
+- [ ] Writing to a file without correct access code returns FR_DENIED
+    and doesn't write anything
+- [ ] Writing only works if after a flush (f_sync)
+ 
 FRESULT f_sync (FIL* fp);											// Flush cached data of the writing file
-- [ ] Flushes cached data so that it can be read with f_read
-- [ ] Size is updated accordingly
+- [ ] 
 
-FRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt);			// Mount/Unmount a logical drive
-- [ ] Just returns error code that was set
+Maybe implement:
 
-FRESULT
+FRESULT f_close (FIL* fp);											// Close an open file object
 
-Fake utilities
-- [ ] Set error code and all functions will return this error code
-- [ ] A copy of the files information will be returned
-- [ ] Helper functions can be made?
+Extras:
+
+Very large files,
+Invalid names
+Invalid paths
 
 Unimplemented:
 

@@ -76,10 +76,9 @@ const char* fakefilesystem_readfile(const char* fileName)
     File_t* file = findFile(fileName);
     if (file)
     {
-
         return file->data;
     }
-    return NULL;
+    return "";
 }
 
 void fakefilesystem_writeFile(const char* fileName, const char* data)

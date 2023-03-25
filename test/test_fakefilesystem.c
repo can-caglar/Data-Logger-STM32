@@ -69,7 +69,7 @@ void test_createdFileHasNoDataToBeginWithAfterInit(void)
     TEST_ASSERT_EQUAL_STRING("", fileData);
 }
 
-void test_readingADeletedFileReturnsNULL(void)
+void test_readingADeletedFileReturnsEmptyString(void)
 {
     fakefilesystem_createFile("file");
 
@@ -77,7 +77,7 @@ void test_readingADeletedFileReturnsNULL(void)
 
     const char* fileData = fakefilesystem_readfile("file");
 
-    TEST_ASSERT_EQUAL(NULL, fileData);
+    TEST_ASSERT_EQUAL_STRING("", fileData);
 }
 
 void test_dataWrittenToFileCanBeReadBackExactly(void)

@@ -1,100 +1,73 @@
 #include "fakeff.h"
 #include <string.h>
-#include <stdint.h>
+#include "fakefilesystem.h"
 
-// Data structure for a single file
-typedef struct
+static struct
 {
-    FIL* fp;
-    char fileData[MAX_FILE_SIZE];
-} FakeFile_t;
+    int mounted;
+    char internalBuffer[200];
+    int bufCount;
+    char filename[20];
+} internalState;
 
-// Data structure for module
-typedef struct
+void fakeff_reset(void)
 {
-    uint32_t numFilesOpen;
-    FakeFile_t files[MAX_OPEN_FILES];
-} Fakeff_t;
-
-static Fakeff_t internalState;
-
-// Helpers
-static uint8_t fileAlreadyOpen(FIL* fp);
-static void openFile(FIL* fp);
-static int getFileIndex(FIL* fp);
-
-void fakeff_init(void)
-{
-    memset(&internalState, 0, sizeof(Fakeff_t));
+    memset(&internalState, 0, sizeof(internalState));
 }
 
-void fakeff_destroy(void)
+FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode)
 {
-
-}
-
-uint32_t fakeff_numFilesOpen(void)
-{
-    return internalState.numFilesOpen;
-}
-
-FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
-{
-    FRESULT err = FR_INVALID_PARAMETER;
-    if (fp != NULL)
+    FRESULT ret = FR_OK;
+    if (!internalState.mounted)
     {
-        err = FR_OK;
-        if (!fileAlreadyOpen(fp))
+        ret = FR_INVALID_DRIVE;
+    }
+    if (ret == FR_OK)
+    {
+        if (fp == NULL || path == NULL || 
+            (strcmp(path, "") == 0))
         {
-            openFile(fp);
-        }
-        else
-        {
-            err = FR_DISK_ERR;
+            ret = FR_INVALID_PARAMETER;
         }
     }
-    return err;
+    if (ret == FR_OK)
+    {
+        fp->flag = mode;
+        strcpy(internalState.filename, path);
+        fakefilesystem_createFile(path);
+    }
+    return ret;
+}
+
+FRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt)
+{
+    internalState.mounted = 1;
+    return FR_OK;
 }
 
 FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw)
 {
-    int index = getFileIndex(fp);
-    strncpy(internalState.files[index].fileData, buff, btw);
+    if (fp->flag & FA_WRITE)
+    {
+        *bw = btw;
+        strncpy(internalState.internalBuffer,
+            buff, btw);
+        return FR_OK;
+    }
+    return FR_DENIED;
+}
+
+FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br)
+{
+    const char* data = fakefilesystem_readfile(internalState.filename);
+    strncpy(buff, data, btr);
+    *br = btr;
     return FR_OK;
 }
 
-Fakeff_t fakeff_getInternalState(void)
+FRESULT f_sync (FIL* fp)
 {
-    return internalState;
-}
-
-/******* Helpers ********/
-
-uint8_t fileAlreadyOpen(FIL* fp)
-{
-    uint8_t open = 0;
-    if (getFileIndex(fp) > -1)
-    {
-        open = 1;
-    }
-    return open;
-}
-
-void openFile(FIL* fp)
-{
-    internalState.files[internalState.numFilesOpen++].fp = fp;
-}
-
-static int getFileIndex(FIL* fp)
-{
-    int index = -1;
-    for (int i = 0; i < MAX_OPEN_FILES; i++)
-    {
-        if (internalState.files[i].fp == fp)
-        {
-            index = i;
-            break;
-        }
-    }
-    return index;
+    fakefilesystem_writeFile(internalState.filename,
+        internalState.internalBuffer);
+    return FR_OK;
 }
