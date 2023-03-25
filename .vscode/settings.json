@@ -33,5 +33,8 @@
         "utility": "c",
         "initializer_list": "c",
         "*.tcc": "c"
-    }
+    },
+    "gcovViewer.buildDirectories": [
+        "c:\\Users\\canca\\OneDrive\\Study\\Embedded\\tdd_embedded_systems\\on_target_3\\build"
+    ]
 }

@@ -48,7 +48,7 @@ void test_queryMultipleFilesCanBeCreated(void)
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("fileOpen3"));
 }
 
-void test_queryMultipleFilesCanBeDeleted(void)
+void test_queryDeletingAFileDoesNotDeleteOthers(void)
 {
     fakefilesystem_createFile("fileOpen1");
     fakefilesystem_createFile("fileOpen2");
@@ -97,6 +97,7 @@ void test_writingToADeletedFileDoesNotWriteAnythingToIt(void)
     fakefilesystem_writeFile("file", "hey");
     fakefilesystem_deleteFile("file");
 
+    fakefilesystem_writeFile("file", "hey");
     fakefilesystem_createFile("file");
     const char* fileData = fakefilesystem_readfile("file");
     
@@ -148,6 +149,20 @@ void test_writingTwiceToAFile(void)
     TEST_ASSERT_EQUAL_STRING("abcdef", fileData);
 }
 
+void test_maxFiles(void)
+{
+    for (int i = 0; i < FFS_MAX_FILES; i++)
+    {
+        char fileName[FFS_MAX_FILENAME];
+        sprintf(fileName, "file%i", i);
+        fakefilesystem_createFile(fileName);
+        TEST_ASSERT_TRUE(fakefilesystem_fileExists(fileName));
+    }
+    fakefilesystem_createFile("none");
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("none"));
+}
+
+//  gcov fakefilesystem.c -c -b -o build/gcov/out
 
 /*
 - [x] Want to have files that persist data

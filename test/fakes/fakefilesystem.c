@@ -58,7 +58,10 @@ void fakefilesystem_createFile(const char* fileName)
     if (file == NULL)
     {
         file = findEmptyFileSlot();
-        strncpy(file->name, fileName, FFS_MAX_FILENAME);
+        if (file)
+        {
+            strncpy(file->name, fileName, FFS_MAX_FILENAME);
+        }
     }
 }
 
@@ -73,6 +76,7 @@ const char* fakefilesystem_readfile(const char* fileName)
     File_t* file = findFile(fileName);
     if (file)
     {
+
         return file->data;
     }
     return NULL;
@@ -108,7 +112,8 @@ File_t* findFile(const char* fileName)
 File_t* findEmptyFileSlot(void)
 {
     File_t* file = NULL;
-    for (int i = 0; i < FFS_MAX_FILES; i++)
+    int i;
+    for (i = 0; i < FFS_MAX_FILES; i++)
     {
         if (strcmp(internalState.files[i].name, "") == 0)
         {
