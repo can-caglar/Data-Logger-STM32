@@ -22,7 +22,7 @@ void fakeff_reset(void)
     fakefilesystem_reset();
 }
 
-FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode)
+FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
 {
     FRESULT ret = FR_OK;
     if (!internalState.mounted)
@@ -49,13 +49,13 @@ FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode)
     return ret;
 }
 
-FRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt)
+FRESULT f_mount(FATFS* fs, const TCHAR* path, BYTE opt)
 {
     internalState.mounted = 1;
     return FR_OK;
 }
 
-FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw)
+FRESULT f_write(FIL* fp, const void* buff, UINT btw, UINT* bw)
 {
     if (fp->flag & FA_WRITE)
     {
@@ -65,19 +65,20 @@ FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw)
             buff, btw);
         return FR_OK;
     }
+    *bw = 0;
     return FR_DENIED;
 }
 
-FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br)
+FRESULT f_read(FIL* fp, void* buff, UINT btr, UINT* br)
 {
     FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
     const char* data = fakefilesystem_readfile(thisFile->filename);
     strncpy(buff, data, btr);
-    *br = btr;
+    *br = strlen(data);
     return FR_OK;
 }
 
-FRESULT f_sync (FIL* fp)
+FRESULT f_sync(FIL* fp)
 {
     FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
     fakefilesystem_writeFile(thisFile->filename,

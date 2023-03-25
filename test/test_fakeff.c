@@ -1,113 +1,109 @@
 #include "unity.h"
 #include "fakeff.h"
 #include <string.h>
+#include <stdbool.h>
 
 // included only to make ceedling compile this dependency
 // do not use in tests to prevent tests coupling to fakefilesystem internals
 #include "fakefilesystem.h"
 
 #define DONT_CARE   0
+#define MOUNT(x) f_mount(&(x), "0:", DONT_CARE)
+
+// Test vars
+FIL fileHandle;
+FATFS fatfsHandle;
+const char const writeBuf[] = "abcdefghijklmnopqrstuvwxyz";
+char readBuf[100];
+
+FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath);
 
 void setUp(void)
 {
     fakeff_reset();
+    memset(&fileHandle, 0, sizeof(fileHandle));
+    memset(&fatfsHandle, 0, sizeof(fatfsHandle));
+    memset(readBuf, 0, sizeof(readBuf));
 }
 
 void tearDown(void)
 {
 }
 
+void test_mountIsAlwaysSuccessful(void)
+{
+    TEST_ASSERT_EQUAL_INT(FR_OK, MOUNT(fatfsHandle));
+}
+
 void test_openReturnsErrorIfNotMounted(void)
 {
-    FIL myFile;
-    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE, f_open(&myFile, "0:", FA_READ));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE, call_f_open_with(false, true, true));
 }
 
 void test_openReturnsErrorIfMountedButNULLFilePointerPassedIn(void)
 {
-    FATFS fatfs;
-    TEST_ASSERT_EQUAL_INT(FR_OK, f_mount(&fatfs, "0:", DONT_CARE));
-
-    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(NULL, "path", FA_READ));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, call_f_open_with(true, false, true));
 }
 
 void test_openReturnsErrorIfMountedAndValidFilePointerButNULLPath(void)
 {
-    FATFS fatfs;
-    FIL myFile;
-    f_mount(&fatfs, "0:", DONT_CARE);
-
-    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(&myFile, NULL, FA_READ));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, call_f_open_with(true, true, false));
 }
 
-void test_openReturnsErrorIfMountedAndValidFilePointerButBadPath(void)
+void test_openReturnsErrorIfMountedAndValidFilePointerButEmptyPath(void)
 {
-    FATFS fatfs;
-    FIL myFile;
-    f_mount(&fatfs, "0:", DONT_CARE);
+    MOUNT(fatfsHandle);
 
-    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(&myFile, "", FA_READ));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_open(&fileHandle, "", FA_READ));
 }
 
 void test_openSuccessIfMountedAndValidFilePointerAndPathPassedIn(void)
 {
-    FATFS fatfs;
-    FIL myFile;
-    f_mount(&fatfs, "0:", DONT_CARE);
-
-    TEST_ASSERT_EQUAL_INT(FR_OK, f_open(&myFile, "abc", FA_READ));
+    TEST_ASSERT_EQUAL_INT(FR_OK, call_f_open_with(true, true, true));
 }
 
 void test_OpenFileCannotBeWrittenToUnlessWriteOptionEnabled(void)
 {
-    FATFS fatfs;
-    FIL myFile = { 0 };
-    char myBuff[20] = {'a', 'b'};
-    char myBuffRead[20] = { 0 };
-    memset(myBuffRead, 'X', 19);
-    UINT byteCount;
+    UINT byteCount = 0xAA;  // so we know if it changes
 
-    f_mount(&fatfs, "0:", DONT_CARE);
-    f_open(&myFile, "abc", FA_READ);
+    MOUNT(fatfsHandle);
+    f_open(&fileHandle, "abc", FA_READ);
 
     TEST_ASSERT_EQUAL_INT(FR_DENIED,
-        f_write(&myFile, myBuff, 20, &byteCount));
+        f_write(&fileHandle, writeBuf, 20, &byteCount));
+    
+    TEST_ASSERT_EQUAL_INT(0, byteCount);
+    byteCount = 0xAA;
+    
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_read(&fileHandle, readBuf, 20, &byteCount));
     
     TEST_ASSERT_EQUAL_INT(0, byteCount);
     
-    TEST_ASSERT_EQUAL_INT(FR_OK,
-        f_read(&myFile, myBuffRead, 20, &byteCount));
-    
-    TEST_ASSERT_EQUAL_STRING("", myBuffRead);
+    TEST_ASSERT_EQUAL_STRING("", readBuf);
 }
 
 void test_OpenFileISWrittenToWhenWriteOptionIsEnabled(void)
 {
-    FATFS fatfs = { 0 };
-    FIL myFile = { 0 };
-    char myBuff[20] = {'a', 'b'};
-    char myBuffRead[20] = { 0 };
-    memset(myBuffRead, 'X', 19);
     UINT byteCount;
+    MOUNT(fatfsHandle);
 
-    f_mount(&fatfs, "0:", DONT_CARE);
-    f_open(&myFile, "abc", FA_READ | FA_WRITE);
-
-    TEST_ASSERT_EQUAL_INT(FR_OK,
-        f_write(&myFile, myBuff, 20, &byteCount));
-    
-    TEST_ASSERT_EQUAL_INT(20, byteCount);
-    byteCount = 0;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE);
 
     TEST_ASSERT_EQUAL_INT(FR_OK,
-        f_sync(&myFile));
+        f_write(&fileHandle, writeBuf, 5, &byteCount));
+    TEST_ASSERT_EQUAL_INT(5, byteCount);
+
+    byteCount = 0xAA;
+
+    TEST_ASSERT_EQUAL_INT(FR_OK,
+        f_sync(&fileHandle));
     
     TEST_ASSERT_EQUAL_INT(FR_OK,
-        f_read(&myFile, myBuffRead, 20, &byteCount));
-
-    TEST_ASSERT_EQUAL_INT(20, byteCount);
+        f_read(&fileHandle, readBuf, 5, &byteCount));
+    TEST_ASSERT_EQUAL_INT(5, byteCount);
     
-    TEST_ASSERT_EQUAL_STRING("ab", myBuffRead);
+    TEST_ASSERT_EQUAL_STRING("abcde", readBuf);
 }
 
 void test_openingSameFileTwiceReturnsError(void)
@@ -133,6 +129,26 @@ void test_writingVeryLongMessageToFile(void)
 }
 
 
+// Private
+
+FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath)
+{
+    FIL* fp = &fileHandle;
+    TCHAR* path = "test";
+    if (isMounted)
+    {
+        MOUNT(fatfsHandle);
+    }
+    if (!goodFileFP)
+    {
+        fp = NULL;
+    }
+    if (!goodPath)
+    {
+        path = NULL;
+    }
+    f_open(fp, path, FA_READ);
+}
 
 /*
 Fake FatFS module

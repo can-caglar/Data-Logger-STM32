@@ -35,7 +35,7 @@
   :include:
     - C:/Keil_v5/ARM/PACK/ARM/CMSIS/5.3.0/CMSIS/Include
     - C:/Keil_v5/ARM/PACK/Keil/STM32F3xx_DFP/2.2.2/Drivers/CMSIS/Device/ST/STM32F3xx/Include
-    - C:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_uart_ex.h
+    - C:/Keil_v5/ARM/PACK/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h
   :source:
     - src/**
     - test/fakes/
