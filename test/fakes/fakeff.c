@@ -7,7 +7,7 @@ typedef struct FakeFile_t
 {
     FIL* fp;
     char internalBuffer[200];
-    int bufCount;
+    int writeIndex;
     char filename[20];
 } FakeFile_t;
 
@@ -15,6 +15,8 @@ static struct
 {
     int mounted;
 } internalState;
+
+static FRESULT getMountError(void);
 
 void fakeff_reset(void)
 {
@@ -24,11 +26,8 @@ void fakeff_reset(void)
 
 FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
 {
-    FRESULT ret = FR_OK;
-    if (!internalState.mounted)
-    {
-        ret = FR_INVALID_DRIVE;
-    }
+    FRESULT ret = getMountError();
+    // check parameters
     if (ret == FR_OK)
     {
         if (fp == NULL || path == NULL || 
@@ -37,6 +36,15 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
             ret = FR_INVALID_PARAMETER;
         }
     }
+    // check if file is already open
+    if (ret == FR_OK)
+    {
+        if (fakefilesystem_fileExists(path))
+        {
+            ret = FR_INVALID_OBJECT;
+        }
+    }
+    // all is good, let's create the file
     if (ret == FR_OK)
     {
         fp->flag = mode;
@@ -57,31 +65,70 @@ FRESULT f_mount(FATFS* fs, const TCHAR* path, BYTE opt)
 
 FRESULT f_write(FIL* fp, const void* buff, UINT btw, UINT* bw)
 {
-    if (fp->flag & FA_WRITE)
+    FRESULT ret = getMountError();
+    if (ret == FR_OK)
     {
+        // check mode
+        if ((fp->flag & FA_WRITE) == 0)
+        {
+            ret = FR_DENIED;
+            *bw = 0;
+        }
+    }
+    if (ret == FR_OK)
+    {
+        // all is good, let's write
         *bw = btw;
         FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
-        strncpy(thisFile->internalBuffer,
+        strncpy(thisFile->internalBuffer + thisFile->writeIndex, 
             buff, btw);
-        return FR_OK;
+        thisFile->writeIndex += btw;
     }
-    *bw = 0;
-    return FR_DENIED;
+    return ret;
 }
 
 FRESULT f_read(FIL* fp, void* buff, UINT btr, UINT* br)
 {
-    FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
-    const char* data = fakefilesystem_readfile(thisFile->filename);
-    strncpy(buff, data, btr);
-    *br = strlen(data);
-    return FR_OK;
+    FRESULT ret = getMountError();
+    if (ret == FR_OK)
+    {
+        if ((fp->flag & FA_READ) == 0)
+        {
+            ret = FR_DENIED;
+            *br = 0;
+        }
+    }
+    if (ret == FR_OK)
+    {
+        FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
+        const char* data = fakefilesystem_readfile(thisFile->filename);
+        strncpy(buff, data, btr);
+        *br = strlen(data);
+    }
+    return ret;
 }
 
 FRESULT f_sync(FIL* fp)
 {
-    FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
-    fakefilesystem_writeFile(thisFile->filename,
-        thisFile->internalBuffer);
-    return FR_OK;
+    FRESULT ret = getMountError();
+    if (ret == FR_OK)
+    {
+        FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
+        fakefilesystem_writeFile(thisFile->filename,
+            thisFile->internalBuffer);
+    }
+    return ret;
+}
+
+/* Static functions */
+
+static FRESULT getMountError(void)
+{
+    FRESULT ret = FR_OK;
+    // check if file system is mounted
+    if (!internalState.mounted)
+    {
+        ret = FR_INVALID_DRIVE;
+    }
+    return ret;
 }
