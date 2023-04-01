@@ -6,7 +6,7 @@
 typedef struct FakeFile_t
 {
     FIL* fp;
-    char internalBuffer[200];
+    char internalBuffer[FFS_MAX_FILESIZE];
     int writeIndex;
     char filename[20];
 } FakeFile_t;
@@ -36,15 +36,18 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
             ret = FR_INVALID_PARAMETER;
         }
     }
-    // check if file is already open
+    // params are ok
     if (ret == FR_OK)
     {
-        if (fakefilesystem_fileExists(path))
+        if (!fakefilesystem_fileExists(path))
         {
-            ret = FR_INVALID_OBJECT;
+            if ((mode & FA_CREATE_ALWAYS) == 0)
+            {
+                ret = FR_NO_FILE;
+            }
         }
     }
-    // all is good, let's create the file
+    // mode is okay, let's create the file
     if (ret == FR_OK)
     {
         fp->flag = mode;

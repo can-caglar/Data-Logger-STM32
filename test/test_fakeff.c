@@ -11,7 +11,7 @@
 FIL fileHandle;
 FATFS fatfsHandle;
 const char const writeBuf[] = "abcdefghijklmnopqrstuvwxyz";
-char readBuf[100];
+char readBuf[2000];
 
 #define DONT_CARE   0
 #define MOUNT(x) f_mount(&(x), "0:", DONT_CARE)
@@ -68,7 +68,7 @@ void test_OpenFileCannotBeWrittenToUnlessWriteOptionEnabled(void)
     UINT byteCount = 0xAA;  // so we know if it changes
 
     MOUNT_FATFS();
-    f_open(&fileHandle, "abc", FA_READ);
+    f_open(&fileHandle, "abc", FA_READ | FA_CREATE_ALWAYS);
 
     TEST_ASSERT_EQUAL_INT(FR_DENIED,
         f_write(&fileHandle, writeBuf, 20, &byteCount));
@@ -89,10 +89,10 @@ void test_OpenFileISWrittenToWhenWriteOptionIsEnabled(void)
     UINT byteCount;
     MOUNT_FATFS();
 
-    f_open(&fileHandle, "file", FA_READ | FA_WRITE);
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
 
     TEST_ASSERT_EQUAL_INT(FR_OK,
-        f_write(&fileHandle, writeBuf, 5, &byteCount));
+        f_write(&fileHandle, "abcde", 5, &byteCount));
     TEST_ASSERT_EQUAL_INT(5, byteCount);
 
     byteCount = 0xAA;
@@ -107,29 +107,18 @@ void test_OpenFileISWrittenToWhenWriteOptionIsEnabled(void)
     TEST_ASSERT_EQUAL_STRING("abcde", readBuf);
 }
 
-void test_openingSameFileTwiceWithoutClosingReturnsError(void)
-{
-    // not sure exactly how fatfs handles this,
-    // but we won't allow it
-    MOUNT_FATFS();
-
-    TEST_ASSERT_EQUAL_INT(FR_OK, f_open(&fileHandle, "path", FA_READ));
-    TEST_ASSERT_EQUAL_INT(FR_INVALID_OBJECT, f_open(&fileHandle, "path", FA_READ));
-}
-
 void test_writingMultipleTimesAppendsToEndOfFile(void)
 {
     MOUNT_FATFS();
 
     UINT byteCount = 0xAA;
-    f_open(&fileHandle, "path", FA_READ | FA_WRITE);
+    f_open(&fileHandle, "path", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
     f_write(&fileHandle, "hello", 5, &byteCount);
     TEST_ASSERT_EQUAL_INT(5, byteCount);
     
     byteCount = 0xAA;
     TEST_ASSERT_EQUAL_INT(FR_OK, 
         f_write(&fileHandle, " world!", 7, &byteCount));
-    
     TEST_ASSERT_EQUAL_INT(7, byteCount);
 
     f_sync(&fileHandle);
@@ -154,7 +143,7 @@ void test_callingAnyOfTheApiBeforeMountShouldReturnError(void)
     TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE, 
         f_sync(&fileHandle));
     
-    // f_open was tested thoroughly in the above tests
+    // f_open is tested thoroughly in the above tests
 }
 
 void test_readingWithoutCorrectModeReturnsDeniedError(void)
@@ -163,7 +152,7 @@ void test_readingWithoutCorrectModeReturnsDeniedError(void)
 
     MOUNT_FATFS();
 
-    f_open(&fileHandle, "myfile", FA_WRITE);
+    f_open(&fileHandle, "myfile", FA_WRITE | FA_CREATE_ALWAYS);
 
     TEST_ASSERT_EQUAL_INT(FR_DENIED,
         f_read(&fileHandle, readBuf, 10, &byteCount));
@@ -175,19 +164,74 @@ void test_readingWithoutCorrectModeReturnsDeniedError(void)
 
 void test_writingToTwoFilesOpenAtSameTime(void)
 {
-    TEST_IGNORE();
-
     MOUNT_FATFS();
 
     FIL fp2 = { 0 };
+    UINT byteCount = 0; // not being used
 
-    f_open(&fileHandle, "path1", FA_READ | FA_WRITE);
+    f_open(&fileHandle, "path1", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+    f_open(&fp2, "path2", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+
+    f_write(&fileHandle, "writing to file 1", 17, &byteCount);
+    f_write(&fp2, "writing to file 2", 17, &byteCount);
+
+    f_sync(&fileHandle);
+    f_sync(&fp2);
+
+    f_read(&fileHandle, readBuf, 17, &byteCount);
+    TEST_ASSERT_EQUAL_STRING("writing to file 1", readBuf);
+    f_read(&fp2, readBuf, 17, &byteCount);
+    TEST_ASSERT_EQUAL_STRING("writing to file 2", readBuf);
 }
 
-void test_writingVeryLongMessageToFile(void)
+void test_abletoReadAndWriteLongMessagesToAndFromFile(void)
 {
-    TEST_IGNORE();
+    UINT byteCount = 0xAA;
+
+    MOUNT_FATFS();
+
+    const uint32_t LONG_MSG_LEN = 1000;
+    char longMessage[LONG_MSG_LEN];
+    memset(longMessage, 'x', LONG_MSG_LEN);
+    longMessage[LONG_MSG_LEN] = '\0';
+
+    f_open(&fileHandle, "path1", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+    f_write(&fileHandle, longMessage, LONG_MSG_LEN, &byteCount);
+    TEST_ASSERT_EQUAL_INT(LONG_MSG_LEN, byteCount);
+    byteCount = 0xAA;   // reset it
+
+    f_sync(&fileHandle);
+    f_read(&fileHandle, readBuf, LONG_MSG_LEN, &byteCount);
+    TEST_ASSERT_EQUAL_INT(LONG_MSG_LEN, byteCount);
+
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(longMessage, readBuf, LONG_MSG_LEN);
 }
+
+void test_modeFlags_OpenExistingOnlySucceedsIfFileExists(void)
+{
+    // test create new, open existing, open append etc
+
+    MOUNT_FATFS();
+
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("newfile"));
+
+    TEST_ASSERT_EQUAL_INT(FR_NO_FILE,
+        f_open(&fileHandle, "newfile", FA_READ));
+    
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("newfile"));
+}
+
+
+/*
+#define	FA_READ				0x01
+#define	FA_WRITE			0x02
+#define	FA_OPEN_EXISTING	0x00
+#define	FA_CREATE_NEW		0x04
+#define	FA_CREATE_ALWAYS	0x08
+#define	FA_OPEN_ALWAYS		0x10
+#define	FA_OPEN_APPEND		0x30
+
+*/
 
 
 // Private
@@ -208,7 +252,7 @@ FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath)
     {
         path = NULL;
     }
-    f_open(fp, path, FA_READ);
+    return f_open(fp, path, FA_READ | FA_CREATE_ALWAYS);
 }
 
 /*

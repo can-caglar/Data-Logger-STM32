@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #define FFS_MAX_FILENAME 13
-#define FFS_MAX_FILESIZE 50
+#define FFS_MAX_FILESIZE 5000
 #define FFS_MAX_FILES   20
 
 void fakefilesystem_reset(void);
