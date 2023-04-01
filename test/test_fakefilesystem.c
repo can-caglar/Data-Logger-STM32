@@ -86,6 +86,8 @@ void test_dataWrittenToFileCanBeReadBackExactly(void)
 
     fakefilesystem_writeFile("file", "hey");
 
+    fakefilesystem_seek("file", FFS_BEGIN);
+
     const char* fileData = fakefilesystem_readfile("file");
 
     TEST_ASSERT_EQUAL_STRING("hey", fileData);
@@ -118,6 +120,7 @@ void test_deletedFileLosesAllDataEvenAfterRecreated(void)
 {
     fakefilesystem_createFile("file");
     fakefilesystem_writeFile("file", "hey");
+    fakefilesystem_seek("file", FFS_BEGIN);
 
     const char* fileData = fakefilesystem_readfile("file");
     TEST_ASSERT_EQUAL_STRING("hey", fileData);
@@ -144,6 +147,7 @@ void test_writingTwiceToAFile(void)
 
     fakefilesystem_writeFile("file", "abc");
     fakefilesystem_writeFile("file", "def");
+    fakefilesystem_seek("file", FFS_BEGIN);
 
     const char* fileData = fakefilesystem_readfile("file");
     TEST_ASSERT_EQUAL_STRING("abcdef", fileData);
@@ -158,9 +162,100 @@ void test_maxFiles(void)
         fakefilesystem_createFile(fileName);
         TEST_ASSERT_TRUE(fakefilesystem_fileExists(fileName));
     }
-    fakefilesystem_createFile("none");
-    TEST_ASSERT_FALSE(fakefilesystem_fileExists("none"));
+    fakefilesystem_createFile("full");
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("full"));
 }
+
+void test_fileSystemSeekToChangeReadWritePointerToBegining(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "mansion");
+
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    fakefilesystem_writeFile("file", "pen");
+    fakefilesystem_writeFile("file", "cil");
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    TEST_ASSERT_EQUAL_STRING("pencil", fakefilesystem_readfile("file"));
+}
+
+void test_fileSystemSeekDoesNothingToNonExistingFile(void)
+{
+    // exercise a potential crash
+    fakefilesystem_seek("file", FFS_BEGIN);
+}
+
+void test_fileSystemSeekToChangeReadWritePointerToEnd(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "man");
+
+    fakefilesystem_seek("file", FFS_BEGIN);
+    fakefilesystem_seek("file", FFS_END);
+
+    fakefilesystem_writeFile("file", "sion");
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    TEST_ASSERT_EQUAL_STRING("mansion", fakefilesystem_readfile("file"));
+}
+
+void test_fileSystemSeekToChangeReadWritePointerToMiddle(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "mansion");
+
+    fakefilesystem_seek("file", 3);
+
+    fakefilesystem_writeFile("file", "ner");
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    TEST_ASSERT_EQUAL_STRING("manner", fakefilesystem_readfile("file"));
+}
+
+void test_fileSystemSeekBeyondSizeLimitsSeekageToEnd(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "garden");
+
+    fakefilesystem_seek("file", 77);
+
+    fakefilesystem_writeFile("file", "er");
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    TEST_ASSERT_EQUAL_STRING("gardener", fakefilesystem_readfile("file"));
+
+}
+
+void test_fileSystemSeekAnyNegativeValueWillJustSeekEnd(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "garden");
+
+    fakefilesystem_seek("file", -2);
+
+    fakefilesystem_writeFile("file", "er");
+    fakefilesystem_seek("file", FFS_BEGIN);
+
+    TEST_ASSERT_EQUAL_STRING("gardener", fakefilesystem_readfile("file"));
+}
+
+void test_fileSystemReadIsAffectedBySeek(void)
+{
+    fakefilesystem_createFile("file");
+    fakefilesystem_writeFile("file", "understand");
+
+    fakefilesystem_seek("file", 5);
+
+    TEST_ASSERT_EQUAL_STRING("stand", fakefilesystem_readfile("file"));
+}
+
+void test_deletingAFileThatDoesntExist(void)
+{
+    // just to exercise it
+    fakefilesystem_deleteFile("file");
+}
+
 
 //  gcov fakefilesystem.c -c -b -o build/gcov/out
 

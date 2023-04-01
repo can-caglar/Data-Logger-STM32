@@ -15,6 +15,7 @@ typedef struct File_t
     char name[FFS_MAX_FILENAME];
     char data[FFS_MAX_FILESIZE];
     int fileSize;
+    int filePointer;
 } File_t;
 typedef struct InternalState_t
 {
@@ -68,7 +69,10 @@ void fakefilesystem_createFile(const char* fileName)
 void fakefilesystem_deleteFile(const char* fileName)
 {
     File_t* file = findFile(fileName);
-    memset(file, 0, sizeof(*file));
+    if (file != NULL)
+    {
+        memset(file, 0, sizeof(*file));
+    }
 }
 
 const char* fakefilesystem_readfile(const char* fileName)
@@ -76,7 +80,7 @@ const char* fakefilesystem_readfile(const char* fileName)
     File_t* file = findFile(fileName);
     if (file)
     {
-        return file->data;
+        return file->data + file->filePointer;
     }
     return "";
 }
@@ -86,9 +90,34 @@ void fakefilesystem_writeFile(const char* fileName, const char* data)
     File_t* file = findFile(fileName);
     if (file != NULL)
     {
-        char* writeIndex = file->data + file->fileSize;
+        char* writeIndex = file->data + file->filePointer;
         strcpy(writeIndex, data);
+        file->filePointer += strlen(data);
         file->fileSize = strlen(file->data);
+    }
+}
+
+void fakefilesystem_seek(const char* fileName, int pos)
+{
+    File_t* file = findFile(fileName);
+    if (file != NULL)
+    {
+        if (pos == FFS_BEGIN)
+        {
+            file->filePointer = 0;
+        }
+        else if (pos <= FFS_END)
+        {
+            file->filePointer = file->fileSize;
+        }
+        else
+        {
+            if (pos > file->fileSize)
+            {
+                pos = file->fileSize;
+            }
+            file->filePointer = pos;
+        }
     }
 }
 
