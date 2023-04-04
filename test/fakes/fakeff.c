@@ -5,7 +5,6 @@
 
 typedef struct FakeFile_t
 {
-    FIL* fp;
     char internalBuffer[FFS_MAX_FILESIZE];
     int writeIndex;
     char filename[20];
@@ -26,6 +25,7 @@ void fakeff_reset(void)
 
 FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
 {
+    // check mount status
     FRESULT ret = getMountError();
     // check parameters
     if (ret == FR_OK)
@@ -36,13 +36,11 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
             ret = FR_INVALID_PARAMETER;
         }
     }
-    // params are ok, check mode
+    // if params are ok, check mode
     if (ret == FR_OK)
     {
         if ((mode & FA_OPEN_APPEND) == FA_OPEN_APPEND)
         {
-            // Same as FA_OPEN_ALWAYS except the
-            // read/write pointer is set end of the file.
             fakefilesystem_createFile(path);
         }
         else if ((mode & FA_OPEN_ALWAYS) == FA_OPEN_ALWAYS)
@@ -79,7 +77,7 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
             }
         }
     }
-    // mode is okay, let's open file for our use
+    // if mode is okay, let's open file for our use
     if (ret == FR_OK)
     {
         fp->flag = mode;
@@ -153,6 +151,8 @@ FRESULT f_sync(FIL* fp)
         // clear and ready internal buffer for next time
         memset(thisFile->internalBuffer, 0, FFS_MAX_FILESIZE);
         thisFile->writeIndex = 0;
+        // update file size
+        fp->obj.objsize = fakefilesystem_fileSize(thisFile->filename);
     }
     return ret;
 }

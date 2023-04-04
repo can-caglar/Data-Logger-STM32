@@ -358,7 +358,16 @@ void test_writeMultipleTimesWithoutSyncing(void)
 
 void test_acquireFileSize(void)
 {
-    TEST_IGNORE();
+    MOUNT_FATFS();
+    UINT byteCount = 0xAA;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    
+    for (int i = 0; i < 1003; i++)
+    {
+        f_write_with_sync(&fileHandle, "a", 6, &byteCount);
+    }
+
+    TEST_ASSERT_EQUAL_INT(1003, f_size(&fileHandle));
 }
 
 // Private
