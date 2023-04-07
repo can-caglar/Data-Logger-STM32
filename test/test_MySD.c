@@ -11,13 +11,14 @@ void setUp(void)
 {
     // Close the module to reset internal state variables
     MySD_Close();
+    fakeLed_reset();
 }
 
 void tearDown(void)
 {
 }
 
-void test_OpenLogFileMountsAndOpensAFile(void)
+void test_OpenLogFileMountsAndOpensAFileAndLedIsOn(void)
 {
     //given
     TEST_ASSERT_FALSE(fakefilesystem_fileExists("file"));
@@ -26,6 +27,7 @@ void test_OpenLogFileMountsAndOpensAFile(void)
     // then
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("file"));
+    TEST_ASSERT_TRUE(fakeLed_isOn());
 }
 
 #if 0

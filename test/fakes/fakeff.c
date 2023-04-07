@@ -12,6 +12,7 @@ typedef struct FakeFile_t
 
 static struct
 {
+    State_fakeff_e state;
     int mounted;
 } internalState;
 
@@ -21,6 +22,11 @@ void fakeff_reset(void)
 {
     memset(&internalState, 0, sizeof(internalState));
     fakefilesystem_reset();
+}
+
+void fakeff_setState(State_fakeff_e state)
+{
+    internalState.state = state;
 }
 
 FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
@@ -94,8 +100,16 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
 
 FRESULT f_mount(FATFS* fs, const TCHAR* path, BYTE opt)
 {
-    internalState.mounted = 1;
-    return FR_OK;
+    FRESULT ret = FR_OK;
+    if (internalState.state == NO_SD_CARD)
+    {
+        ret = FR_NOT_READY;
+    }
+    if (ret == FR_OK)
+    {
+        internalState.mounted = 1;
+    }
+    return ret;
 }
 
 FRESULT f_write(FIL* fp, const void* buff, UINT btw, UINT* bw)
@@ -174,6 +188,11 @@ FRESULT f_lseek(FIL* fp, FSIZE_t ofs)
 FRESULT f_close (FIL* fp)
 {
     return FR_OK;
+}
+
+void fakeff_makeApiReturn(FRESULT err)
+{
+
 }
 
 /* Static functions */

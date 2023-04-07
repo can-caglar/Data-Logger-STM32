@@ -381,6 +381,15 @@ void test_usingSameFilePointerDoesntCauseIssues(void)
     TEST_ASSERT_EQUAL_INT(0, f_size(&fileHandle));
 }
 
+void test_ifSdCardNotInsertedMountFails(void)
+{
+    fakeff_setState(NO_SD_CARD);
+
+    TEST_ASSERT_EQUAL_INT(FR_NOT_READY, f_mount(0, 0, 0));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE,
+        f_open(&fileHandle, "file", FA_READ | FA_OPEN_ALWAYS));
+}
+
 // Private
 
 FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath)
