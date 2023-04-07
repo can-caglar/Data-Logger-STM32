@@ -83,6 +83,9 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
         fp->flag = mode;
         // create a new file object
         FakeFile_t* thisFile = calloc(1, sizeof(FakeFile_t));
+        // clean previous data ?
+        memset(&fp->obj, 0, sizeof(fp->obj));
+        // do the set up
         fp->obj.fs = (FATFS*)thisFile;
         strcpy(thisFile->filename, path);
     }
@@ -166,6 +169,11 @@ FRESULT f_lseek(FIL* fp, FSIZE_t ofs)
         fakefilesystem_seek(thisFile->filename, ofs);
     }
     return ret;
+}
+
+FRESULT f_close (FIL* fp)
+{
+    return FR_OK;
 }
 
 /* Static functions */

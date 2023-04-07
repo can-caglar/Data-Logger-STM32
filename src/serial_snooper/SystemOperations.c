@@ -16,8 +16,6 @@ static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 static char fileName[MAX_FILE_NAME];
 
-#define CONFIG_FILE_NAME    "ssdata"
-
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
@@ -38,7 +36,6 @@ void SystemOperations_OpenLogFile(void)
     uint8_t bMaxFileSizeReached = (dataSize >= MAX_FILE_SIZE);
     uint8_t bLowerBoundaryFileSizeReached = (dataSize >= FILE_SIZE_LOWER_THRESHOLD);
     uint8_t bOpenNewFileEarly = (bLowerBoundaryFileSizeReached && !bThereIsNewDataToHandle);
-    
     if (!bLogFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
     {
         if (bLogFileIsOpen || (fileName[0] == '\0'))
@@ -46,10 +43,8 @@ void SystemOperations_OpenLogFile(void)
             // generate a new file name
             strncpy(fileName, DH_GetFileName(), MAX_FILE_NAME);
         }
-
         // open file
         FRESULT err = MySD_Init(fileName);
-
         if (err == FR_OK)
         {
             bLogFileIsOpen = 1;

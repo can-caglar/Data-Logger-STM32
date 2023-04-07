@@ -75,6 +75,8 @@ void fakefilesystem_deleteFile(const char* fileName)
     }
 }
 
+// Reads from where the file pointer is.
+// Use fakefilesystem_seek to modify it.
 const char* fakefilesystem_readfile(const char* fileName)
 {
     File_t* file = findFile(fileName);

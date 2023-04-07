@@ -370,6 +370,17 @@ void test_acquireFileSize(void)
     TEST_ASSERT_EQUAL_INT(1003, f_size(&fileHandle));
 }
 
+void test_usingSameFilePointerDoesntCauseIssues(void)
+{
+    MOUNT_FATFS();
+    UINT byteCount = 0xAA;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    f_write_with_sync(&fileHandle, "hello", 5, &byteCount);
+
+    f_open(&fileHandle, "file2", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    TEST_ASSERT_EQUAL_INT(0, f_size(&fileHandle));
+}
+
 // Private
 
 FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath)

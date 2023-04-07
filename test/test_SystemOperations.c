@@ -1,35 +1,39 @@
 #include "unity.h"
 #include "SystemOperations.h"
-#include "mock_stm32f3xx_hal.h"
+// #include "mock_stm32f3xx_hal.h"
 
-#include "fake_SDCard.h"
+#include "MySD.h"
+#include "fakeff.h"
 #include "fake_myTimeString.h"
 #include "MyCircularBuffer.h"
 #include "DataHolder.h"
 #include "FileNameIterator.h"
+#include "exploding_fakes.h"
+#include "fakefilesystem.h"
+#include "fake_led.h"
+#include "SystemConfigs.h"
 
 #include <string.h>
 
 #define TEST_TIMESTAMP "[Timestamp]"
+#define SET_NEXT_LOGFILE_NAME(name) fake_myTimeString_setFileName(name)
 
 static void expectToOpenAFile(int withSuccessOrFailure);
-static void setNewHALTime(uint32_t newTime);  // TODO, test what happens when overflows
+static void setNewHALTime(uint32_t newTime);
 static void circBufWriteString(const char* str);
 static void doWriteSD(int amountOfTimes);
 static void inputStream(const char* str);
 
-// Tests
+// Helper functions
+static void fillUpFile(char* fileName, size_t amount);
+static int newLogFileIsOpenedWhenCurrentLogFileSizeIs(size_t size);
 
 void setUp(void)
 {
-    // init just to reset internal variables
-    SystemOperations_Init();
-    // then reset all fakes and lower level modules
-    // Reset circular buffer
+    fakeff_reset();
     MyCircularBuffer_close();
     MyCircularBuffer_init();
-    // reset fake sd card module
-    fake_SDCard_reset();
+    SystemOperations_Init();
 }
 
 void tearDown(void)
@@ -38,16 +42,80 @@ void tearDown(void)
     fake_myTimeString_reset();
 }
 
-void test_WriteSD_DoesNotWriteIfSDCardNotInitialised(void)
+void test_initWillOpenConfigFile(void)
+{
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists(CONFIG_FILE_NAME));
+}
+
+void test_OpenLogFile_opensFileBasedOnFileNameFromTimeString(void)
+{
+    // Given
+    SET_NEXT_LOGFILE_NAME("abc.txt");
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("abc.txt"));
+    // When
+    SystemOperations_OpenLogFile();
+    // Then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("abc.txt"));
+}
+
+void test_OpenLogFile_WontOpenAnotherFileIfCalledInSuccessionAlone(void)
+{
+    // Given
+    SET_NEXT_LOGFILE_NAME("abc.txt");
+    SystemOperations_OpenLogFile();
+    SET_NEXT_LOGFILE_NAME("next.txt");
+    // When
+    for (int i = 0; i < 1000; i++)
+    {
+        SystemOperations_OpenLogFile();
+    }
+    // Then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("abc.txt"));
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("next.txt"));
+}
+
+void test_OpenLogFile_OpensAnotherFileIfFileIsAtThreshold(void)
+{
+    TEST_ASSERT_TRUE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+        FILE_SIZE_LOWER_THRESHOLD));
+}
+
+void test_OpenLogFile_DoesNotOpenAnotherFileIsLessThanThreshold(void)
+{
+    TEST_ASSERT_FALSE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+        FILE_SIZE_LOWER_THRESHOLD - 1));
+}
+
+void test_OpenLogFile_doesNotOpenAnotherFileIfCircularBufferNotEmpty(void)
 {
     MyCircularBuffer_write('a');
 
-    SystemOperations_WriteSD();
-
-    MySD_Flush();
-
-    TEST_ASSERT_EQUAL(1, fake_SDCard_isFileEmpty());
+    TEST_ASSERT_FALSE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+        FILE_SIZE_LOWER_THRESHOLD));
 }
+
+void test_OpenLogFile_opensNewFileIfBufferNotEmptyButMaxSizeReached(void)
+{
+    MyCircularBuffer_write('a');
+
+    TEST_ASSERT_TRUE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+        MAX_FILE_SIZE));
+}
+
+void test_OpeningFilesSavesFileNameToSD(void)
+{
+    TEST_IGNORE();
+
+    // given
+    SET_NEXT_LOGFILE_NAME("first");
+    // when
+    SystemOperations_OpenLogFile();
+    // then
+    const char* configFile = fakefilesystem_readfile(CONFIG_FILE_NAME);
+    TEST_ASSERT_EQUAL_STRING("first", configFile);
+}
+
+#if 0
 
 void test_WriteSD_DoesNotWriteWhenBufferIsEmpty(void)
 {
@@ -165,6 +233,44 @@ void test_sdCardFlusher_FlushesEveryFLUSH_TIME_MS(void)
     TEST_ASSERT_EQUAL_STRING("hello", fake_SDCard_getFileData());
 }
 
+void test_InitWillGetConfigsFromSD(void)
+{
+    const char* fname = "myFile.txt";
+    fake_SDCard_helperWriteFileData(fname, strlen(fname));
+
+    SystemOperations_Init();
+
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("ssdata", fake_SDCard_getOpenFileName());
+
+    // first file opened
+    SystemOperations_OpenLogFile();
+
+    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("myFile.txt", fake_SDCard_getOpenFileName());
+}
+
+void test_InitWillGetDefaultsIfConfigsFromSDCorrupt(void)
+{
+    // prepare fake returns
+    const char* fname = "myFile.txt";
+    fake_SDCard_helperWriteFileData(fname, strlen(fname));
+    fake_SDCard_toReturn(FR_DISK_ERR);
+    fake_myTimeString_setFileName("timestr");
+
+    SystemOperations_Init();
+
+    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_totalNumOfFilesOpened());
+    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
+
+    // first file opened
+    fake_SDCard_toReturn(FR_OK);
+    SystemOperations_OpenLogFile();
+
+    TEST_ASSERT_EQUAL_STRING("timestr", fake_SDCard_getOpenFileName());
+    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
+}
+
 
 void test_OpenLogFile_OpensOneFileClosesTheOtherWhenNoFileOpen(void)
 {
@@ -211,90 +317,6 @@ void test_OpenLogFile_OpensAnotherFileIfSizeAboveLimit(void)
     TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
 }
 
-void test_OpenLogFile_OpensAnotherFileBeforeSizeLimitIfDataBufferEmpty(void)
-{
-    // Open log file
-    SystemOperations_OpenLogFile();
-    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
-
-    // Update the file size with FILE_SIZE_LOWER_THRESHOLD data
-    char data[FILE_SIZE_LOWER_THRESHOLD];
-    memset(data, 'x', FILE_SIZE_LOWER_THRESHOLD);
-    data[FILE_SIZE_LOWER_THRESHOLD] = '\0';
-    inputStream(data);
-    MySD_Flush();
-    TEST_ASSERT_EQUAL(FILE_SIZE_LOWER_THRESHOLD, MySD_getOpenedFileSize());
-
-    // Fill up circular buffer so it isn't empty
-    MyCircularBuffer_write('a');
-    
-    // don't expect new file as buffer not empty
-    SystemOperations_OpenLogFile();
-    TEST_ASSERT_EQUAL(1, fake_SDCard_totalNumOfFilesOpened());
-
-    // expect new file since no new data
-    MyCircularBuffer_read();
-    SystemOperations_OpenLogFile();
-    TEST_ASSERT_EQUAL(2, fake_SDCard_totalNumOfFilesOpened());
-}
-
-void test_InitWillGetConfigsFromSD(void)
-{
-    const char* fname = "myFile.txt";
-    fake_SDCard_helperWriteFileData(fname, strlen(fname));
-
-    SystemOperations_Init();
-
-    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
-    TEST_ASSERT_EQUAL_STRING("ssdata", fake_SDCard_getOpenFileName());
-
-    // first file opened
-    SystemOperations_OpenLogFile();
-
-    TEST_ASSERT_EQUAL_INT(2, fake_SDCard_totalNumOfFilesOpened());
-    TEST_ASSERT_EQUAL_STRING("myFile.txt", fake_SDCard_getOpenFileName());
-}
-
-void test_InitWillGetDefaultsIfConfigsFromSDCorrupt(void)
-{
-    // prepare fake returns
-    const char* fname = "myFile.txt";
-    fake_SDCard_helperWriteFileData(fname, strlen(fname));
-    fake_SDCard_toReturn(FR_DISK_ERR);
-    fake_myTimeString_setFileName("timestr");
-
-    SystemOperations_Init();
-
-    TEST_ASSERT_EQUAL_INT(0, fake_SDCard_totalNumOfFilesOpened());
-    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getOpenFileName());
-
-    // first file opened
-    fake_SDCard_toReturn(FR_OK);
-    SystemOperations_OpenLogFile();
-
-    TEST_ASSERT_EQUAL_STRING("timestr", fake_SDCard_getOpenFileName());
-    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_totalNumOfFilesOpened());
-}
-
-void test_OpeningFilesSavesFileNameToSD(void)
-{
-    TEST_IGNORE();
-
-    fake_myTimeString_setFileName("timestr");
-
-    SystemOperations_Init();
-
-    const char* onSdCard = fake_SDCard_getFileData();
-
-    TEST_ASSERT_EQUAL_STRING("", onSdCard);
-
-    SystemOperations_OpenLogFile();
-
-    onSdCard = fake_SDCard_getFileData();
-
-    TEST_ASSERT_EQUAL_STRING("timestr", onSdCard);
-}
-
 // Helper functions
 
 static void setNewHALTime(uint32_t newTime)
@@ -329,6 +351,32 @@ static void inputStream(const char* testStr)
     {
         SystemOperations_WriteSD();
     }
+}
+
+#endif
+
+static void fillUpFile(char* fileName, size_t amount)
+{
+    TEST_ASSERT_EQUAL_INT(FR_OK, MySD_Init(fileName));
+    for (size_t i = 0; i < amount; i++)
+    {
+        TEST_ASSERT_EQUAL_INT(i, MySD_getOpenedFileSize());
+        MySD_WriteString("x");
+        MySD_Flush();
+    }
+}
+
+static int newLogFileIsOpenedWhenCurrentLogFileSizeIs(size_t size)
+{
+    fillUpFile("abc.txt", size);
+
+    SET_NEXT_LOGFILE_NAME("abc.txt");
+    SystemOperations_OpenLogFile();
+
+    SET_NEXT_LOGFILE_NAME("next.txt");
+    SystemOperations_OpenLogFile();
+
+    return fakefilesystem_fileExists("next.txt");
 }
 
 /*

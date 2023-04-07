@@ -7,5 +7,5 @@
 #define NULL_VALUE_FAKE_FOR(value_type, f, result) value_type f(void); value_type f(void) { return result; }
  
 EXPLODING_FAKE_FOR(HAL_IncTick)
-// EXPLODING_FAKE_FOR(huart1)
-// EXPLODING_FAKE_FOR(HAL_UART_IRQHandler)
+EXPLODING_FAKE_FOR(HAL_GetTick)
+

@@ -1,23 +1,34 @@
 #include "unity.h"
-#include "mock_ff.h"
 #include "MySD.h"
+#include "fakeff.h"
+#include "fakefilesystem.h"
+#include "fake_led.h"
 #include "string.h"
-#include "mock_LED.h"
 
 static const BYTE g_Mode = FA_WRITE | FA_READ | FA_OPEN_APPEND;
 
 void setUp(void)
 {
+    // Close the module to reset internal state variables
+    MySD_Close();
 }
 
 void tearDown(void)
 {
-    // Close the module to reset internal state variables
-    f_close_IgnoreAndReturn(FR_OK);
-    f_mount_IgnoreAndReturn(FR_OK);
-    MySD_Close();
 }
 
+void test_OpenLogFileMountsAndOpensAFile(void)
+{
+    //given
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("file"));
+    //when
+    FRESULT err = MySD_Init("file");
+    // then
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file"));
+}
+
+#if 0
 void test_init_sd_when_all_ok(void)
 {
     FATFS FatFs = { 0 };
@@ -32,7 +43,6 @@ void test_init_sd_when_all_ok(void)
 
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
 }
-
 
 void test_init_sd_when_no_mount(void)
 {
@@ -190,6 +200,8 @@ void test_read_ok(void)
     FRESULT err = MySD_Read(buf, buflen);
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
 }
+
+#endif
 
 /*
 
