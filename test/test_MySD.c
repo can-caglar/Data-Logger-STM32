@@ -12,6 +12,7 @@ void setUp(void)
     // Close the module to reset internal state variables
     MySD_Close();
     fakeLed_reset();
+    fakeff_reset();
 }
 
 void tearDown(void)
@@ -28,6 +29,30 @@ void test_OpenLogFileMountsAndOpensAFileAndLedIsOn(void)
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("file"));
     TEST_ASSERT_TRUE(fakeLed_isOn());
+}
+
+void test_OpenLogFileDoesntTurnOnLedIfNoSDCard(void)
+{
+    // given
+    fakeff_setState(NO_SD_CARD);
+    // when 
+    FRESULT err = MySD_Init("file");
+    // then
+    TEST_ASSERT_EQUAL_INT(FR_NOT_READY, err);
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("file"));
+    TEST_ASSERT_FALSE(fakeLed_isOn());
+}
+
+void test_OpenLogFileCanOpenLogFilesConsecutively(void)
+{
+    FRESULT err = MySD_Init("file");
+    FRESULT err2 = MySD_Init("file2");
+
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    TEST_ASSERT_EQUAL_INT(FR_OK, err2);
+
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file"));
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file2"));
 }
 
 #if 0

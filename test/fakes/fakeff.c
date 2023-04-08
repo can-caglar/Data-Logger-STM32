@@ -17,6 +17,7 @@ static struct
 } internalState;
 
 static FRESULT getMountError(void);
+static FRESULT getIsFileOpenError(FIL* fp);
 
 void fakeff_reset(void)
 {
@@ -42,7 +43,16 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
             ret = FR_INVALID_PARAMETER;
         }
     }
-    // if params are ok, check mode
+    // check if file pointer belongs to an already open one
+    if (ret == FR_OK)
+    {
+        // if fp belongs to an already open file
+        if (fp->dir_sect == 0xaa)
+        {
+            ret = FR_INVALID_PARAMETER;
+        }
+    }
+    // if params are ok, check mode and handle file creation
     if (ret == FR_OK)
     {
         if ((mode & FA_OPEN_APPEND) == FA_OPEN_APPEND)
@@ -89,11 +99,10 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
         fp->flag = mode;
         // create a new file object
         FakeFile_t* thisFile = calloc(1, sizeof(FakeFile_t));
-        // clean previous data ?
-        memset(&fp->obj, 0, sizeof(fp->obj));
         // do the set up
         fp->obj.fs = (FATFS*)thisFile;
         strcpy(thisFile->filename, path);
+        fp->dir_sect = 0xaa;    // mark it as open
     }
     return ret;
 }
@@ -162,6 +171,10 @@ FRESULT f_sync(FIL* fp)
     FRESULT ret = getMountError();
     if (ret == FR_OK)
     {
+        ret = getIsFileOpenError(fp);
+    }
+    if (ret == FR_OK)
+    {
         FakeFile_t* thisFile = (FakeFile_t*)fp->obj.fs;
         fakefilesystem_writeFile(thisFile->filename,
             thisFile->internalBuffer);
@@ -185,14 +198,21 @@ FRESULT f_lseek(FIL* fp, FSIZE_t ofs)
     return ret;
 }
 
-FRESULT f_close (FIL* fp)
+FRESULT f_close(FIL* fp)
 {
-    return FR_OK;
-}
-
-void fakeff_makeApiReturn(FRESULT err)
-{
-
+    FRESULT ret = getMountError();
+    if (ret == FR_OK)
+    {
+        ret = getIsFileOpenError(fp);
+    }
+    if (ret == FR_OK)
+    {
+        f_sync(fp);
+        free(fp->obj.fs);
+        fp->dir_sect = 0;   // mark as closed
+        memset(&fp->obj, 0, sizeof(fp->obj));
+    }
+    return ret;
 }
 
 /* Static functions */
@@ -204,6 +224,17 @@ static FRESULT getMountError(void)
     if (!internalState.mounted)
     {
         ret = FR_INVALID_DRIVE;
+    }
+    return ret;
+}
+
+static FRESULT getIsFileOpenError(FIL* fp)
+{
+    FRESULT ret = FR_OK;
+    if (fp->dir_sect != 0xaa)
+    {
+        // file is not open anyway?
+        ret = FR_INVALID_PARAMETER;
     }
     return ret;
 }

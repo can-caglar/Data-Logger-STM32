@@ -145,7 +145,9 @@ void test_callingAnyOfTheApiBeforeMountShouldReturnError(void)
 
     TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE,
         f_lseek(&fileHandle, 0));
-
+    
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE,
+        f_close(&fileHandle));
     // f_open is tested thoroughly in the above tests
 }
 
@@ -254,6 +256,78 @@ void test_modeFlags_CreateNewCreatesNewFileOnlyIfItDoesntExist(void)
     TEST_ASSERT_EQUAL_INT(FR_OK, f_write(&fileHandle, "abc", 3, &byteCount));
 }
 
+void test_usingSameFilePointerWithoutClosingItReturnsError(void)
+{
+    // i think fatfs would allow this but the behaviour is undefined, 
+    // so we will just return an error instead to prevent us from doing
+    // it at all.
+
+    // given
+    MOUNT_FATFS();
+    UINT byteCount = 0xAA;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    f_write_with_sync(&fileHandle, "hello", 5, &byteCount);
+    // when
+    FATFS* currentObj = fileHandle.obj.fs;
+    FRESULT err = f_open(
+            &fileHandle, "file2", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    FATFS* afterObj = fileHandle.obj.fs;
+    // then
+    TEST_ASSERT_EQUAL_MEMORY(currentObj, afterObj, sizeof(*currentObj));
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, err);
+    TEST_ASSERT_EQUAL_INT(5, f_size(&fileHandle));
+}
+
+void test_usingSameFilePointerButClosingItWorksFine(void)
+{
+    // given
+    MOUNT_FATFS();
+    UINT byteCount = 0xAA;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    f_write_with_sync(&fileHandle, "hello", 5, &byteCount);
+    f_close(&fileHandle);
+    // when
+    FATFS* currentObj = fileHandle.obj.fs;
+    FRESULT err = f_open(
+            &fileHandle, "file2", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    FATFS* afterObj = fileHandle.obj.fs;
+    // then
+    TEST_ASSERT_NOT_EQUAL(currentObj, afterObj);
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    TEST_ASSERT_EQUAL_INT(0, f_size(&fileHandle));
+}
+
+void test_closingAFileThatWasntOpenedReturnsError(void)
+{
+    MOUNT_FATFS();
+
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, f_close(&fileHandle));
+}
+
+void test_closingAFileWillFlushContents(void)
+{
+    // given
+    MOUNT_FATFS();
+    UINT byteCount = 0;
+    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
+    f_write(&fileHandle, "hello", 5, &byteCount);
+    // when
+    FRESULT err = f_close(&fileHandle);
+    // then
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    fakefilesystem_seek("file", 0);
+    TEST_ASSERT_EQUAL_STRING("hello", fakefilesystem_readfile("file"));
+}
+
+void test_syncingWithoutOpeningAFileFirstWillReturnError(void)
+{
+    MOUNT_FATFS();
+
+    FRESULT err = f_sync(&fileHandle);
+
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, err);
+}
+
 void test_modeFlags_CreateAlwaysWillAlwaysCreateFileAndTruncateIt(void)
 {
     MOUNT_FATFS();
@@ -276,6 +350,7 @@ void test_modeFlags_CreateAlwaysWillAlwaysCreateFileAndTruncateIt(void)
     f_lseek(&fileHandle, 0);
     f_read(&fileHandle, readBuf, 10, &byteCount);
     TEST_ASSERT_EQUAL_STRING("abc", readBuf);
+    f_close(&fileHandle);
 
     // when file does not exist:
     err = f_open(&fileHandle, "existsLater",
@@ -302,7 +377,7 @@ void test_modeFlags_OpenAppendSetsFilePointerAtEnd(void)
     TEST_ASSERT_EQUAL_STRING("hello there", readBuf);
 }
 
-void test_modeFlags_OpenAlwaysOpensAFileAtBeginningIfExistsOrNot(void)
+void test_modeFlags_OpenAlwaysOpensAFileAtBeginningWhetherExistsOrNot(void)
 {
     MOUNT_FATFS();
 
@@ -313,6 +388,7 @@ void test_modeFlags_OpenAlwaysOpensAFileAtBeginningIfExistsOrNot(void)
     
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("file"));
+    f_close(&fileHandle);
 
     // when file exists:
     fakefilesystem_createFile("exists");
@@ -370,25 +446,17 @@ void test_acquireFileSize(void)
     TEST_ASSERT_EQUAL_INT(1003, f_size(&fileHandle));
 }
 
-void test_usingSameFilePointerDoesntCauseIssues(void)
-{
-    MOUNT_FATFS();
-    UINT byteCount = 0xAA;
-    f_open(&fileHandle, "file", FA_READ | FA_WRITE | FA_CREATE_NEW);
-    f_write_with_sync(&fileHandle, "hello", 5, &byteCount);
-
-    f_open(&fileHandle, "file2", FA_READ | FA_WRITE | FA_CREATE_NEW);
-    TEST_ASSERT_EQUAL_INT(0, f_size(&fileHandle));
-}
-
 void test_ifSdCardNotInsertedMountFails(void)
 {
+    // given
     fakeff_setState(NO_SD_CARD);
-
+    // when, then
     TEST_ASSERT_EQUAL_INT(FR_NOT_READY, f_mount(0, 0, 0));
     TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE,
         f_open(&fileHandle, "file", FA_READ | FA_OPEN_ALWAYS));
 }
+
+//void test_
 
 // Private
 
