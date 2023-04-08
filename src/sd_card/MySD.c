@@ -30,7 +30,6 @@ FRESULT MySD_Init(const char* filename)
         led_init();
         led_on();
     }
-
     return err;
 }
 

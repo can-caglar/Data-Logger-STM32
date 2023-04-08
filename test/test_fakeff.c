@@ -328,6 +328,12 @@ void test_syncingWithoutOpeningAFileFirstWillReturnError(void)
     TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, err);
 }
 
+void test_mountingTwiceWillReturnError(void)
+{
+    TEST_ASSERT_EQUAL_INT(FR_OK, MOUNT_FATFS());
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_PARAMETER, MOUNT_FATFS());
+}
+
 void test_modeFlags_CreateAlwaysWillAlwaysCreateFileAndTruncateIt(void)
 {
     MOUNT_FATFS();
@@ -443,6 +449,23 @@ void test_acquireFileSize(void)
         f_write_with_sync(&fileHandle, "a", 6, &byteCount);
     }
 
+    TEST_ASSERT_EQUAL_INT(1003, f_size(&fileHandle));
+}
+
+void test_fileSizeIsTrueEvenForAnAlreadyExistingFile(void)
+{
+    // given
+    MOUNT_FATFS();
+    fakefilesystem_createFile("exists");
+    for (int i = 0; i < 1003; i++)
+    {
+        fakefilesystem_writeFile("exists", "a");
+    }
+    // when
+    FRESULT err = f_open(
+        &fileHandle, "exists", FA_READ | FA_OPEN_EXISTING);
+    // then
+    TEST_ASSERT_EQUAL_INT(FR_OK, err);
     TEST_ASSERT_EQUAL_INT(1003, f_size(&fileHandle));
 }
 

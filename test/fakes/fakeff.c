@@ -103,6 +103,9 @@ FRESULT f_open(FIL* fp, const TCHAR* path, BYTE mode)
         fp->obj.fs = (FATFS*)thisFile;
         strcpy(thisFile->filename, path);
         fp->dir_sect = 0xaa;    // mark it as open
+        // update its size
+        fp->obj.objsize = 
+            fakefilesystem_fileSize(thisFile->filename);   
     }
     return ret;
 }
@@ -113,6 +116,13 @@ FRESULT f_mount(FATFS* fs, const TCHAR* path, BYTE opt)
     if (internalState.state == NO_SD_CARD)
     {
         ret = FR_NOT_READY;
+    }
+    if (ret == FR_OK)
+    {
+        if (internalState.mounted == 1)
+        {
+            ret = FR_INVALID_PARAMETER;
+        }
     }
     if (ret == FR_OK)
     {
