@@ -43,6 +43,10 @@ void test_App_CLI(void)
     runApp();
 }
 
+void test_RewriteTheseTestsToUseNewFatfsModule(void)
+{
+    TEST_IGNORE();
+}
 
 /* Tests for the Serial Snooping App */
 

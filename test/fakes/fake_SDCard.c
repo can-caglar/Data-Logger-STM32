@@ -81,16 +81,6 @@ void MySD_Close(void)
     memset(openFileName, 0, sizeof(openFileName));
 }
 
-FRESULT MySD_WriteString(const char* buf)
-{
-    MY_LOG("FakeSDCard MySD_WriteString called\n");
-    if (toReturn == FR_OK)
-    {
-        MySD_Write(buf, strlen(buf));
-    }
-    return toReturn;
-}
-
 FRESULT MySD_Write(const uint8_t* buf, uint32_t len)
 {
     MY_LOG("FakeSDCard MySD_Write called\n");

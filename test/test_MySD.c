@@ -64,134 +64,56 @@ void test_OpenLogFileReturnsErrorAndDoesntTurnOnLedIfFails(void)
     TEST_ASSERT_FALSE(fakeLed_isOn());
 }
 
-void test_WriteStringWritesToOpenFile(void)
+void test_MySDWrite_WritesToOpenFileAfterFlushing(void)
 {
-    TEST_IGNORE();
-}
-
-#if 0
-
-void test_close_sd(void)
-{
-    FIL file = { 0 };
-    f_close_ExpectAndReturn(&file, FR_OK);
-    f_mount_ExpectAndReturn(NULL, "", 0, FR_OK);
-    MySD_Close();
-}
-
-void test_write_sd_string_all_bytes_written_correctly(void)
-{
-    FIL file = { 0 };
-    char buf[] = "test buffer";
-    int len = strlen(buf);
-    unsigned int bytesWrote = 0;
-
-    f_write_ExpectAndReturn(&file, buf, len, &bytesWrote, FR_OK);
-    led_toggle_Expect();
-
-    FRESULT err = MySD_WriteString(buf);
+    // given
+    MySD_Init("file");
+    // when
+    FRESULT err = MySD_Write("hello", 5);
+    MySD_Flush();   // also happening to test flush
+    fakefilesystem_seek("file", 0);
+    // then
     TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    const char* result = fakefilesystem_readfile("file");
+    TEST_ASSERT_EQUAL_STRING("hello", result);
 }
 
-void test_write_sd_calls_fats_toggles_led(void)
+void test_MySDWrite_TogglesLedWithEachWriteIfSuccess(void)
 {
-    const uint8_t buflen = 6;
-    FIL file = { 0 };
-    char buf[6] = {0, 5, 6, 7, 8, 1};
-    unsigned int bytesWrote = 0;
-
-    f_write_ExpectAndReturn(&file, buf, buflen, &bytesWrote, FR_OK);
-    led_toggle_Expect();
-
-    FRESULT err = MySD_Write(buf, buflen);
-    TEST_ASSERT_EQUAL_INT(FR_OK, err);
+    // given
+    uint8_t ledState[3];
+    MySD_Init("file");
+    // when
+    ledState[0] = fakeLed_isOn();
+    MySD_Write("a", 1);
+    ledState[1] = fakeLed_isOn();
+    MySD_Write("a", 1);
+    ledState[2] = fakeLed_isOn();
+    // then
+    TEST_ASSERT_TRUE(ledState[0]);
+    TEST_ASSERT_FALSE(ledState[1]);
+    TEST_ASSERT_TRUE(ledState[2]);
 }
 
-void test_write_sd_fails_doesnt_toggle_led(void)
+void test_MySDWrite_FailsIfNotOpenedLogFileAndDoesntToggleLed(void)
 {
-    const uint8_t buflen = 6;
-    FIL file = { 0 };
-    char buf[6] = {0, 5, 6, 7, 8, 1};
-    unsigned int bytesWrote = 0;
-
-    f_write_ExpectAndReturn(&file, buf, buflen, &bytesWrote, FR_DISK_ERR);
-
-    FRESULT err = MySD_Write(buf, buflen);
-    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, err);
+    // given
+    TEST_ASSERT_FALSE(fakeLed_isOn());
+    // when
+    FRESULT err = MySD_Write("hello", 5);
+    // then
+    TEST_ASSERT_FALSE(fakeLed_isOn());
+    TEST_ASSERT_EQUAL_INT(FR_INVALID_DRIVE, err);
 }
 
-void test_write_string_fails_doesnt_toggle_led(void)
+void test_MySDGetOpenedFileSize_returnCorrectFileSize(void)
 {
-    FIL file = { 0 };
-    char buf[] = "test buffer";
-    int len = strlen(buf);
-    unsigned int bytesWrote = 0;
-
-    f_write_ExpectAndReturn(&file, buf, len, &bytesWrote, FR_DISK_ERR);
-
-    FRESULT err = MySD_WriteString(buf);
-    TEST_ASSERT_EQUAL_INT(FR_DISK_ERR, err);
-}
-
-void test_mysd_flush(void)
-{
-    FIL file = { 0 };
-
-    f_sync_ExpectAndReturn(&file, FR_OK);
-
-    FRESULT err = MySD_Flush();
-    TEST_ASSERT_EQUAL_INT(FR_OK, err);
-}
-
-void test_mysd_size(void)
-{    
-    FIL file = { 0 };
-    // funny hack to get around encapsulating the FIL object
-    FIL fileWithSize = { 0 };   
-    fileWithSize.obj.objsize = 33;
-
-
-    f_mount_IgnoreAndReturn(0);
-    f_open_ExpectAndReturn(&file, 
-        "filename", g_Mode, FR_OK);
-    // here's the hack, the encapsulated file will now
-    // have a size of 33
-    f_open_ReturnMemThruPtr_fp(&fileWithSize, sizeof(FIL));
-    led_init_Ignore();
-    led_on_Ignore();
-
-    FRESULT err = MySD_Init("filename");
-
+    // given
+    MySD_Init("file");
+    MySD_Write("abc", 3);
+    MySD_Flush();
+    // when
     FSIZE_t size = MySD_getOpenedFileSize();
-
-    TEST_ASSERT_EQUAL(33, size);
+    // then
+    TEST_ASSERT_EQUAL_INT(3, size);
 }
-
-void test_read_ok(void)
-{
-    const uint8_t buflen = 6;
-    FIL file = { 0 };
-    char buf[6] = {0, 5, 6, 7, 8, 1};
-    unsigned int bytesRead = 0;
-
-    f_read_ExpectAndReturn(&file, buf, buflen, &bytesRead, FR_OK);
-
-    FRESULT err = MySD_Read(buf, buflen);
-    TEST_ASSERT_EQUAL_INT(FR_OK, err);
-}
-
-#endif
-
-/*
-
-- [x] Init will mount SD card then open a file for writing
-- [x] Init again will not mount again and will close
-    the open file and open a new one
-- [x] Write will write to the end of that file
-    - Write without init will return error
-    - A successful write will return 0
-- [x] Close file shall close the file and unmount SD
-    - Even if mount failed, will do the unmount routine
-    - Even if file not opened, will close
-
-*/

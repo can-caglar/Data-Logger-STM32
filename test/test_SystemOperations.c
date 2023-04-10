@@ -105,17 +105,37 @@ void test_OpenLogFile_opensNewFileIfBufferNotEmptyButMaxSizeReached(void)
 void test_OpeningFilesSavesFileNameToSD(void)
 {
     TEST_IGNORE();
+    // mb not; delete this feature and make tests pass?
+    // or just add all to test harness then delete the
+    // feature
+}
 
+#if 0
+void test_OpeningFilesSavesFileNameToSD(void)
+{
     // given
     SET_NEXT_LOGFILE_NAME("first");
     // when
     SystemOperations_OpenLogFile();
     // then
+    fakefilesystem_seek(CONFIG_FILE_NAME, 0);
     const char* configFile = fakefilesystem_readfile(CONFIG_FILE_NAME);
     TEST_ASSERT_EQUAL_STRING("first", configFile);
 }
 
-#if 0
+void test_FirstFileNameIsWhatsOnSDConfigs(void)
+{
+    // given
+    SET_NEXT_LOGFILE_NAME("random");
+    fakefilesystem_createFile(CONFIG_FILE_NAME);
+    fakefilesystem_writeFile(CONFIG_FILE_NAME, "first");
+    // when
+    SystemOperations_OpenLogFile();
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("first"));
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("random"));
+}
+
 
 void test_WriteSD_DoesNotWriteWhenBufferIsEmpty(void)
 {

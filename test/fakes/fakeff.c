@@ -221,6 +221,7 @@ FRESULT f_close(FIL* fp)
         free(fp->obj.fs);
         fp->dir_sect = 0;   // mark as closed
         memset(&fp->obj, 0, sizeof(fp->obj));
+        memset(fp, 0, sizeof(*fp));
     }
     return ret;
 }

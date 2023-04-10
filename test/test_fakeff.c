@@ -479,8 +479,6 @@ void test_ifSdCardNotInsertedMountFails(void)
         f_open(&fileHandle, "file", FA_READ | FA_OPEN_ALWAYS));
 }
 
-//void test_
-
 // Private
 
 FRESULT call_f_open_with(bool isMounted, bool goodFileFP, bool goodPath)
