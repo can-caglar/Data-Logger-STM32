@@ -12,11 +12,14 @@
 #include "fakefilesystem.h"
 #include "fake_led.h"
 #include "SystemConfigs.h"
+#include "fake_stm32f0xx_hal.h"
 
 #include <string.h>
 
 #define TEST_TIMESTAMP "[Timestamp]"
 #define SET_NEXT_LOGFILE_NAME(name) fake_myTimeString_setFileName(name)
+#define SET_NEXT_TIMESTAMP(ts) fake_myTimeString_setTimestamp(ts)
+#define READ_FILE(fileName) (fakefilesystem_seek("file.txt", 0), fakefilesystem_readfile("file.txt"))
 
 static void expectToOpenAFile(int withSuccessOrFailure);
 static void setNewHALTime(uint32_t newTime);
@@ -26,11 +29,13 @@ static void inputStream(const char* str);
 
 // Helper functions
 static void fillUpFile(char* fileName, size_t amount);
-static int newLogFileIsOpenedWhenCurrentLogFileSizeIs(size_t size);
+static int isNewFileOpenedWhenLogfileSizeIs(size_t size);
+static void doWriteOperations(const char* fileName, const char* data);
 
 void setUp(void)
 {
     fakeff_reset();
+    fake_halTick_reset();
     MyCircularBuffer_close();
     MyCircularBuffer_init();
     SystemOperations_Init();
@@ -76,13 +81,13 @@ void test_OpenLogFile_WontOpenAnotherFileIfCalledInSuccessionAlone(void)
 
 void test_OpenLogFile_OpensAnotherFileIfFileIsAtThreshold(void)
 {
-    TEST_ASSERT_TRUE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+    TEST_ASSERT_TRUE(isNewFileOpenedWhenLogfileSizeIs(
         FILE_SIZE_LOWER_THRESHOLD));
 }
 
 void test_OpenLogFile_DoesNotOpenAnotherFileIsLessThanThreshold(void)
 {
-    TEST_ASSERT_FALSE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+    TEST_ASSERT_FALSE(isNewFileOpenedWhenLogfileSizeIs(
         FILE_SIZE_LOWER_THRESHOLD - 1));
 }
 
@@ -90,7 +95,7 @@ void test_OpenLogFile_doesNotOpenAnotherFileIfCircularBufferNotEmpty(void)
 {
     MyCircularBuffer_write('a');
 
-    TEST_ASSERT_FALSE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+    TEST_ASSERT_FALSE(isNewFileOpenedWhenLogfileSizeIs(
         FILE_SIZE_LOWER_THRESHOLD));
 }
 
@@ -98,19 +103,167 @@ void test_OpenLogFile_opensNewFileIfBufferNotEmptyButMaxSizeReached(void)
 {
     MyCircularBuffer_write('a');
 
-    TEST_ASSERT_TRUE(newLogFileIsOpenedWhenCurrentLogFileSizeIs(
+    TEST_ASSERT_TRUE(isNewFileOpenedWhenLogfileSizeIs(
         MAX_FILE_SIZE));
 }
 
-void test_OpeningFilesSavesFileNameToSD(void)
+void test_WriteSD_writesDataFromCircularBuffer(void)
 {
-    TEST_IGNORE();
-    // mb not; delete this feature and make tests pass?
-    // or just add all to test harness then delete the
-    // feature
+    // given
+    // when
+    doWriteOperations("file.txt", "x");
+    // then
+    TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForFirstData(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "x");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]x", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesNothingIfNoDataOrTimestamp(void)
+{
+    // given
+    // when
+    doWriteOperations("file.txt", "");
+    TEST_ASSERT_TRUE(MyCircularBuffer_isEmpty());
+    // then
+    TEST_ASSERT_EQUAL_STRING("", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampOncePerLine(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "xy");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]xy", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForLineEndings_CR(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\ra");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r[10:34]a", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForLineEnding_LF(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\na");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n[10:34]a", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForLineEnding_CRLF(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\r\na");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r\n[10:34]a", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForLineEnding_LFCR(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\n\ra");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n\r[10:34]a", READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForMultipleLineEndings_CR(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\r\ra");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r[10:34]\r[10:34]a",
+        READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForMultipleLineEndings_LF(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\n\na");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n[10:34]\n[10:34]a",
+        READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForMultipleLineEndings_CRLF(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\r\n\r\na");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r\n[10:34]\r\n[10:34]a",
+        READ_FILE("file.txt"));
+}
+
+void test_WriteSD_writesTimestampForMultipleLineEndings_LFCR(void)
+{
+    // given
+    SET_NEXT_TIMESTAMP("[10:34]");
+    // when
+    doWriteOperations("file.txt", "\n\r\n\ra");
+    // then
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n\r[10:34]\n\r[10:34]a",
+        READ_FILE("file.txt"));
 }
 
 #if 0
+void test_WriteSD_flushFlushesAtRightTime(void)
+{
+    // given
+    SET_NEXT_LOGFILE_NAME("file.txt");
+    SystemOperations_OpenLogFile();
+    MyCircularBuffer_write('x');
+    // when
+    SystemOperations_WriteSD();
+    fake_halTick_setTickValue(FLUSH_TIME_MS);
+    SystemOperations_FlushSD();
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file.txt"));
+    fakefilesystem_seek("file.txt", 0);
+    TEST_ASSERT_EQUAL_STRING("x",
+        fakefilesystem_readfile("file.txt"));
+}
+
+void test_WriteSD_writeDoesNothingIfNoData(void)
+{
+    // given
+    SET_NEXT_LOGFILE_NAME("file.txt");
+    SystemOperations_OpenLogFile();
+    // when
+    SystemOperations_WriteSD();
+    fake_halTick_setTickValue(FLUSH_TIME_MS);
+    SystemOperations_FlushSD();
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file.txt"));
+    fakefilesystem_seek("file.txt", 0);
+    TEST_ASSERT_EQUAL_STRING("",
+        fakefilesystem_readfile("file.txt"));
+}
+
 void test_OpeningFilesSavesFileNameToSD(void)
 {
     // given
@@ -386,7 +539,7 @@ static void fillUpFile(char* fileName, size_t amount)
     }
 }
 
-static int newLogFileIsOpenedWhenCurrentLogFileSizeIs(size_t size)
+static int isNewFileOpenedWhenLogfileSizeIs(size_t size)
 {
     fillUpFile("abc.txt", size);
 
@@ -397,6 +550,24 @@ static int newLogFileIsOpenedWhenCurrentLogFileSizeIs(size_t size)
     SystemOperations_OpenLogFile();
 
     return fakefilesystem_fileExists("next.txt");
+}
+
+static void doWriteOperations(const char* fileName, const char* data)
+{
+    SET_NEXT_LOGFILE_NAME("file.txt");
+    SystemOperations_OpenLogFile();
+
+    for (size_t i = 0; i < strlen(data); i++)
+    {
+        MyCircularBuffer_write(data[i]);
+    }
+
+    for (size_t i = 0; i < strlen(data); i++)
+    {
+        SystemOperations_WriteSD();
+    }
+
+    MySD_Flush();
 }
 
 /*
