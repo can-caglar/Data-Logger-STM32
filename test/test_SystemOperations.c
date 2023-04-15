@@ -1,6 +1,5 @@
 #include "unity.h"
 #include "SystemOperations.h"
-// #include "mock_stm32f3xx_hal.h"
 
 #include "MySD.h"
 #include "fakeff.h"
@@ -21,16 +20,12 @@
 #define SET_NEXT_TIMESTAMP(ts) fake_myTimeString_setTimestamp(ts)
 #define READ_FILE(fileName) (fakefilesystem_seek("file.txt", 0), fakefilesystem_readfile("file.txt"))
 
-static void expectToOpenAFile(int withSuccessOrFailure);
-static void setNewHALTime(uint32_t newTime);
-static void circBufWriteString(const char* str);
-static void doWriteSD(int amountOfTimes);
-static void inputStream(const char* str);
-
 // Helper functions
 static void fillUpFile(char* fileName, size_t amount);
 static int isNewFileOpenedWhenLogfileSizeIs(size_t size);
-static void doWriteOperations(const char* fileName, const char* data);
+static void doWriteOperationsNoFlush(const char* fileName, const char* data);
+static void fillUpCircularBuffer(const char* data, size_t amount);
+static void writeWithoutFlush(const char* file, const char* str);
 
 void setUp(void)
 {
@@ -111,7 +106,8 @@ void test_WriteSD_writesDataFromCircularBuffer(void)
 {
     // given
     // when
-    doWriteOperations("file.txt", "x");
+    doWriteOperationsNoFlush("file.txt", "x");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
 }
@@ -121,7 +117,8 @@ void test_WriteSD_writesTimestampForFirstData(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "x");
+    doWriteOperationsNoFlush("file.txt", "x");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]x", READ_FILE("file.txt"));
 }
@@ -130,7 +127,8 @@ void test_WriteSD_writesNothingIfNoDataOrTimestamp(void)
 {
     // given
     // when
-    doWriteOperations("file.txt", "");
+    doWriteOperationsNoFlush("file.txt", "");
+    MySD_Flush();
     TEST_ASSERT_TRUE(MyCircularBuffer_isEmpty());
     // then
     TEST_ASSERT_EQUAL_STRING("", READ_FILE("file.txt"));
@@ -141,7 +139,8 @@ void test_WriteSD_writesTimestampOncePerLine(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "xy");
+    doWriteOperationsNoFlush("file.txt", "xy");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]xy", READ_FILE("file.txt"));
 }
@@ -151,9 +150,11 @@ void test_WriteSD_writesTimestampForLineEndings_CR(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\ra");
+    doWriteOperationsNoFlush("file.txt", "\ra");
+    MySD_Flush();
     // then
-    TEST_ASSERT_EQUAL_STRING("[10:34]\r[10:34]a", READ_FILE("file.txt"));
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r[10:34]a", 
+        READ_FILE("file.txt"));
 }
 
 void test_WriteSD_writesTimestampForLineEnding_LF(void)
@@ -161,9 +162,11 @@ void test_WriteSD_writesTimestampForLineEnding_LF(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\na");
+    doWriteOperationsNoFlush("file.txt", "\na");
+    MySD_Flush();
     // then
-    TEST_ASSERT_EQUAL_STRING("[10:34]\n[10:34]a", READ_FILE("file.txt"));
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n[10:34]a", 
+        READ_FILE("file.txt"));
 }
 
 void test_WriteSD_writesTimestampForLineEnding_CRLF(void)
@@ -171,9 +174,11 @@ void test_WriteSD_writesTimestampForLineEnding_CRLF(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\r\na");
+    doWriteOperationsNoFlush("file.txt", "\r\na");
+    MySD_Flush();
     // then
-    TEST_ASSERT_EQUAL_STRING("[10:34]\r\n[10:34]a", READ_FILE("file.txt"));
+    TEST_ASSERT_EQUAL_STRING("[10:34]\r\n[10:34]a",
+        READ_FILE("file.txt"));
 }
 
 void test_WriteSD_writesTimestampForLineEnding_LFCR(void)
@@ -181,9 +186,11 @@ void test_WriteSD_writesTimestampForLineEnding_LFCR(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\n\ra");
+    doWriteOperationsNoFlush("file.txt", "\n\ra");
+    MySD_Flush();
     // then
-    TEST_ASSERT_EQUAL_STRING("[10:34]\n\r[10:34]a", READ_FILE("file.txt"));
+    TEST_ASSERT_EQUAL_STRING("[10:34]\n\r[10:34]a",
+        READ_FILE("file.txt"));
 }
 
 void test_WriteSD_writesTimestampForMultipleLineEndings_CR(void)
@@ -191,7 +198,8 @@ void test_WriteSD_writesTimestampForMultipleLineEndings_CR(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\r\ra");
+    doWriteOperationsNoFlush("file.txt", "\r\ra");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]\r[10:34]\r[10:34]a",
         READ_FILE("file.txt"));
@@ -202,7 +210,8 @@ void test_WriteSD_writesTimestampForMultipleLineEndings_LF(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\n\na");
+    doWriteOperationsNoFlush("file.txt", "\n\na");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]\n[10:34]\n[10:34]a",
         READ_FILE("file.txt"));
@@ -213,7 +222,8 @@ void test_WriteSD_writesTimestampForMultipleLineEndings_CRLF(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\r\n\r\na");
+    doWriteOperationsNoFlush("file.txt", "\r\n\r\na");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]\r\n[10:34]\r\n[10:34]a",
         READ_FILE("file.txt"));
@@ -224,30 +234,65 @@ void test_WriteSD_writesTimestampForMultipleLineEndings_LFCR(void)
     // given
     SET_NEXT_TIMESTAMP("[10:34]");
     // when
-    doWriteOperations("file.txt", "\n\r\n\ra");
+    doWriteOperationsNoFlush("file.txt", "\n\r\n\ra");
+    MySD_Flush();
     // then
     TEST_ASSERT_EQUAL_STRING("[10:34]\n\r[10:34]\n\r[10:34]a",
         READ_FILE("file.txt"));
 }
 
-#if 0
-void test_WriteSD_flushFlushesAtRightTime(void)
+void test_FlushSD_FlushesAtRightTime(void)
 {
     // given
-    SET_NEXT_LOGFILE_NAME("file.txt");
-    SystemOperations_OpenLogFile();
-    MyCircularBuffer_write('x');
-    // when
-    SystemOperations_WriteSD();
     fake_halTick_setTickValue(FLUSH_TIME_MS);
+    doWriteOperationsNoFlush("file.txt", "x");
+    // when
+    SystemOperations_FlushSD();
+    // then
+    TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
+}
+
+void test_FlushSD_DoesntFlushIfNotTime(void)
+{   
+    // given
+    fake_halTick_setTickValue(FLUSH_TIME_MS - 1);
+    doWriteOperationsNoFlush("file.txt", "x");
+    // when
     SystemOperations_FlushSD();
     // then
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("file.txt"));
-    fakefilesystem_seek("file.txt", 0);
-    TEST_ASSERT_EQUAL_STRING("x",
-        fakefilesystem_readfile("file.txt"));
+    TEST_ASSERT_EQUAL_STRING("", READ_FILE("file.txt"));
 }
 
+void test_FlushSD_FlushesOnceAndNotAgainUntilTime(void)
+{   
+    // given
+    fake_halTick_setTickValue(FLUSH_TIME_MS);
+    doWriteOperationsNoFlush("file.txt", "x");
+    SystemOperations_FlushSD();
+    // when
+    fake_halTick_setTickValue(FLUSH_TIME_MS + 1);
+    doWriteOperationsNoFlush("file.txt", "x");
+    SystemOperations_FlushSD();
+    // then
+    TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
+}
+
+void test_FlushSD_FlushesMultipleTimesAsLongAsTimeElapsed(void)
+{   
+    // given
+    fake_halTick_setTickValue(FLUSH_TIME_MS);
+    doWriteOperationsNoFlush("file.txt", "x");
+    SystemOperations_FlushSD();
+    // when
+    fake_halTick_setTickValue(FLUSH_TIME_MS * 2);
+    doWriteOperationsNoFlush("file.txt", "x");
+    SystemOperations_FlushSD();
+    // then
+    TEST_ASSERT_EQUAL_STRING("xx", READ_FILE("file.txt"));
+}
+
+#if 0
 void test_WriteSD_writeDoesNothingIfNoData(void)
 {
     // given
@@ -552,7 +597,7 @@ static int isNewFileOpenedWhenLogfileSizeIs(size_t size)
     return fakefilesystem_fileExists("next.txt");
 }
 
-static void doWriteOperations(const char* fileName, const char* data)
+static void doWriteOperationsNoFlush(const char* fileName, const char* data)
 {
     SET_NEXT_LOGFILE_NAME("file.txt");
     SystemOperations_OpenLogFile();
@@ -566,8 +611,6 @@ static void doWriteOperations(const char* fileName, const char* data)
     {
         SystemOperations_WriteSD();
     }
-
-    MySD_Flush();
 }
 
 /*
