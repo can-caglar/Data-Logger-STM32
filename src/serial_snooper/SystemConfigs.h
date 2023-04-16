@@ -1,8 +1,6 @@
 #ifndef SYSTEM_CONFIGS_H
 #define SYSTEM_CONFIGS_H
 
-// The least hacky way I could think of...
-
 #ifndef TEST
 #define MAX_FILE_SIZE   23068672
 #define FILE_SIZE_LOWER_THRESHOLD   20971520

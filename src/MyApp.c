@@ -16,6 +16,13 @@ int main(void)
 */
 int runApp(void)
 {
+    int app = initialise();
+    runInfiniteLoop(&app);
+}
+
+int initialise(void)
+{
+    int app;
     CubeMX_SystemInit(CMX_FATFS);   // needs a 1s delay
     AppDecider_Init();
     
@@ -23,10 +30,7 @@ int runApp(void)
     {
         // The CLI application
         MyCLI_Init();
-        LOOP
-        {
-            MyCLI_Run();
-        }
+        app = APP_CLI;
     }
     else
     {
@@ -40,6 +44,22 @@ int runApp(void)
             0, true, true);
         MyScheduler_AddTask(SystemOperations_FlushSD,
             0, true, true);
+        app = APP_SNOOPING;
+    }
+    return app;
+}
+
+void runInfiniteLoop(const int* const app)
+{
+    if (*app == APP_CLI)
+    {
+        LOOP
+        {
+            MyCLI_Run();
+        }
+    }
+    else
+    {
         LOOP
         {
             MyScheduler_Run();

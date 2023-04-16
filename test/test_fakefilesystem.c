@@ -1,6 +1,6 @@
 #include "unity.h"
-#include "fakefilesystem.h"
 #include <string.h>
+#include "fakefilesystem.h"
 
 void setUp(void)
 {
@@ -256,19 +256,25 @@ void test_deletingAFileThatDoesntExist(void)
     fakefilesystem_deleteFile("file");
 }
 
-
-//  gcov fakefilesystem.c -c -b -o build/gcov/out
-
-/*
-- [x] Want to have files that persist data
-    - [x] Want to read data
-    - [x] Want to write data
-- [x] Files must be created before writing or reading
-- [x] Files will write from beginning
-- [x] Files will read from beginning
-- [x] File will keep appending to end each write
-- [x] Want to know size of file
-- [x] Want to be able to delete file
-- [x] Want to have multiple files at same time
-- [x] Files are to be known by their names
-*/
+void test_dumpInfo(void)
+{
+    // just to see what the print looks like
+    // switch in to use
+    #if 0   
+    fakefilesystem_createFile("file");
+    fakefilesystem_createFile("file2");
+    fakefilesystem_createFile("file3");
+    fakefilesystem_createFile("file4");
+    fakefilesystem_createFile("file5");
+    
+    fakefilesystem_writeFile("file", "a");
+    fakefilesystem_writeFile("file2", 
+        "hello this is a long-ish string being printed.");
+    fakefilesystem_writeFile("file5", "hello");
+    
+    fakefilesystem_deleteFile("file3");
+    fakefilesystem_seek("file5", 2);
+    
+    fakefilesystem_dump();
+    #endif
+}

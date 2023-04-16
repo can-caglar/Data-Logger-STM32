@@ -1,6 +1,7 @@
 #include "fakefilesystem.h"
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 
 typedef uint8_t bool;
 #ifndef true
@@ -17,13 +18,11 @@ typedef struct File_t
     int fileSize;
     int filePointer;
 } File_t;
-typedef struct InternalState_t
+
+struct
 {
     File_t files[FFS_MAX_FILES];
-} InternalState_t;
-
-// Module variables
-static InternalState_t internalState;
+} internalState;
 
 /* Private functions */
 
@@ -152,4 +151,28 @@ File_t* findEmptyFileSlot(void)
         }
     }
     return file;
+}
+
+void fakefilesystem_dump(void)
+{
+    printf("Printing file system contents...\n");
+    for (size_t i = 0; i < FFS_MAX_FILES; i++)
+    {
+        if (strcmp(internalState.files[i].name, "") != 0)
+        {
+            File_t* thisFile = &internalState.files[i];
+            printf("Filename: \"%s\"\n", thisFile->name);
+            printf("Contents: ");
+            int count = printf("%.20s", thisFile->data);
+            if (count == 20)
+            {
+                printf("{truncated}");
+            }
+            printf("\n");
+            printf("Size: %u\n", thisFile->fileSize);
+            printf("File Ptr: %u\n", thisFile->filePointer); 
+            printf("--------------\n");
+        }
+    }
+    printf("Finished printing\n");
 }

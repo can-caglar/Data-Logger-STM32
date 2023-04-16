@@ -7,12 +7,16 @@
 
 #include "MyScheduler.h"
 #include "fake_stm32f0xx_hal.h"
-#include "fake_SDCard.h"
+// #include "fake_SDCard.h"
 #include "fake_myTimeString.h"
 #include "SystemOperations.h"
 #include "DataHolder.h"
 #include "MyCircularBuffer.h"
 #include "FileNameIterator.h"
+#include "MySD.h"
+#include "fake_led.h"
+#include "fakeff.h"
+#include "fakefilesystem.h"
 
 #include <string.h>
 
@@ -21,15 +25,20 @@
 // Helpers
 void expectMySchedulerInitHelper(void);
 void setUp_SerialSnooperAppTests(void);
-void streamNewData(char* data);
+void streamNewDataIn(char* data);
 void fillDataBuffer(unsigned int amount);
+void fillDataBuffer(unsigned int amount);
+void fillUpFile(const char* fileName, size_t amount);
+int TheApplication;    // could be CLI or serial snooper
 
 /* Tests for the CLI App */
 
 void test_App_CLI(void)
 {
-    LOOP_COUNT(3);  // expecting 3 times round the loop
+    TEST_IGNORE();  // these should be rewritten
 
+    #if 0
+    LOOP_COUNT(3);  // expecting 3 times round the loop
     CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_CLI);
@@ -40,81 +49,133 @@ void test_App_CLI(void)
     MyCLI_Run_Expect();
     MyCLI_Run_Expect();
 
-    runApp();
-}
-
-void test_RewriteTheseTestsToUseNewFatfsModule(void)
-{
-    TEST_IGNORE();
+    runInfiniteLoop(&TheApplication);
+    #endif
 }
 
 /* Tests for the Serial Snooping App */
 
-void test_App_OpeningNewFiles(void)
+void setUp(void)
 {
-    setUp_SerialSnooperAppTests();
+    LOOP_COUNT(1);  // expecting X times round the loop by default
+    // A hacky set up routine - older tests
+    // depended heavily on mocks. Leaving these
+    // packacged up and hidden here for the time being
+    expectMySchedulerInitHelper();
+    // reset dependencies
+    fakeff_reset();
+    fake_halTick_reset();
+    fake_myTimeString_reset();
+    MyCircularBuffer_close();
+    MyCircularBuffer_init();
+    TheApplication = initialise();
+}
 
-    // set up file name
+void tearDown(void)
+{
+    MySD_Close();
+}
+
+void test_App_SystemShallOpenAFileWhenItRunsForTheFirstTime(void)
+{
+    // given
+    bool existsBefore = fakefilesystem_fileExists("newfile.txt");
+    // when
     fake_myTimeString_setFileName("newfile.txt");
-
-    // First time running, open new file
-    runApp();
-
-    TEST_ASSERT_EQUAL_STRING("newfile.txt", fake_SDCard_getOpenFileName());
-    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_numFilesOpen());
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_FALSE(existsBefore);
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("newfile.txt"));
 }
 
-void test_App_ShallWriteNothingToSDCardIfNoData(void)
+void test_App_SystemShallOpenANewFileWhenSizeOfFileReachesMax(void)
 {
-    setUp_SerialSnooperAppTests();
-
-    LOOP_COUNT(10); // configure to run some amount of times
-
-    runApp();
-
-    TEST_ASSERT_EQUAL_INT(1, fake_SDCard_isFileEmpty());
+    // given
+    fake_myTimeString_setFileName("newfile.txt");
+    fillUpFile("newfile.txt", FILE_SIZE_LOWER_THRESHOLD);
+    LOOP_COUNT(1);
+    runInfiniteLoop(&TheApplication);
+    LOOP_COUNT(1);
+    fake_myTimeString_setFileName("next.txt");
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("newfile.txt"));
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("next.txt"));
 }
 
-void test_App_ShallNotFlushUntilItsTime(void)
+void test_App_SystemShallNotOpenANewFileYetWhenThereIsDataInTheBuffer(void)
 {
-    setUp_SerialSnooperAppTests();
+    // given
+    streamNewDataIn("hello one two");
+    fake_myTimeString_setFileName("newfile.txt");
+    fillUpFile("newfile.txt", FILE_SIZE_LOWER_THRESHOLD);
+    LOOP_COUNT(1);
+    runInfiniteLoop(&TheApplication);
+    LOOP_COUNT(1);
+    fake_myTimeString_setFileName("next.txt");
+    TEST_ASSERT_FALSE(MyCircularBuffer_isEmpty());
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("newfile.txt"));
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("next.txt"));
+}
 
-    LOOP_COUNT(10); // configure to run some amount of times
+void test_App_SystemCanForceOpenANewFileEvenWhenDataInBufferIfMaxFileSizeReached(void)
+{
+    // given
+    streamNewDataIn("hello one two");
+    fake_myTimeString_setFileName("newfile.txt");
+    fillUpFile("newfile.txt", MAX_FILE_SIZE);
+    LOOP_COUNT(1);
+    runInfiniteLoop(&TheApplication);
+    LOOP_COUNT(1);
+    fake_myTimeString_setFileName("next.txt");
+    TEST_ASSERT_FALSE(MyCircularBuffer_isEmpty());
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("newfile.txt"));
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("next.txt"));
+}
 
-    streamNewData("hello, this is a new message");
+void test_App_ShallNotFlushToSDCardIfTimeNotRight(void)
+{
+    // given
     fake_halTick_setTickValue(FLUSH_TIME_MS - 1);
-
-    runApp();
-
-    // expect no data
-    TEST_ASSERT_EQUAL_STRING("", fake_SDCard_getFileData());
+    fake_myTimeString_setFileName("newfile.txt");
+    streamNewDataIn("hello, this is a new message");
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_EQUAL_STRING("", READ_FILE("newfile.txt"));
 }
 
-void test_App_ShallWriteAllDataToSDAsLongAsItIsFlushing(void)
+void test_App_ShallFlushToSDCardAsTimePasses(void)
 {
-    setUp_SerialSnooperAppTests();
-
-    LOOP_COUNT(strlen("hello, this is a new message")); // configure to run some amount of times
-
-    streamNewData("hello, this is a new message");
-    fake_myTimeString_setTimestamp("[1] ");
-    fake_halTick_setTickValue(0);
+    // given
+    LOOP_COUNT(50);
+    fake_myTimeString_setFileName("newfile.txt");
+    streamNewDataIn("hello, this is a new message");
     fake_halTick_enableAutoIncrement(FLUSH_TIME_MS);
-
-    runApp();
-
-    // output is the time stamp + string
-    TEST_ASSERT_EQUAL_STRING("[1] hello, this is a new message", 
-        fake_SDCard_getFileData());
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("newfile.txt"));
+    TEST_ASSERT_EQUAL_STRING("hello, this is a new message", 
+        READ_FILE("newfile.txt"));
 }
 
+
+#if 0
 void test_App_OpensOneFileToReadAndOneToWrite(void)
 {
     setUp_SerialSnooperAppTests();
     
     LOOP_COUNT(MAX_FILE_SIZE + 10); // configure to run some amount of times
 
-    runApp();
+    runInfiniteLoop(&TheApplication);
 
     TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED, fake_SDCard_totalNumOfFilesOpened());
 }
@@ -127,7 +188,7 @@ void test_App_ShallOpenANewFileAfterUpperLimitWhenData(void)
 
     fillDataBuffer(MAX_FILE_SIZE);
 
-    runApp();
+    runInfiniteLoop(&TheApplication);
 
     TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED + 1, fake_SDCard_totalNumOfFilesOpened());
 }
@@ -140,7 +201,7 @@ void test_App_ShallOpenANewFileAfterLowerLimitWhenNoData(void)
 
     fillDataBuffer(FILE_SIZE_LOWER_THRESHOLD);
 
-    runApp();
+    runInfiniteLoop(&TheApplication);
 
     TEST_ASSERT_EQUAL_INT(MIN_FILES_OPENED + 1, fake_SDCard_totalNumOfFilesOpened());
 }
@@ -154,14 +215,17 @@ void test_firstFileOpenedIsOneReadFromSDCard(void)
 
     LOOP_COUNT(10); // configure to run some amount of times
 
-    runApp();
+    runInfiniteLoop(&TheApplication);
 
     const char* name = fake_SDCard_getOpenFileName();
 
     TEST_ASSERT_EQUAL_STRING("prevFile", name);
 }
 
-/*********** Helpers ***********/
+#endif
+
+
+/* Helpers */
 
 void expectMySchedulerInitHelper(void)
 {
@@ -171,23 +235,7 @@ void expectMySchedulerInitHelper(void)
     CubeMX_SystemInit_Expect(CMX_UART);
 }
 
-void setUp_SerialSnooperAppTests(void)
-{
-    // A hacky set up routine - older tests
-    // depended heavily on mocks. Leaving these
-    // packacged up and hidden here for the time being
-
-    LOOP_COUNT(1);  // expecting X times round the loop
-    
-    expectMySchedulerInitHelper();  // the init sequence
-
-    fake_SDCard_reset();    // clean slate SD card
-    fake_myTimeString_reset();  // clean slate time string
-    MyCircularBuffer_close();
-    MyCircularBuffer_init();
-}
-
-void streamNewData(char* data)
+void streamNewDataIn(char* data)
 {
     while (*data)
     {
@@ -201,14 +249,15 @@ void fillDataBuffer(unsigned int amount)
     // fill up data up to lower limit only
     for (int i = 0; i < amount; i++)
     {
-        streamNewData("b");
+        streamNewDataIn("b");
     }
 }
 
-/*
-TODO: 
-    Perhaps begin from scratch.
-
-    Write some tests, maybe then create the fake modules.
-
-*/
+void fillUpFile(const char* fileName, size_t amount)
+{
+    fakefilesystem_createFile(fileName);
+    for (size_t i = 0; i < amount; i++)
+    {
+        fakefilesystem_writeFile(fileName, "x");
+    }
+}

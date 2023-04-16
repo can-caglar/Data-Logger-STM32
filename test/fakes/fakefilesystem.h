@@ -18,5 +18,9 @@ void fakefilesystem_deleteFile(const char* fileName);
 const char* fakefilesystem_readfile(const char* fileName);
 void fakefilesystem_writeFile(const char* fileName, const char* data);
 void fakefilesystem_seek(const char* fileName, int pos);
+// debug commands
+void fakefilesystem_dump(void);
+// helpful macros
+#define READ_FILE(fileName) (fakefilesystem_seek(fileName, 0), fakefilesystem_readfile(fileName))
 
 #endif

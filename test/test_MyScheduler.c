@@ -8,6 +8,7 @@
 static uint8_t task1Called = 0;
 static uint8_t task2Called = 0;
 static uint8_t fnGetDataCalled = 0;
+static uint32_t task1CallCount = 0;
 
 // Tasks for testing
 static void resetTaskData(void);
@@ -15,6 +16,7 @@ static void task1(void);
 static void task2(void);
 static uint8_t wasTask1Called(void);    // auto clears state
 static uint8_t wasTask2Called(void);    // auto clears state
+static uint8_t getTask1CallCount(void);
 static const int fakeDataContext = 777;
 
 // Test functions
@@ -206,12 +208,28 @@ void test_OneShotTasksAreCalledOnce(void)
     TEST_ASSERT_EQUAL_INT(0, wasTask1Called());
 }
 
+void test_tasksCanBeCalledPeriodically(void)
+{
+    // given
+    const int period = 100;
+    MyScheduler_AddTask(task1ptr, period, true, true);
+    fake_halTick_enableAutoIncrement(period);
+    // when
+    MyScheduler_Run();
+    MyScheduler_Run();
+    MyScheduler_Run();
+    // then
+    TEST_ASSERT_EQUAL_INT(1, wasTask1Called());
+    TEST_ASSERT_EQUAL_INT(3, getTask1CallCount());
+}
+
 
 /* Helpers */
 
 void task1(void)
 {
     task1Called = 1;
+    task1CallCount++;
 }
 
 void task2(void)
@@ -224,6 +242,7 @@ static void resetTaskData(void)
     task1Called = 0;
     task2Called = 0;
     fnGetDataCalled = 0;
+    task1CallCount = 0;
 }
 
 static uint8_t wasTask1Called(void)
@@ -240,6 +259,10 @@ static uint8_t wasTask2Called(void)
     return ret;
 }
 
+static uint8_t getTask1CallCount(void)
+{
+    return task1CallCount;
+}
 
 /*
 - This module will be a scheduler
