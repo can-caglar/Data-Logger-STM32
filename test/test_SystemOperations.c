@@ -251,48 +251,15 @@ void test_FlushSD_FlushesAtRightTime(void)
     TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
 }
 
-void test_FlushSD_DoesntFlushIfNotTime(void)
+void test_FlushSD_FlushesDataToSD(void)
 {   
     // given
-    fake_halTick_setTickValue(FLUSH_TIME_MS - 1);
     doWriteOperationsNoFlush("file.txt", "x");
     // when
-    SystemOperations_FlushSD();
-    // then
-    TEST_ASSERT_TRUE(fakefilesystem_fileExists("file.txt"));
-    TEST_ASSERT_EQUAL_STRING("", READ_FILE("file.txt"));
-}
-
-void test_FlushSD_FlushesOnceAndNotAgainUntilTime(void)
-{   
-    // given
-    fake_halTick_setTickValue(FLUSH_TIME_MS);
-    doWriteOperationsNoFlush("file.txt", "x");
-    SystemOperations_FlushSD();
-    // when
-    fake_halTick_setTickValue(FLUSH_TIME_MS + 1);
-    doWriteOperationsNoFlush("file.txt", "x");
     SystemOperations_FlushSD();
     // then
     TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
 }
-
-void test_FlushSD_FlushesMultipleTimesAsLongAsTimeElapsed(void)
-{   
-    // given
-    fake_halTick_enableAutoIncrement(FLUSH_TIME_MS);
-    // when
-    doWriteOperationsNoFlush("file.txt", "a");
-    SystemOperations_FlushSD();
-    doWriteOperationsNoFlush("file.txt", "b");
-    SystemOperations_FlushSD();
-    doWriteOperationsNoFlush("file.txt", "c");
-    SystemOperations_FlushSD();
-    doWriteOperationsNoFlush("file.txt", "d"); // no flush for this
-    // then
-    TEST_ASSERT_EQUAL_STRING("abc", READ_FILE("file.txt"));
-}
-
 
 // Helpers
 

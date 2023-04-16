@@ -10,7 +10,6 @@
 #define STATUS_TIMESTAMP (1 << 1)
 
 static uint8_t previousData;
-static uint32_t lastTimeFlushed;
 static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
@@ -81,14 +80,7 @@ void SystemOperations_WriteSD(void)
 
 void SystemOperations_FlushSD(void)
 {
-    // Device may be unplugged at any moment.
-    // Flush every so often so no data is lost.
-    uint32_t tNow = HAL_GetTick();
-    if (tNow >= (lastTimeFlushed + FLUSH_TIME_MS))
-    {
-        MySD_Flush();
-        lastTimeFlushed = tNow;
-    }
+    MySD_Flush();
 }
 
 
