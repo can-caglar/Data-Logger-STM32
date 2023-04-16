@@ -43,7 +43,7 @@ int initialise(void)
         MyScheduler_AddTask(SystemOperations_WriteSD, 
             0, true, true);
         MyScheduler_AddTask(SystemOperations_FlushSD,
-            0, true, true);
+            FLUSH_TIME_MS, true, true);
         app = APP_SNOOPING;
     }
     return app;
