@@ -6,7 +6,6 @@
 
 #define SO_SUCCESS 0
 #define SO_FAIL 1
-#define CONFIG_FILE_NAME    "ssdata"
 
 int SystemOperations_Init(void);
 void SystemOperations_OpenLogFile(void);

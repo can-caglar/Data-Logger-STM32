@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>ON_TARGET</Define>
               <Undefine></Undefine>
-              <IncludePath>.\test\support;.\src\stm32cube_files;.\src\stm32cube_files\App;.\src\stm32cube_files\core;.\src\stm32cube_files\middlewares;.\src\stm32cube_files\middlewares\option;.\src\stm32cube_files\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Inc;.\RTE\Device\STM32F303K8Tx;src\RTC;src\led;src\sd_card;src\serial_snooper;src\dip_switch;src\circular_buffer;src\cli;src\common</IncludePath>
+              <IncludePath>.\test\support;.\src\stm32cube_files;.\src\stm32cube_files\App;.\src\stm32cube_files\core;.\src\stm32cube_files\middlewares;.\src\stm32cube_files\middlewares\option;.\src\stm32cube_files\Target;.\src;C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Inc;.\RTE\Device\STM32F303K8Tx;src\RTC;src\led;src\sd_card;src\serial_snooper;src\dip_switch;src\circular_buffer;src\cli;src\common;.\src\stm32_flash</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -491,6 +491,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\FileNameIterator.c</FilePath>
             </File>
+            <File>
+              <FileName>MyStm32Flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\stm32_flash\MyStm32Flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -620,6 +625,16 @@
               <FileName>stm32f3xx_hal_rcc_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_rcc_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f3xx_hal_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f3xx_hal_flash_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_flash_ex.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -3,6 +3,7 @@
 #include "stm32f3xx_hal.h"
 #include "DataHolder.h"
 #include "FileNameIterator.h"
+#include "MyStm32Flash.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -14,17 +15,14 @@ static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 static char fileName[MAX_FILE_NAME];
+static uint8_t isNvmFilenameValid(void);
 
 int SystemOperations_Init(void)
 {
     status = STATUS_TIMESTAMP;
-    lastTimeFlushed = 0;
     bLogFileIsOpen = 0;
     memset(fileName, 0, sizeof(fileName));
     FileNameIterator_init();
-    MySD_Init(CONFIG_FILE_NAME);
-    MySD_Read((uint8_t*)fileName, MAX_FILE_NAME);
-
     return SO_SUCCESS;
 }   
 
@@ -37,16 +35,33 @@ void SystemOperations_OpenLogFile(void)
     uint8_t bOpenNewFileEarly = (bLowerBoundaryFileSizeReached && !bThereIsNewDataToHandle);
     if (!bLogFileIsOpen || bMaxFileSizeReached || bOpenNewFileEarly)
     {
-        if (bLogFileIsOpen || (fileName[0] == '\0'))
+        if (bLogFileIsOpen)
         {
             // generate a new file name
             strncpy(fileName, DH_GetFileName(), MAX_FILE_NAME);
+        }
+        else
+        {
+            char data[13 + 4 + 1] = "";
+            read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
+            if (strncmp(data, "file", 4) == 0)
+            {
+                strcpy(fileName, data + 4);
+            }
+            else
+            {
+                // generate a new file name
+                strncpy(fileName, DH_GetFileName(), MAX_FILE_NAME);
+            }
         }
         // open file
         FRESULT err = MySD_Init(fileName);
         if (err == FR_OK)
         {
             bLogFileIsOpen = 1;
+            char data[13 + 4 + 1] = "file";
+            strcpy(data + 4, fileName);
+            write_flash_string(FLASH_DATA_PAGE_0, data);
         }
         else
         {
@@ -123,4 +138,11 @@ static uint8_t timestampThisLine(uint8_t thisByte)
         }
     }
     return ret;
+}
+
+static uint8_t isNvmFilenameValid(void)
+{
+    char data[13 + 4 + 1] = "";
+    read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
+    return strncmp(data, "file", 4) == 0;
 }

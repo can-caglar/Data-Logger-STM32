@@ -12,6 +12,7 @@
 #include "fake_led.h"
 #include "SystemConfigs.h"
 #include "fake_stm32f0xx_hal.h"
+#include "fake_stm32flash.h"
 
 #include <string.h>
 
@@ -25,25 +26,19 @@ static int isNewFileOpenedWhenLogfileSizeIs(size_t size);
 static void doWriteOperationsNoFlush(const char* fileName, const char* data);
 static void fillUpCircularBuffer(const char* data, size_t amount);
 static void writeWithoutFlush(const char* file, const char* str);
+static void restartSystem(void);
 
 void setUp(void)
 {
     fakeff_reset();
-    fake_halTick_reset();
-    MyCircularBuffer_close();
-    MyCircularBuffer_init();
-    SystemOperations_Init();
+    fake_stm32flash_reset();
+    restartSystem();
 }
 
 void tearDown(void)
 {
     MySD_Close();
     fake_myTimeString_reset();
-}
-
-void test_initWillOpenConfigFile(void)
-{
-    TEST_ASSERT_TRUE(fakefilesystem_fileExists(CONFIG_FILE_NAME));
 }
 
 void test_OpenLogFile_opensFileBasedOnFileNameFromTimeString(void)
@@ -261,6 +256,35 @@ void test_FlushSD_FlushesDataToSD(void)
     TEST_ASSERT_EQUAL_STRING("x", READ_FILE("file.txt"));
 }
 
+void test_App_firstFileOpenedWasTheLastOneWrittenTo(void)
+{
+    // given
+    fake_myTimeString_setFileName("prevFile.txt");
+    SystemOperations_OpenLogFile();
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("prevFile.txt"));
+    MySD_Close();
+    restartSystem();
+    fakeff_reset();
+    fake_myTimeString_setFileName("new.txt");
+    // when
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("prevFile.txt"));
+    SystemOperations_OpenLogFile();
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("prevFile.txt"));
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("new.txt"));
+}
+
+void test_App_firstFileOpenIgnoresGarbage(void)
+{
+    // given
+    fake_myTimeString_setFileName("new.txt");
+    write_flash_string(FLASH_DATA_PAGE_0, "g~';#2d");
+    // when
+    SystemOperations_OpenLogFile();
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("new.txt"));
+}
+
 // Helpers
 
 static void fillUpFile(char* fileName, size_t amount)
@@ -301,6 +325,14 @@ static void doWriteOperationsNoFlush(const char* fileName, const char* data)
     {
         SystemOperations_WriteSD();
     }
+}
+
+static void restartSystem(void)
+{
+    fake_halTick_reset();
+    MyCircularBuffer_close();
+    MyCircularBuffer_init();
+    SystemOperations_Init();
 }
 
 /*
