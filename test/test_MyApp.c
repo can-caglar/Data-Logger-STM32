@@ -17,6 +17,7 @@
 #include "fake_led.h"
 #include "fakeff.h"
 #include "fakefilesystem.h"
+#include "fake_stm32flash.h"
 
 #include <string.h>
 
@@ -29,6 +30,8 @@ void streamNewDataIn(char* data);
 void fillDataBuffer(unsigned int amount);
 void fillDataBuffer(unsigned int amount);
 void fillUpFile(const char* fileName, size_t amount);
+void restartSystem(void);
+
 int TheApplication;    // could be CLI or serial snooper
 
 /* Tests for the CLI App */
@@ -55,20 +58,18 @@ void test_App_CLI(void)
 
 /* Tests for the Serial Snooping App */
 
+// Maybe these tests should just be mocks
+// To see which "SystemOperations" are being executed
+// and when.
+
 void setUp(void)
 {
     LOOP_COUNT(1);  // expecting X times round the loop by default
-    // A hacky set up routine - older tests
-    // depended heavily on mocks. Leaving these
-    // packacged up and hidden here for the time being
-    expectMySchedulerInitHelper();
-    // reset dependencies
+    fake_stm32flash_reset();
     fakeff_reset();
-    fake_halTick_reset();
     fake_myTimeString_reset();
-    MyCircularBuffer_close();
-    MyCircularBuffer_init();
-    TheApplication = initialise();
+    fake_halTick_reset();
+    restartSystem();
 }
 
 void tearDown(void)
@@ -167,8 +168,33 @@ void test_App_ShallFlushToSDCardAsTimePasses(void)
         READ_FILE("newfile.txt"));
 }
 
-void test_App_firstFileOpenedWasTheLastOneWrittenTo
+void test_App_firstFileOpenedWasTheLastOneWrittenTo(void)
+{
+    // given
+    fake_myTimeString_setFileName("prevFile.txt");
+    runInfiniteLoop(&TheApplication);
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("prevFile.txt"));
+    restartSystem();
+    fakefilesystem_reset();
+    fake_myTimeString_setFileName("new.txt");
+    // when
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("prevFile.txt"));
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("prevFile.txt"));
+    TEST_ASSERT_FALSE(fakefilesystem_fileExists("new.txt"));
+}
 
+void test_App_firstFileOpenIgnoresGarbage(void)
+{
+    // given
+    fake_myTimeString_setFileName("new.txt");
+    write_flash_string(FLASH_DATA_PAGE_0, "~';2efwww");
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_TRUE(fakefilesystem_fileExists("new.txt"));
+}
 
 #if 0
 void test_App_OpensOneFileToReadAndOneToWrite(void)
@@ -262,4 +288,17 @@ void fillUpFile(const char* fileName, size_t amount)
     {
         fakefilesystem_writeFile(fileName, "x");
     }
+}
+
+// As if the system was power cycles
+void restartSystem(void)
+{
+    // A hacky set up routine - older tests
+    // depended heavily on mocks. Leaving these
+    // packacged up and hidden here for the time being
+    expectMySchedulerInitHelper();
+    // reset dependencies
+    MyCircularBuffer_close();
+    MyCircularBuffer_init();
+    TheApplication = initialise();
 }
