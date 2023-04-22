@@ -1,0 +1,24 @@
+- [x] Capture schematic
+    - [x] Same as prototype version but without on-board ST link
+        - [x] LED to indicate power
+        - [x] LED to indicate receive (rx)
+        - [x] LED to indicate transmit (tx)
+        - [x] LED to indicate errors
+        - [x] SWDIO for programming it
+        - [x] Test points for comms
+        - [x] Test points for GND
+        - [x] USB for power only
+        - [-] Power also from external supply?
+        - [x] Current consumption header
+        - [x] Pull up UART / SPI / I2C lines
+        - [x] Use fuse for overcurrent protection
+        - [x] Crystal, or crystal oscillator for stm32 uc
+        - [x] Pins to expose UART
+        - [x] USB mini
+- [x] Draw layout
+    - [-] Silkscreen
+        - On the back, explain how to use it
+- [x] Order
+- [ ] Board bring-up
+- [ ] Code changes:
+    - [ ] No-pull on the dip switch I/O

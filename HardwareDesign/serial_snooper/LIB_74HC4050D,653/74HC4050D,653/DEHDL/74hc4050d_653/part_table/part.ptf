@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART '74HC4050D_653'
+CLASS = IC
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "Nexperia", "74HC4050D,653" (!) = "", "SOIC127P600X175-16N", "Small Outline Packages", "771-74HC4050D-T", "https://www.mouser.co.uk/ProductDetail/Nexperia/74HC4050D653?qs=P62ublwmbi%2FIblpTHxAIPw%3D%3D", "NEXPERIA - 74HC4050D,653 - LEVEL SHIFTER, NON INVERTING, SOIC-16", "", "1.75 mm"
+END_PART
+
+END.

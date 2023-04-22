@@ -1,0 +1,10 @@
+(unit MM)
+
+(package "BATHLD003SMT"
+    (type UNDEF)
+    (uver 2)
+    (mountForm default
+        (footprintRef "BATHLD003SMT")
+        (spec "default")
+    )
+)

@@ -1,0 +1,9 @@
+Manufacturer=BelFuse
+PartNumber=0ZCK0020FF2G
+PartCategory=Fuse
+PackageCategory=Fuses Chip
+PinCount=2
+Version=1.1
+Released=2020-07-10 06:11:10
+Downloaded=2023-04-23 13:24:49
+3D=Y

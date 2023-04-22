@@ -1,0 +1,95 @@
+;Proteus Design Interchange Format
+(PDIF
+ (vendor "SamacSys Limited")
+ (version 1 0)
+ (library
+  (part "0ZCK0020FF2G"
+   (description "BEL FUSE - 0ZCK0020FF2G - FUSE, RESETTABLE PTC, 9VDC, 0.2A, SMD")
+   (family "FUS")
+   (package "FUSC2214X100N")
+   (attribute "Datasheet Link" "https://datasheet.datasheetarchive.com/originals/dk/DKDS-24/478080.pdf")
+   (attribute "Geometry.Height" "1mm")
+   (attribute "Mouser Part Number" "530-0ZCK0020FF2G")
+   (attribute "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Bel-Fuse/0ZCK0020FF2G?qs=SRYZG9HaIQ1YaXTwF3oUbw%3D%3D")
+   (attribute "Manufacturer_Name" "BelFuse")
+   (attribute "Manufacturer_Part_Number" "0ZCK0020FF2G")
+   (gate
+    (symbol "0ZCK0020FF2G")
+    (pin "1" 1 PS)
+    (pin "2" 2 PS)
+   )
+  )
+  (symbol "0ZCK0020FF2G"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 200 50) (pt 500 50) (pt 500 -50) (pt 200 -50) (pt 200 50) (closed))
+   )
+   (graphic
+    (stroke 10)
+    (path (pt 200 0) (pt 500 0))
+   )
+   (terminal
+    (body (symbol "PIN") (pt 0 0) (rot 0) (mir 0) (visible true))
+    (name (pt 0 -10) (rot 0) (just TOP LEFT) (visible false))
+    (number (pt 0 10) (rot 0) (just BOTTOM LEFT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 700 0) (rot 0) (mir X) (visible true))
+    (name (pt 0 -10) (rot 0) (just TOP LEFT) (visible false))
+    (number (pt 0 10) (rot 0) (just BOTTOM LEFT) (visible true)))
+  )
+  (symbol "PIN"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 200 0))))
+  (symbol "PINSHORT"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 100 0))))
+  (package "FUSC2214X100N"
+   (units MM)
+   (layer OCCA
+    (graphic
+     (stroke 0.05)
+     (path
+      (closed true)
+      (pt -1.76 1.01)
+      (pt 1.76 1.01)
+      (pt 1.76 -1.01)
+      (pt -1.76 -1.01)
+      (pt -1.76 1.01))))
+   (layer TASM
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -1.075 0.675)
+      (pt 1.075 0.675)
+      (pt 1.075 -0.675)
+      (pt -1.075 -0.675)
+      (pt -1.075 0.675))))
+   (layer TSLK
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed false)
+      (pt 0 0.575)
+      (pt 0 -0.575))))
+   (leg 1 (pt -1.01 0) (padstack 0))
+   (leg 2 (pt 1.01 0) (padstack 0))
+   (padstack 0
+    (plated false)
+    (pad (layer TCOP) (rectf 1 1.52 0 0 90))
+   )
+   (model "0ZCK0020FF2G.stp"
+    (euler 0 0 0)
+    (offset 0 0 0)
+   )
+  )
+ )
+)

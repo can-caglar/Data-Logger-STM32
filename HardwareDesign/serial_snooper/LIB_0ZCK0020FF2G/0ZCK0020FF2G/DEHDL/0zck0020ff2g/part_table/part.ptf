@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART '0ZCK0020FF2G'
+CLASS = DISCRETE
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "BelFuse", "0ZCK0020FF2G" (!) = "", "FUSC2214X100N", "Fuses Chip", "530-0ZCK0020FF2G", "https://www.mouser.co.uk/ProductDetail/Bel-Fuse/0ZCK0020FF2G?qs=SRYZG9HaIQ1YaXTwF3oUbw%3D%3D", "BEL FUSE - 0ZCK0020FF2G - FUSE, RESETTABLE PTC, 9VDC, 0.2A, SMD", "https://datasheet.datasheetarchive.com/originals/dk/DKDS-24/478080.pdf", "1 mm"
+END_PART
+
+END.

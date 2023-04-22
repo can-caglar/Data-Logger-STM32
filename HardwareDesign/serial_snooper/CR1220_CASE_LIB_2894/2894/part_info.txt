@@ -1,0 +1,9 @@
+Manufacturer=Keystone Electronics
+PartNumber=2894
+PartCategory=Hardware
+PackageCategory=Other
+PinCount=3
+Version=1.1
+Released=2019-06-29 22:45:59
+Downloaded=2023-05-07 17:10:37
+3D=Y

@@ -1,0 +1,140 @@
+;Proteus Design Interchange Format
+(PDIF
+ (vendor "SamacSys Limited")
+ (version 1 0)
+ (library
+  (part "BAT-HLD-003-SMT"
+   (description "Coin Cell Battery Holders Holder for 2016, 2020, 2025 and 2032 Batteries, Surface Mount, Bulk Packaging")
+   (family "ANA")
+   (package "BATHLD003SMT")
+   (attribute "Datasheet Link" "https://linxtechnologies.com/wp/wp-content/uploads/bat-hld-003-smt-ds.pdf")
+   (attribute "Geometry.Height" "4.2mm")
+   (attribute "Mouser Part Number" "712-BAT-HLD-003-SMT")
+   (attribute "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Linx-Technologies/BAT-HLD-003-SMT?qs=TuK3vfAjtkVRZQIT6eTqjQ%3D%3D")
+   (attribute "Manufacturer_Name" "Linx Technologies")
+   (attribute "Manufacturer_Part_Number" "BAT-HLD-003-SMT")
+   (gate
+    (symbol "BAT-HLD-003-SMT")
+    (pin "1" 1 PS)
+    (pin "2" 2 PS)
+    (pin "3" 3 PS)
+   )
+  )
+  (symbol "BAT-HLD-003-SMT"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 200 100) (pt 600 100) (pt 600 -300) (pt 200 -300) (pt 200 100) (closed))
+   )
+   (terminal
+    (body (symbol "PIN") (pt 0 0) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 0 -200) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 0 -100) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+  )
+  (symbol "PIN"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 200 0))))
+  (symbol "PINSHORT"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 100 0))))
+  (package "BATHLD003SMT"
+   (units MM)
+   (layer OCCA
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -16.75 11.5)
+      (pt 16.75 11.5)
+      (pt 16.75 -10.35)
+      (pt -16.75 -10.35)
+      (pt -16.75 11.5))))
+   (layer TASM
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed false)
+      (pt 4 10.45)
+      (pt -4 10.45)
+      (pt -10.55 4.5)
+      (pt -10.55 -9.35)
+      (pt 10.55 -9.35)
+      (pt 10.55 4.5)
+      (pt 4 10.5))))
+   (layer TASM
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed false)
+      (pt -10.55 2.55)
+      (pt -15.2 2.55)
+      (pt -15.2 -2.55)
+      (pt -10.55 -2.55))))
+   (layer TASM
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed false)
+      (pt 10.55 2.55)
+      (pt 15.2 2.55)
+      (pt 15.2 -2.55)
+      (pt 10.55 -2.55))))
+   (layer TSLK
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed false)
+      (pt -10.55 3.575)
+      (pt -10.55 4.5)
+      (pt -4 10.45)
+      (pt 4 10.45)
+      (pt 10.55 4.5)
+      (pt 10.55 3.575))))
+   (layer TSLK
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed false)
+      (pt 10.55 -3.625)
+      (pt 10.55 -9.35)
+      (pt -10.55 -9.35)
+      (pt -10.55 -3.625))))
+   (layer TSLK
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -16.2 0.175)
+      (arc (pt -16.200 0.175) (pt -16.200 0.125) (pt -16.100 0.225) (start 180.0) (sweep 180.0))
+      (pt -16.1 0.175)
+      (arc (pt -16.100 0.175) (pt -16.200 0.125) (pt -16.100 0.225) (start 180.0) (sweep .0))
+      (pt -16.2 0.175))))
+   (leg 1 (pt -12.900 0.000) (padstack 0))
+   (leg 2 (pt 12.900 0.000) (padstack 0))
+   (leg 3 (pt 0.000 0.000) (padstack 3))
+   (padstack 0
+    (plated false)
+    (pad (layer TCOP) (rectf 5.700 6.100 0 0 90.000))
+   )
+   (padstack 3
+    (plated false)
+    (pad (layer TCOP) (round 17.900))
+   )
+  )
+ )
+)

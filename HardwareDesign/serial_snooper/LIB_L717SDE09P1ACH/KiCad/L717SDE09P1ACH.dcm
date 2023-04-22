@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP L717SDE09P1ACH
+D Dsub, Stamped Signal 3A, Right Angle PCB Through Hole, FP=10.40mm (0.409in), Row Pitch 2.54mm, 9 Pin, Flash Gold, Bright Tin Shell+Grounding Dimples, 3.05mm  (0.120in) Clear Hole, Ground Tab with Boardlock
+K
+F https://cdn.amphenol-cs.com/media/wysiwyg/files/drawing/l717sdxxxp1ach.pdf
+$ENDCMP
+#
+#End Doc Library

@@ -84,3 +84,5 @@
 build/test/*
 build/artifacts/*
 build/gcov/*
+
+HardwareDesign/serial_snooper/serial_snooper-backups/*

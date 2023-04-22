@@ -1,0 +1,9 @@
+Manufacturer=Amphenol Communications Solutions
+PartNumber=L717SDE09P1ACH
+PartCategory=Connector
+PackageCategory=Other
+PinCount=11
+Version=9.3
+Released=2019-11-10 10:46:46
+Downloaded=2023-04-22 18:26:18
+3D=Y
