@@ -1,0 +1,175 @@
+;Proteus Design Interchange Format
+(PDIF
+ (vendor "SamacSys Limited")
+ (version 1 0)
+ (library
+  (part "L717SDE09P1ACH"
+   (description "Dsub, Stamped Signal 3A, Right Angle PCB Through Hole, FP=10.40mm (0.409in), Row Pitch 2.54mm, 9 Pin, Flash Gold, Bright Tin Shell+Grounding Dimples, 3.05mm  (0.120in) Clear Hole, Ground Tab with Boardlock")
+   (family "CON")
+   (package "L717SDE09P1ACH")
+   (attribute "Datasheet Link" "https://cdn.amphenol-cs.com/media/wysiwyg/files/drawing/l717sdxxxp1ach.pdf")
+   (attribute "Geometry.Height" "12.93mm")
+   (attribute "Mouser Part Number" "523-L717SDE09P1ACH")
+   (attribute "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Amphenol-Commercial-Products/L717SDE09P1ACH?qs=ToP8pWlZ0bM4QYgeUn06cg%3D%3D")
+   (attribute "Manufacturer_Name" "Amphenol Communications Solutions")
+   (attribute "Manufacturer_Part_Number" "L717SDE09P1ACH")
+   (gate
+    (symbol "L717SDE09P1ACH")
+    (pin "1" 1 PS)
+    (pin "2" 2 PS)
+    (pin "3" 3 PS)
+    (pin "4" 4 PS)
+    (pin "5" 5 PS)
+    (pin "6" 6 PS)
+    (pin "7" 7 PS)
+    (pin "8" 8 PS)
+    (pin "9" 9 PS)
+    (pin "MH1" MH1 PS)
+    (pin "MH2" MH2 PS)
+   )
+  )
+  (symbol "L717SDE09P1ACH"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 200 300) (pt 800 300) (pt 800 -300) (pt 200 -300) (pt 200 300) (closed))
+   )
+   (terminal
+    (body (symbol "PIN") (pt 300 500) (rot 90) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 400 500) (rot 90) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 500 500) (rot 90) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 600 500) (rot 90) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 700 500) (rot 90) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 300 -500) (rot 90) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 400 -500) (rot 90) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 500 -500) (rot 90) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 600 -500) (rot 90) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 0 0) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 1000 0) (rot 0) (mir X) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+  )
+  (symbol "PIN"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 200 0))))
+  (symbol "PINSHORT"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 100 0))))
+  (package "L717SDE09P1ACH"
+   (units MM)
+   (layer TASM
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed true)
+      (pt -9.865 1.66)
+      (pt 20.945 1.66)
+      (pt 20.945 -12.94)
+      (pt -9.865 -12.94)
+      (pt -9.865 1.66))))
+   (layer TSLK
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -9.865 1.66)
+      (pt 20.945 1.66)
+      (pt 20.945 -12.94)
+      (pt -9.865 -12.94)
+      (pt -9.865 1.66))))
+   (layer OCCA
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -10.865 3.1)
+      (pt 21.945 3.1)
+      (pt 21.945 -13.94)
+      (pt -10.865 -13.94)
+      (pt -10.865 3.1))))
+   (layer TSLK
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt 0 2)
+      (arc (pt 0.000 2.000) (pt -0.050 2.000) (pt 0.050 2.100) (start 180.0) (sweep -90.0))
+      (pt 0 2.1)
+      (arc (pt 0.000 2.100) (pt -0.050 2.000) (pt 0.050 2.100) (start 180.0) (sweep 90.0))
+      (pt 0 2))))
+   (leg 1 (pt 0.000 0.000) (padstack 0))
+   (leg 2 (pt 2.770 0.000) (padstack 0))
+   (leg 3 (pt 5.540 0.000) (padstack 0))
+   (leg 4 (pt 8.310 0.000) (padstack 0))
+   (leg 5 (pt 11.080 0.000) (padstack 0))
+   (leg 6 (pt 1.385 -2.540) (padstack 0))
+   (leg 7 (pt 4.155 -2.540) (padstack 0))
+   (leg 8 (pt 6.925 -2.540) (padstack 0))
+   (leg 9 (pt 9.695 -2.540) (padstack 0))
+   (leg MH1 (pt -6.955 -1.270) (padstack 10))
+   (leg MH2 (pt 18.035 -1.270) (padstack 11))
+   (padstack 0
+    (hole 1.1)
+    (plated true)
+    (pad (layer TCOP) (round 1.650))
+    (pad (layer INNER) (round 1.650))
+    (pad (layer BCOP) (round 1.650))
+   )
+   (padstack 10
+    (hole 3.2)
+    (plated true)
+    (pad (layer TCOP) (round 4.800))
+    (pad (layer INNER) (round 4.800))
+    (pad (layer BCOP) (round 4.800))
+   )
+   (padstack 11
+    (hole 3.2)
+    (plated true)
+    (pad (layer TCOP) (round 4.800))
+    (pad (layer INNER) (round 4.800))
+    (pad (layer BCOP) (round 4.800))
+   )
+   (model "L717SDE09P1ACH.stp"
+    (euler 0 180 180)
+    (offset 5.519999980926514 -12.539999961853027 7)
+   )
+  )
+ )
+)

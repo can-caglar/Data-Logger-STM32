@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "L717SDE09P1ACH"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2019-11-10-10:46:46)
+    (mountForm default
+        (footprintRef "L717SDE09P1ACH")
+        (spec "System")
+    )
+)

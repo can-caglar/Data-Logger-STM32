@@ -1,0 +1,184 @@
+
+(EDIF
+  (rename &L717SDE09P1ACH "L717SDE09P1ACH")
+  (EDIFVersion 2 0 0)
+  (EDIFLevel 0)
+  (keywordMap (keywordLevel 0))
+  (status
+    (written
+      (timestamp 2023 04 22 18 26 18)
+      (dataOrigin "1672709/1120083/2.50/11/2/Connector")
+      (program "SamacSys ECAD Model L717SDE09P1ACH"
+        (version "9.3"))))
+  (library
+  (rename &L717SDE09P1ACH "L717SDE09P1ACH")
+    (EDIFLevel 0)
+    (technology
+      (numberDefinition (scale 1 (e 254 -6) (unit DISTANCE)))
+      (userData GRIDRESOLUTION (integer 50 50))
+      (figureGroup DEFAULT (pathWidth 10) (textHeight 100))
+      (figureGroup PROPERTY (pathWidth 10) (textHeight 90))
+      (figureGroup PINNUMBER (pathWidth 10) (textHeight 90))
+      (figureGroup PINNAME (pathWidth 10) (textHeight 90))
+      (figureGroup COMMENT (pathWidth 10) (textHeight 90))
+      (figureGroup PIN (pathWidth 10) (textHeight 90))
+      (figureGroup GRAPHIC (pathWidth 10) (textHeight 100))
+    )
+    (cell
+      (rename &L717SDE09P1ACH "L717SDE09P1ACH")
+      (cellType GENERIC)
+      (view
+        (rename NORMAL "Normal")
+        (viewType SCHEMATIC)
+        (interface
+          (designator "J")
+          (property (rename PACKAGENAME "PackageName") (string "L717SDE09P1ACH"))
+          (property (rename ISHETEROGENEOUS "IsHeterogeneous") (string "False"))
+          (property (rename DEVICESINVIEW "DevicesInView") (string "1"))
+          (property (rename DEVICESINPACKAGE "DevicesInPackage") (string "1"))
+          (property (rename DEVICEDESIGNATOR "DeviceDesignator") (string "A"))
+          (property (rename DEVICENUMBERING "DeviceNumbering") (string "Alpha"))
+          (property (rename PCB_32_FOOTPRINT "PCB Footprint") (string "L717SDE09P1ACH"))
+          (property (rename &Mouser_Part_Number "Mouser Part Number") (string "523-L717SDE09P1ACH"))
+          (property (rename &Mouser_Price_Stock "Mouser Price/Stock") (string "https://www.mouser.co.uk/ProductDetail/Amphenol-Commercial-Products/L717SDE09P1ACH?qs=ToP8pWlZ0bM4QYgeUn06cg%3D%3D"))
+          (property (rename &Manufacturer_Name "Manufacturer_Name") (string "Amphenol Communications Solutions"))
+          (property (rename &Manufacturer_Part_Number "Manufacturer_Part_Number") (string "L717SDE09P1ACH"))
+          (property (rename &Description "Description") (string "Dsub, Stamped Signal 3A, Right Angle PCB Through Hole, FP=10.40mm (0.409in), Row Pitch 2.54mm, 9 Pin, Flash Gold, Bright Tin Shell+Grounding Dimples, 3.05mm  (0.120in) Clear Hole, Ground Tab with Boardlock"))
+          (property (rename &Datasheet_Link "Datasheet Link") (string "https://cdn.amphenol-cs.com/media/wysiwyg/files/drawing/l717sdxxxp1ach.pdf"))
+          (property (rename &Height "Height") (string "12.93 mm"))
+          (property (rename &_60__32_VALUE_32__62_ "Value") (string "L717SDE09P1ACH"))
+          (property (rename VALUE "Value") (string "Value"))
+          (port
+            (rename &1 "1")
+            (designator "1")
+            (property (rename ORDER "Order") (string "0") (owner "OrCAD"))
+          )
+          (port
+            (rename &2 "2")
+            (designator "2")
+            (property (rename ORDER "Order") (string "1") (owner "OrCAD"))
+          )
+          (port
+            (rename &3 "3")
+            (designator "3")
+            (property (rename ORDER "Order") (string "2") (owner "OrCAD"))
+          )
+          (port
+            (rename &4 "4")
+            (designator "4")
+            (property (rename ORDER "Order") (string "3") (owner "OrCAD"))
+          )
+          (port
+            (rename &5 "5")
+            (designator "5")
+            (property (rename ORDER "Order") (string "4") (owner "OrCAD"))
+          )
+          (port
+            (rename &6 "6")
+            (designator "6")
+            (property (rename ORDER "Order") (string "5") (owner "OrCAD"))
+          )
+          (port
+            (rename &7 "7")
+            (designator "7")
+            (property (rename ORDER "Order") (string "6") (owner "OrCAD"))
+          )
+          (port
+            (rename &8 "8")
+            (designator "8")
+            (property (rename ORDER "Order") (string "7") (owner "OrCAD"))
+          )
+          (port
+            (rename &9 "9")
+            (designator "9")
+            (property (rename ORDER "Order") (string "8") (owner "OrCAD"))
+          )
+          (port
+            (rename &MH1 "MH1")
+            (designator "MH1")
+            (property (rename ORDER "Order") (string "9") (owner "OrCAD"))
+          )
+          (port
+            (rename &MH2 "MH2")
+            (designator "MH2")
+            (property (rename ORDER "Order") (string "10") (owner "OrCAD"))
+          )
+          (symbol
+            (portImplementation
+              (name &1 (display PINNAME))
+              (figure PIN (path (pointList (pt 100 200) (pt 100 0))))
+              (connectLocation (figure GRAPHIC (dot (pt 100 200))))
+            )
+            (portImplementation
+              (name &2 (display PINNAME))
+              (figure PIN (path (pointList (pt 200 200) (pt 200 0))))
+              (connectLocation (figure GRAPHIC (dot (pt 200 200))))
+            )
+            (portImplementation
+              (name &3 (display PINNAME))
+              (figure PIN (path (pointList (pt 300 200) (pt 300 0))))
+              (connectLocation (figure GRAPHIC (dot (pt 300 200))))
+            )
+            (portImplementation
+              (name &4 (display PINNAME))
+              (figure PIN (path (pointList (pt 400 200) (pt 400 0))))
+              (connectLocation (figure GRAPHIC (dot (pt 400 200))))
+            )
+            (portImplementation
+              (name &5 (display PINNAME))
+              (figure PIN (path (pointList (pt 500 200) (pt 500 0))))
+              (connectLocation (figure GRAPHIC (dot (pt 500 200))))
+            )
+            (portImplementation
+              (name &6 (display PINNAME))
+              (figure PIN (path (pointList (pt 100 -800) (pt 100 -600))))
+              (connectLocation (figure GRAPHIC (dot (pt 100 -800))))
+            )
+            (portImplementation
+              (name &7 (display PINNAME))
+              (figure PIN (path (pointList (pt 200 -800) (pt 200 -600))))
+              (connectLocation (figure GRAPHIC (dot (pt 200 -800))))
+            )
+            (portImplementation
+              (name &8 (display PINNAME))
+              (figure PIN (path (pointList (pt 300 -800) (pt 300 -600))))
+              (connectLocation (figure GRAPHIC (dot (pt 300 -800))))
+            )
+            (portImplementation
+              (name &9 (display PINNAME))
+              (figure PIN (path (pointList (pt 400 -800) (pt 400 -600))))
+              (connectLocation (figure GRAPHIC (dot (pt 400 -800))))
+            )
+            (portImplementation
+              (name &MH1 (display PINNAME))
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt -200 -300) (pt 0 -300))))
+              (connectLocation (figure GRAPHIC (dot (pt -200 -300))))
+            )
+            (portImplementation
+              (name &MH2 (display PINNAME))
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt 600 -300) (pt 800 -300))))
+              (connectLocation (figure GRAPHIC (dot (pt 800 -300))))
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 0)
+                  (pt 600 0)
+                  (pt 600 -600)
+                  (pt 0 -600)
+                  (pt 0 0)
+                )
+              )
+            )
+            (keywordDisplay DESIGNATOR (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 650 130))))
+            (propertyDisplay &_60__32_VALUE_32__62_ (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 650 30))))
+          )
+        )
+      )
+    )
+  )
+)

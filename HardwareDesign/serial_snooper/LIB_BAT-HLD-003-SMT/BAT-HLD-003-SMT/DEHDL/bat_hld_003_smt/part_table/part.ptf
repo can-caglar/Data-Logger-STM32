@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART 'BAT_HLD_003_SMT'
+CLASS = DISCRETE
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "Linx Technologies", "BAT-HLD-003-SMT" (!) = "", "BATHLD003SMT", "Other", "712-BAT-HLD-003-SMT", "https://www.mouser.co.uk/ProductDetail/Linx-Technologies/BAT-HLD-003-SMT?qs=TuK3vfAjtkVRZQIT6eTqjQ%3D%3D", "Coin Cell Battery Holders Holder for 2016, 2020, 2025 and 2032 Batteries, Surface Mount, Bulk Packaging", "https://linxtechnologies.com/wp/wp-content/uploads/bat-hld-003-smt-ds.pdf", "4.2 mm"
+END_PART
+
+END.

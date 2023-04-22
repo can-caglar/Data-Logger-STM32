@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "0ZCK0020FF2G"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2020-07-10-06:11:10)
+    (mountForm default
+        (footprintRef "FUSC2214X100N")
+        (spec "System")
+    )
+)

@@ -15,7 +15,7 @@ static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 static char fileName[MAX_FILE_NAME];
-static uint8_t isNvmFilenameValid(char* data);
+static uint8_t isNvmFilenameValid(void);
 
 int SystemOperations_Init(void)
 {
@@ -44,7 +44,7 @@ void SystemOperations_OpenLogFile(void)
         {
             char data[13 + 4 + 1] = "";
             read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
-            if (isNvmFilenameValid(data))
+            if (strncmp(data, "file", 4) == 0)
             {
                 strcpy(fileName, data + 4);
             }
@@ -59,7 +59,7 @@ void SystemOperations_OpenLogFile(void)
         if (err == FR_OK)
         {
             bLogFileIsOpen = 1;
-            char data[13 + 4 + 1] = "file"; // indicates correctness
+            char data[13 + 4 + 1] = "file";
             strcpy(data + 4, fileName);
             write_flash_string(FLASH_DATA_PAGE_0, data);
         }
@@ -140,11 +140,9 @@ static uint8_t timestampThisLine(uint8_t thisByte)
     return ret;
 }
 
-static uint8_t isNvmFilenameValid(char* data)
+static uint8_t isNvmFilenameValid(void)
 {
-    if (strncmp(data, "file", 4) == 0)
-    {
-        return 1;
-    }
-    return 0;
+    char data[13 + 4 + 1] = "";
+    read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
+    return strncmp(data, "file", 4) == 0;
 }

@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "BAT-HLD-003-SMT"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2022-03-10-09:46:42)
+    (mountForm default
+        (footprintRef "BATHLD003SMT")
+        (spec "System")
+    )
+)

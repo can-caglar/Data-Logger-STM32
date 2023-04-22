@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--/822012/1120083/2.50/2/3/Fuse/-->
+<quadcept_library>
+  <setting unit="mil" />
+  <textstyle name="Default" height="47.244094488189" strokewidth="7.8740157480315" charwidth="47.244094488189" />
+  <textstyle name="Dimension" height="19.6850393700787" strokewidth="0" charwidth="19.6850393700787" />
+  <textstyle name="H127W0635TH00762" height="50" strokewidth="3" charwidth="25" />
+  <textstyle name="H15W15TH02" height="59.0551181102362" strokewidth="7.8740157480315" charwidth="59.0551181102362" />
+  <padstyle name="r152_100" surface="True" plated="False" isvia="False" nopaste="False" nomask="True" complex="False" holesize="0">
+    <padshape layer="TOP" shape="rectangle" width="39.370078740157" height="59.842519685039" />
+    <padshape layer="TOP_SOLDER_MASK" shape="rectangle" width="47.244094488188" height="67.71653543307" />
+    <padshape layer="TOP_SOLDER_PASTE" shape="rectangle" width="39.370078740157" height="59.842519685039" />
+  </padstyle>
+  <footprint name="FUSC2214X100N" originx="0" originy="0" pickpointx="0" pickpointy="0">
+    <pcbpin number="1" name="1" style="r152_100" originx="-39.763779527559" originy="0" rotation="0" />
+    <pcbpin number="2" name="2" style="r152_100" originx="39.763779527559" originy="0" rotation="0" />
+    <line layer="TOP_PLACE_BOUND" originx="-69.291338582676" originy="39.763779527559" endx="69.291338582676" endy="39.763779527559" width="1.9685039370079" />
+    <line layer="TOP_PLACE_BOUND" originx="69.291338582676" originy="39.763779527559" endx="69.291338582676" endy="-39.763779527559" width="1.9685039370079" />
+    <line layer="TOP_PLACE_BOUND" originx="69.291338582676" originy="-39.763779527559" endx="-69.291338582676" endy="-39.763779527559" width="1.9685039370079" />
+    <line layer="TOP_PLACE_BOUND" originx="-69.291338582676" originy="-39.763779527559" endx="-69.291338582676" endy="39.763779527559" width="1.9685039370079" />
+    <line layer="TOP_ASSEMBLY" originx="-42.322834645669" originy="26.574803149606" endx="42.322834645669" endy="26.574803149606" width="3.9370078740157" />
+    <line layer="TOP_ASSEMBLY" originx="42.322834645669" originy="26.574803149606" endx="42.322834645669" endy="-26.574803149606" width="3.9370078740157" />
+    <line layer="TOP_ASSEMBLY" originx="42.322834645669" originy="-26.574803149606" endx="-42.322834645669" endy="-26.574803149606" width="3.9370078740157" />
+    <line layer="TOP_ASSEMBLY" originx="-42.322834645669" originy="-26.574803149606" endx="-42.322834645669" endy="26.574803149606" width="3.9370078740157" />
+    <line layer="TOP_SILKSCREEN" originx="0" originy="22.63779527559" endx="0" endy="-22.63779527559" width="7.8740157480314" />
+  </footprint>
+  <symbol name="0ZCK0020FF2G" originx="0" originy="0">
+    <line originx="200" originy="50" endx="500" endy="50" width="0" />
+    <line originx="500" originy="-50" endx="500" endy="50" width="0" />
+    <line originx="500" originy="-50" endx="200" endy="-50" width="0" />
+    <line originx="200" originy="50" endx="200" endy="-50" width="0" />
+    <line originx="200" originy="0" endx="500" endy="0" width="0" />
+    <sympin number="1" originx="200" originy="0" rotation="180" length="100" width="7.8740157480315" flipped="False">
+      <text name="pinname" originx="0" originy="-10" style="Default" rotation="0" justify="upperleft" flipped="False" hidden="True" data="1" />
+      <text name="pindes" originx="0" originy="10" style="Default" rotation="0" justify="lowerleft" flipped="False" hidden="False" data="1" />
+    </sympin>
+    <sympin number="2" originx="500" originy="0" rotation="0" length="100" width="7.8740157480315" flipped="False">
+      <text name="pinname" originx="700" originy="-10" style="Default" rotation="0" justify="upperright" flipped="False" hidden="True" data="2" />
+      <text name="pindes" originx="700" originy="10" style="Default" rotation="0" justify="lowerright" flipped="False" hidden="False" data="2" />
+    </sympin>
+  </symbol>
+  <component name="0ZCK0020FF2G" designatorprefix="F" height="39.370078740157" footprint="FUSC2214X100N">
+    <comppin designator="1" sympin="1" pinswap="0" gateswap="0" gate="1" group="1" side="" type="Any" name="1" />
+    <comppin designator="2" sympin="2" pinswap="0" gateswap="0" gate="1" group="1" side="" type="Any" name="2" />
+    <attached_symbol gate="1" name="0ZCK0020FF2G" />
+    <pinmap designator="1" footprintpin="1" />
+    <pinmap designator="2" footprintpin="2" />
+    <text name="Datasheet" originx="0" originy="0" style="Default" rotation="0" justify="" flipped="False" hidden="True" data="https://datasheet.datasheetarchive.com/originals/dk/DKDS-24/478080.pdf" />
+    <text name="Description" originx="0" originy="0" style="Default" rotation="0" justify="" flipped="False" hidden="True" data="BEL FUSE - 0ZCK0020FF2G - FUSE, RESETTABLE PTC, 9VDC, 0.2A, SMD" />
+    <text name="Mouser Part Number" originx="0" originy="0" style="Default" rotation="0" justify="" flipped="False" hidden="True" data="530-0ZCK0020FF2G" />
+    <text name="Mouser Price/Stock" originx="0" originy="0" style="Default" rotation="0" justify="" flipped="False" hidden="True" data="https://www.mouser.co.uk/ProductDetail/Bel-Fuse/0ZCK0020FF2G?qs=SRYZG9HaIQ1YaXTwF3oUbw%3D%3D" />
+    <text name="Manufacturer_Name" originx="0" originy="0" style="Default" rotation="0" justify="" flipped="False" hidden="True" data="BelFuse" />
+    <text name="Manufacturer_Part_Number" originx="550" originy="150" style="Default" rotation="0" justify="left" flipped="False" hidden="False" data="0ZCK0020FF2G" />
+  </component>
+</quadcept_library>

@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 0ZCK0020FF2G
+D BEL FUSE - 0ZCK0020FF2G - FUSE, RESETTABLE PTC, 9VDC, 0.2A, SMD
+K
+F https://datasheet.datasheetarchive.com/originals/dk/DKDS-24/478080.pdf
+$ENDCMP
+#
+#End Doc Library

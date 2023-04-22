@@ -1,0 +1,130 @@
+;Proteus Design Interchange Format
+(PDIF
+ (vendor "SamacSys Limited")
+ (version 1 0)
+ (library
+  (part "2894"
+   (description "Coin Cell Battery Holders CR1220 COIN CELL SMT RETAINER")
+   (family "ANA")
+   (package "2894")
+   (attribute "Datasheet Link" "https://www.keyelco.com/product-pdf.cfm?p=14467")
+   (attribute "Geometry.Height" "2.42mm")
+   (attribute "Mouser Part Number" "534-2894")
+   (attribute "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Keystone-Electronics/2894?qs=u16ybLDytRb94n%2F3dXyVLQ%3D%3D")
+   (attribute "Manufacturer_Name" "Keystone Electronics")
+   (attribute "Manufacturer_Part_Number" "2894")
+   (gate
+    (symbol "2894")
+    (pin "+" 1 PS)
+    (pin "-" 2 PS)
+    (pin "MP1" MP1 PS)
+   )
+  )
+  (symbol "2894"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 200 100) (pt 700 100) (pt 700 -300) (pt 200 -300) (pt 200 100) (closed))
+   )
+   (terminal
+    (body (symbol "PIN") (pt 0 0) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 0 -200) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+   (terminal
+    (body (symbol "PIN") (pt 0 -100) (rot 0) (mir 0) (visible true))
+    (name (pt 230 0) (rot 0) (just MIDDLE LEFT) (visible true))
+    (number (pt 140 20) (rot 0) (just BOTTOM RIGHT) (visible true)))
+  )
+  (symbol "PIN"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 200 0))))
+  (symbol "PINSHORT"
+   (units THOU)
+   (origin (pt 0 0))
+   (graphic
+    (stroke 10)
+    (path (pt 0 0) (pt 100 0))))
+  (package "2894"
+   (units MM)
+   (layer OCCA
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed true)
+      (pt -9.89 7.605)
+      (pt 9.89 7.605)
+      (pt 9.89 -7.605)
+      (pt -9.89 -7.605)
+      (pt -9.89 7.605))))
+   (layer TASM
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed true)
+      (pt -6.605 0)
+      (arc (pt -6.605 0.000) (pt -6.605 -6.605) (pt 6.605 6.605) (start 180.0) (sweep -180.0))
+      (pt 6.605 0)
+      (arc (pt 6.605 0.000) (pt -6.605 -6.605) (pt 6.605 6.605) (start 180.0) (sweep .0))
+      (pt -6.605 0))))
+   (layer TASM
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed false)
+      (pt -5 4.45)
+      (pt -5.5 5)
+      (pt -4.5 5.8)
+      (pt -4 5.25))))
+   (layer TSLK
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed false)
+      (pt -5 4.45)
+      (pt -5.5 5)
+      (pt -4.5 5.8)
+      (pt -4 5.25))))
+   (layer TASM
+    (graphic
+     (stroke 0.2)
+     (path
+      (closed false)
+      (pt 5 4.45)
+      (pt 5.5 5)
+      (pt 4.5 5.8)
+      (pt 4 5.25))))
+   (layer TSLK
+    (graphic
+     (stroke 0.1)
+     (path
+      (closed false)
+      (pt 4 5.25)
+      (pt 4.5 5.8)
+      (pt 5.5 5)
+      (pt 5 4.45))))
+   (leg 1 (pt -7.620 0.000) (padstack 0))
+   (leg 2 (pt 7.620 0.000) (padstack 0))
+   (leg MP1 (pt 0.000 0.000) (padstack 3))
+   (padstack 0
+    (plated false)
+    (pad (layer TCOP) (rectf 2.540 3.170 0 0 90.000))
+   )
+   (padstack 3
+    (plated false)
+    (pad (layer TCOP) (rectf 3.960 3.960 0 0 90.000))
+   )
+   (model "2894.stp"
+    (euler 90 0 0)
+    (offset 0 0 2.4200000762939453)
+   )
+  )
+ )
+)
