@@ -10,6 +10,10 @@
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)
 
+// e.g. for a file named hello.txt, nvm shall store:
+// "filehello.txt    \0"
+#define FILENAME_DATA_NVM_LEN ((MAX_FILE_NAME) + 4 + 1)
+
 static uint8_t previousData;
 static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
@@ -42,8 +46,8 @@ void SystemOperations_OpenLogFile(void)
         }
         else
         {
-            char data[13 + 4 + 1] = "";
-            read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
+            char data[FILENAME_DATA_NVM_LEN] = "";
+            read_flash_string(FLASH_DATA_PAGE_0, data, FILENAME_DATA_NVM_LEN);
             if (strncmp(data, "file", 4) == 0)
             {
                 strcpy(fileName, data + 4);
@@ -59,7 +63,7 @@ void SystemOperations_OpenLogFile(void)
         if (err == FR_OK)
         {
             bLogFileIsOpen = 1;
-            char data[13 + 4 + 1] = "file";
+            char data[FILENAME_DATA_NVM_LEN] = "file";
             strcpy(data + 4, fileName);
             write_flash_string(FLASH_DATA_PAGE_0, data);
         }
@@ -142,7 +146,7 @@ static uint8_t timestampThisLine(uint8_t thisByte)
 
 static uint8_t isNvmFilenameValid(void)
 {
-    char data[13 + 4 + 1] = "";
-    read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
+    char data[FILENAME_DATA_NVM_LEN] = "";
+    read_flash_string(FLASH_DATA_PAGE_0, data, FILENAME_DATA_NVM_LEN);
     return strncmp(data, "file", 4) == 0;
 }
