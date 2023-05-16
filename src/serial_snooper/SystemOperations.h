@@ -11,5 +11,6 @@ int SystemOperations_Init(void);
 void SystemOperations_OpenLogFile(void);
 void SystemOperations_WriteSD(void);
 void SystemOperations_FlushSD(void);
+void SystemOperations_ConfigureUart(void);
 
 #endif

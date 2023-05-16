@@ -4,6 +4,8 @@
 #include "DataHolder.h"
 #include "FileNameIterator.h"
 #include "MyStm32Flash.h"
+#include "MyUART.h"
+#include "autobaudrate.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -27,6 +29,7 @@ int SystemOperations_Init(void)
     bLogFileIsOpen = 0;
     memset(fileName, 0, sizeof(fileName));
     FileNameIterator_init();
+    autobaudrate_init();
     return SO_SUCCESS;
 }   
 
@@ -100,6 +103,17 @@ void SystemOperations_WriteSD(void)
 void SystemOperations_FlushSD(void)
 {
     MySD_Flush();
+}
+
+void SystemOperations_ConfigureUart(void)
+{
+    uint32_t br = autobaudrate_getBr();
+    if (br != UNDEFINED_BR)
+    {
+        MyUART_Config cfg;
+        cfg.baudrate = br;
+        MyUART_init(&cfg);
+    }
 }
 
 

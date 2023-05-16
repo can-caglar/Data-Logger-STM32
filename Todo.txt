@@ -75,7 +75,7 @@ New in V3:
     - What to do when the maximum log files is reached - shall be handled by error handling.
     - What happens if SD card contains too many files already, is full, or has files with our naming conventions?
 
-- [ ] Continue writing to the same file even after a power cycle
+- [x] Continue writing to the same file even after a power cycle
     - This gives the serial snooper a more predictable behaviour
     - Reduces likelihood of creating too many files on the SD card which may cause issues when reading it from a PC
     - [ ] Add system to retain information after power cycling and load this information on start-up.

@@ -57,7 +57,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huartIT;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -147,17 +147,17 @@ void SysTick_Handler(void)
   */
 void USART2_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&huart1);
-  huart1.pRxBuffPtr--;  // assuming the buffer got moved
+  HAL_UART_IRQHandler(&huartIT);
+  huartIT.pRxBuffPtr--;  // assuming the buffer got moved
 
   MyCircularBuffer_init();
 
   // we don't care what the buffer is, set it again
-  if (MyCircularBuffer_write(*(huart1.pRxBuffPtr)))
+  if (MyCircularBuffer_write(*(huartIT.pRxBuffPtr)))
   {
     ErrorIndicator_Indicate();
   }
 
   // set up irq again (1 addr down as it would've been incremented)
-  HAL_UART_Receive_IT(&huart1, huart1.pRxBuffPtr, 1);
+  HAL_UART_Receive_IT(&huartIT, huartIT.pRxBuffPtr, 1);
 }

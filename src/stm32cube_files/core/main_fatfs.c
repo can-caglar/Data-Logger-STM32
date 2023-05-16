@@ -11,7 +11,6 @@ I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart1;
 static uint8_t hal_initialised = 0;
-static uint8_t uartRecvBuf = 0;
 
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
@@ -43,7 +42,7 @@ void CubeMX_SystemInit(unsigned int sys)
     MX_USART2_UART_Init();
     if (sys & CMX_UART)
     {
-        HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
+        // HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
     }
   }
   if (sys & CMX_I2C)
