@@ -35,7 +35,7 @@ int initialise(void)
     else
     {
         // The Serial Snooping application
-        CubeMX_SystemInit(CMX_UART);
+        // CubeMX_SystemInit(CMX_UART);
         MyScheduler_Init();
         SystemOperations_Init();
         MyScheduler_AddTask(SystemOperations_OpenLogFile,
@@ -44,6 +44,8 @@ int initialise(void)
             0, true, true);
         MyScheduler_AddTask(SystemOperations_FlushSD,
             FLUSH_TIME_MS, true, true);
+        MyScheduler_AddTask(SystemOperations_ConfigureUart,
+            0, true, true);
         app = APP_SNOOPING;
     }
     return app;

@@ -11,7 +11,6 @@ I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart1;
 static uint8_t hal_initialised = 0;
-static uint8_t uartRecvBuf = 0;
 
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
@@ -43,7 +42,7 @@ void CubeMX_SystemInit(unsigned int sys)
     MX_USART2_UART_Init();
     if (sys & CMX_UART)
     {
-        HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
+        // HAL_UART_Receive_IT(&huart1, &uartRecvBuf, 1);
     }
   }
   if (sys & CMX_I2C)
@@ -59,6 +58,10 @@ void CubeMX_SystemInit(unsigned int sys)
   */
 void SystemClock_Config(void)
 {
+  // Internal clock is 8 MHz
+  // This gets divided by 2 before going to the PLL
+  // then gets multiplied by the PLL (x16)
+  // Is divided by AHB Prescaler (/1) to give HCLK (64 MHz)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -79,6 +82,8 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
+  // APB1 timer clocks have a compulsory x2 multiplier
+  // with a divider of 2, the effect is negated.
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;

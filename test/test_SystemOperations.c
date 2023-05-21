@@ -13,6 +13,9 @@
 #include "SystemConfigs.h"
 #include "fake_stm32f0xx_hal.h"
 #include "fake_stm32flash.h"
+#include "fake_myuart.h"
+#include "autobaudrate.h"
+#include "fake_MyTimer.h"
 
 #include <string.h>
 

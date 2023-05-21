@@ -15,7 +15,7 @@ typedef enum
 
 static void callWhenCircularBufferIs(CircularBufferState state);
 
-UART_HandleTypeDef huart1; // fake huart1
+UART_HandleTypeDef huartIT; // fake huartIT
 const uint8_t fakeUartBuf = 8; // fake UART buffer
 
 void test_USART2_IRQHandler_normal_operation(void)
@@ -34,10 +34,10 @@ void test_USART2_IRQHandler_when_buffer_full_indicates_error(void)
 
 static void callWhenCircularBufferIs(CircularBufferState state)
 {
-    huart1.pRxBuffPtr = &fakeUartBuf;
-    huart1.pRxBuffPtr++;    // simulating the HAL which increments addr
+    huartIT.pRxBuffPtr = &fakeUartBuf;
+    huartIT.pRxBuffPtr++;    // simulating the HAL which increments addr
 
-    HAL_UART_IRQHandler_Expect(&huart1);
+    HAL_UART_IRQHandler_Expect(&huartIT);
     MyCircularBuffer_init_Expect();
 
     if (state == NOT_FULL)
@@ -51,6 +51,6 @@ static void callWhenCircularBufferIs(CircularBufferState state)
         ErrorIndicator_Indicate_Expect();
     }
     // Expect the same buffer address to be written to for next time
-    HAL_UART_Receive_IT_ExpectAndReturn(&huart1,
+    HAL_UART_Receive_IT_ExpectAndReturn(&huartIT,
         &fakeUartBuf, 1, 0);
 }

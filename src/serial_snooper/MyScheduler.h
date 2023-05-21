@@ -15,7 +15,7 @@ enum
     SS_ERR_FAULT,
 };
 
-#define MAX_TASKS 3
+#define MAX_TASKS 4
 
 // Fw declare DataContext
 typedef struct DataContext DataContext;

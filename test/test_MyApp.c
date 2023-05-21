@@ -7,7 +7,6 @@
 
 #include "MyScheduler.h"
 #include "fake_stm32f0xx_hal.h"
-// #include "fake_SDCard.h"
 #include "fake_myTimeString.h"
 #include "SystemOperations.h"
 #include "DataHolder.h"
@@ -18,6 +17,9 @@
 #include "fakeff.h"
 #include "fakefilesystem.h"
 #include "fake_stm32flash.h"
+#include "fake_MyTimer.h"
+#include "fake_myuart.h"
+#include "autobaudrate.h"
 
 #include <string.h>
 
@@ -69,6 +71,7 @@ void setUp(void)
     fakeff_reset();
     fake_myTimeString_reset();
     fake_halTick_reset();
+    fake_mytimer_reset();
     restartSystem();
 }
 
@@ -189,11 +192,22 @@ void test_App_firstFileOpenIgnoresGarbage(void)
 {
     // given
     fake_myTimeString_setFileName("new.txt");
-    write_flash_string(FLASH_DATA_PAGE_0, "~';2efwww");
+    write_flash_string(FLASH_DATA_PAGE_0, "~';ignoreme");
     // when
     runInfiniteLoop(&TheApplication);
     // then
     TEST_ASSERT_TRUE(fakefilesystem_fileExists("new.txt"));
+}
+
+void test_App_calculates_baudrateBasedOnWhatsReceived(void)
+{
+    // given
+    LOOP_COUNT(20);
+    fake_mytimer_pretendToReceiveString("hello there!", 19200);
+    // when
+    runInfiniteLoop(&TheApplication);
+    // then
+    TEST_ASSERT_EQUAL_UINT32(19200, fake_myuart_getBr());
 }
 
 #if 0
@@ -260,7 +274,7 @@ void expectMySchedulerInitHelper(void)
     CubeMX_SystemInit_Expect(CMX_FATFS);
     AppDecider_Init_Expect();
     AppDecider_Decide_ExpectAndReturn(APP_SNOOPING);
-    CubeMX_SystemInit_Expect(CMX_UART);
+    //CubeMX_SystemInit_Expect(CMX_UART);
 }
 
 void streamNewDataIn(char* data)

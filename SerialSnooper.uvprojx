@@ -496,6 +496,21 @@
               <FileType>1</FileType>
               <FilePath>.\src\stm32_flash\MyStm32Flash.c</FilePath>
             </File>
+            <File>
+              <FileName>autobaudrate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\autobaudrate.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyTimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyUART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\MyUART.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -635,6 +650,16 @@
               <FileName>stm32f3xx_hal_flash_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_flash_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f3xx_hal_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f3xx_hal_tim_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Keil_v5\ARM\PACK\Keil\STM32F3xx_DFP\2.2.2\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_tim_ex.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -4,18 +4,24 @@
 #include "DataHolder.h"
 #include "FileNameIterator.h"
 #include "MyStm32Flash.h"
+#include "MyUART.h"
+#include "autobaudrate.h"
 #include <string.h>
 #include <stdio.h>
 
 #define STATUS_INIT_FAIL (1 << 0)
 #define STATUS_TIMESTAMP (1 << 1)
 
+// e.g. for a file named hello.txt, nvm shall store:
+// "filehello.txt    \0"
+#define FILENAME_DATA_NVM_LEN ((MAX_FILE_NAME) + 4 + 1)
+
 static uint8_t previousData;
 static uint8_t status;
 static uint8_t bLogFileIsOpen = 0;
 static uint8_t timestampThisLine(uint8_t thisByte);
 static char fileName[MAX_FILE_NAME];
-static uint8_t isNvmFilenameValid(char* data);
+static uint8_t isNvmFilenameValid(void);
 
 int SystemOperations_Init(void)
 {
@@ -23,6 +29,7 @@ int SystemOperations_Init(void)
     bLogFileIsOpen = 0;
     memset(fileName, 0, sizeof(fileName));
     FileNameIterator_init();
+    autobaudrate_init();
     return SO_SUCCESS;
 }   
 
@@ -42,9 +49,9 @@ void SystemOperations_OpenLogFile(void)
         }
         else
         {
-            char data[13 + 4 + 1] = "";
-            read_flash_string(FLASH_DATA_PAGE_0, data, 13 + 4 + 1);
-            if (isNvmFilenameValid(data))
+            char data[FILENAME_DATA_NVM_LEN] = "";
+            read_flash_string(FLASH_DATA_PAGE_0, data, FILENAME_DATA_NVM_LEN);
+            if (strncmp(data, "file", 4) == 0)
             {
                 strcpy(fileName, data + 4);
             }
@@ -59,7 +66,7 @@ void SystemOperations_OpenLogFile(void)
         if (err == FR_OK)
         {
             bLogFileIsOpen = 1;
-            char data[13 + 4 + 1] = "file"; // indicates correctness
+            char data[FILENAME_DATA_NVM_LEN] = "file";
             strcpy(data + 4, fileName);
             write_flash_string(FLASH_DATA_PAGE_0, data);
         }
@@ -96,6 +103,17 @@ void SystemOperations_WriteSD(void)
 void SystemOperations_FlushSD(void)
 {
     MySD_Flush();
+}
+
+void SystemOperations_ConfigureUart(void)
+{
+    uint32_t br = autobaudrate_getBr();
+    if (br != UNDEFINED_BR)
+    {
+        MyUART_Config cfg;
+        cfg.baudrate = br;
+        MyUART_init(&cfg);
+    }
 }
 
 
@@ -140,11 +158,9 @@ static uint8_t timestampThisLine(uint8_t thisByte)
     return ret;
 }
 
-static uint8_t isNvmFilenameValid(char* data)
+static uint8_t isNvmFilenameValid(void)
 {
-    if (strncmp(data, "file", 4) == 0)
-    {
-        return 1;
-    }
-    return 0;
+    char data[FILENAME_DATA_NVM_LEN] = "";
+    read_flash_string(FLASH_DATA_PAGE_0, data, FILENAME_DATA_NVM_LEN);
+    return strncmp(data, "file", 4) == 0;
 }

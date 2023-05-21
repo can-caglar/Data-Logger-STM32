@@ -223,7 +223,6 @@ void test_tasksCanBeCalledPeriodically(void)
     TEST_ASSERT_EQUAL_INT(3, getTask1CallCount());
 }
 
-
 /* Helpers */
 
 void task1(void)
