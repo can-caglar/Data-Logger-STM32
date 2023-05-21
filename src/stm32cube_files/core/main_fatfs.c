@@ -58,6 +58,10 @@ void CubeMX_SystemInit(unsigned int sys)
   */
 void SystemClock_Config(void)
 {
+  // Internal clock is 8 MHz
+  // This gets divided by 2 before going to the PLL
+  // then gets multiplied by the PLL (x16)
+  // Is divided by AHB Prescaler (/1) to give HCLK (64 MHz)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -78,6 +82,8 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
+  // APB1 timer clocks have a compulsory x2 multiplier
+  // with a divider of 2, the effect is negated.
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;

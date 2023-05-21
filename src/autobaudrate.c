@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define NUM_PERIODS_STORED 80
+#define NUM_PERIODS_STORED 20
 
 static uint32_t periods[NUM_PERIODS_STORED];
 static uint8_t index = 0;

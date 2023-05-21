@@ -6,10 +6,13 @@ static void initTimer(void);
 extern void Error_Handler(void);
 static TIM_HandleTypeDef htim2;
 
+static uint32_t previousReading = 0;
+
 void MyTimer_init(void(*Fn)(uint32_t))
 {
     Callback = Fn; // register cb
     initTimer();
+    previousReading = 0;
 }
 
 static void initTimer(void)
@@ -22,7 +25,7 @@ static void initTimer(void)
     htim2.Instance = TIM2;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 4294967295;
+    htim2.Init.Period = ~0U;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -58,6 +61,9 @@ static void initTimer(void)
     {
       Error_Handler();
     }
+    
+    HAL_TIM_Base_Start(&htim2);
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_2);
 }
 
 void TIM2_IRQHandler(void)
@@ -67,13 +73,29 @@ void TIM2_IRQHandler(void)
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
   {
     /* Get the Input Capture value */
-    uint32_t value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-  
-    /* You can now use 'value' here, it contains the time in ticks between the rising and falling edges (or vice versa) */
-    volatile int a = value;
+    uint32_t value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+    uint32_t diff;
+    if (previousReading > value)
+    {
+      // wrapped around
+      diff = (~0U - previousReading) + value;
+    }
+    else
+    {
+      diff = value - previousReading;
+    }
+    previousReading = value;
+    
+    // todo, magic number below
+    if (diff < 64000000)  // in other words, ignore anything that is 1 baud or worse to help calculation
+    {
+      uint32_t diffNs = (diff * 1000) >> 6;
+      Callback(diffNs);
+    }
+
   }
 }
 

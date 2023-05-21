@@ -203,7 +203,7 @@ void test_App_calculates_baudrateBasedOnWhatsReceived(void)
 {
     // given
     LOOP_COUNT(20);
-    fake_mytimer_pretendToReceiveString("UUUUUUUUUUUU", 19200);
+    fake_mytimer_pretendToReceiveString("hello there!", 19200);
     // when
     runInfiniteLoop(&TheApplication);
     // then
