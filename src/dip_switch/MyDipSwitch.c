@@ -8,7 +8,7 @@ void MyDIP_Init()
     {
         .Pin = GPIO_PIN_DIP_1 | GPIO_PIN_DIP_2 | GPIO_PIN_DIP_3 | GPIO_PIN_DIP_4,
         .Mode = GPIO_MODE_INPUT,
-        .Pull = GPIO_PULLUP,
+        .Pull = GPIO_NOPULL,
     };
     CLK_ENABLE_DIP();
     HAL_GPIO_Init(GPIO_PORT_DIP, &dipswitch);

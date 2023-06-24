@@ -13,7 +13,7 @@ void test_Init(void)
     GPIO_InitTypeDef gpio = { 0 };
     gpio.Pin = GPIO_PIN_DIP_1 | GPIO_PIN_DIP_2 | GPIO_PIN_DIP_3 | GPIO_PIN_DIP_4;
     gpio.Mode = GPIO_MODE_INPUT;
-    gpio.Pull = GPIO_PULLUP;
+    gpio.Pull = GPIO_NOPULL;
     gpio.Alternate = 0;
 
     MY_HAL_RCC_GPIOB_CLK_ENABLE_Expect();

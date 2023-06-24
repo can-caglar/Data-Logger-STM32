@@ -28,5 +28,7 @@ void led_off(void)
 
 void led_toggle(void)
 {
+    #if 0   // for now, let's not toggle
     HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_GPIO_PIN);
+    #endif
 }

@@ -20,5 +20,15 @@
         - On the back, explain how to use it
 - [x] Order
 - [ ] Board bring-up
-- [ ] Code changes:
-    - [ ] No-pull on the dip switch I/O
+    - [x] Ensure 3v3 power led to lights up | there was an issue with the mask on the back plane causing a short (maybe forgot to do refill before
+        generating gerbers). fixed it by cutting traces around the short.
+    - [x] Program and debug the device | bad solder joints on the SWDIO and 3v3 line on the stm32 was causing issues. now it programs fine.
+        - note: no reset line, but the system still seems to respect the reset button on Keil and start debugging from the beginning.
+        - note2: the only pins connected are GND, SWDIO, SWCLK and 3v3 (to ST link pin 1 (Target Vcc).
+    - [x] Set RTC time
+        - [x] RTC doesn't retain time sometimes and resets, why? | the GND plane wasn't making contact with the battery - added
+            solder there and now it's ok.
+    - [ ] The "Save" LED (blue) doesn't light up - resistor val too high?
+    - [x] Check soldering for the DIP switch - always returning 0xFF | was a bad solder joint
+- [x] Code changes:
+    - [x] No-pull on the dip switch I/O

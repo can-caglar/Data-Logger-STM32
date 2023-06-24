@@ -6,6 +6,7 @@ static uint8_t errorOccured = 0;
 
 void ErrorIndicator_Indicate(void)
 {
+  #if 0
     if (!errorOccured)
     {
         errorOccured = 1;   // indicate error once
@@ -19,4 +20,5 @@ void ErrorIndicator_Indicate(void)
         HAL_GPIO_Init(LED_ERROR_PORT, &my_gpio);
         HAL_GPIO_WritePin(LED_ERROR_PORT, LED_ERROR_PIN, GPIO_PIN_SET);
     }
+  #endif
 }

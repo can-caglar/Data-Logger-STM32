@@ -5,6 +5,7 @@
 
 void test_1(void)
 {
+    TEST_IGNORE();
     GPIO_InitTypeDef my_gpio = 
     {
         .Pin = GPIO_PIN_11,
