@@ -23,11 +23,9 @@
 # Object and HEX files
 *.axf
 *.b[0-3][0-9]
-*.hex
 *.d
 *.crf
 *.elf
-*.hex
 *.h86
 *.lib
 *.obj
