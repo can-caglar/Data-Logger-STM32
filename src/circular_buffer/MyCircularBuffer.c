@@ -1,7 +1,7 @@
 #include "MyCircularBuffer.h"
 #include <string.h>
 
-#define SIZE_OF_BUF     100 // was 10200
+#define SIZE_OF_BUF     9952 // ZI-data + RW-data <= RAM space
 #define MAX_SIZE    ((SIZE_OF_BUF) - 1)  // "wasting" a slot to tell apart full/empty
 #define ADVANCED(ptr) (((ptr) + 1) % (SIZE_OF_BUF))
 
