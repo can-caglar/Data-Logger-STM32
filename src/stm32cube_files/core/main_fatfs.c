@@ -151,7 +151,7 @@ static void MX_USART2_UART_Init(void)
 {
   // STM32F3 Nucleo uses USART2
   huart1.Instance = USART2;
-  huart1.Init.BaudRate = BaudDecider_GetBR();
+  huart1.Init.BaudRate = 19200; //BaudDecider_GetBR();
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

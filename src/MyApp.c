@@ -31,8 +31,8 @@ uint32_t tElapsed2;
 
 #define MAX_BUF_SIZE 4096
 uint8_t buf[MAX_BUF_SIZE];
-const uint16_t writeAmount = 1;
-const int testRunAmount = 300;
+const uint16_t writeAmount = 4096;
+const int testRunAmount = 3000;
 
 /*
 int main(void)
