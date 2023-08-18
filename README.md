@@ -1,17 +1,46 @@
 # Serial Snooper
 
-The Serial Snooper is a UART data logger with a configurable baud rate, real time data stamping and a command-line-interface for user interaction.
+The Serial Snooper is a UART data logger with automatic baud rate detection, real-time data stamping and a command-line-interface for configuration, running on an STM32F3 microcontroller.
+
+It is utilised in an R&D setting to easily capture logs from devices to speed up catching software and hardware bugs.
+
+<i> This project started out as a submission for the final project in the course "Making Embedded Systems" by Elecia White, and evolved into a complete functional product used professionally. The report for the project submitted to the course can be found [here](https://docs.google.com/document/d/1QN5CVr99LwbAlFGOjgETou2btL8RMqJVu_yTGeXLMHs/edit?usp=sharing). </i>
+
+## The Final Product
 
 <center>
-<img src="resource/serial_snooper.png">
+<image src="resource\hw_image_1.jpg">
+<i>PCBA Front</i>
+<br>
+<br>
+<image src="resource\hw_image_2.jpg">
+<i>PCBA Back</i>
+<br>
+<br>
 </center>
 
-This is my submission for the final project in the course Making Embedded Systems by Elecia White.
+## Description of Operation
 
-Final report for the project can be found [here](https://docs.google.com/document/d/1QN5CVr99LwbAlFGOjgETou2btL8RMqJVu_yTGeXLMHs/edit?usp=sharing).
+1. Plug in USB (5V - resettable fuse limits current to 500mA incase of short circuits damaging the power source).
+2. Device powers up, indicated by the green LED.
+3. A short moment later, the red LED lights up, indicating that the SD card was successfully initialised.
+4. Plug in DB9 cable for the device you wish to snoop. The baud rate will be automatically detected.
+5. The yellow LED will toggle for every character received.
+6. The blue LED will toggle for every successful SD card write.
+7. When ready, power down the device by removing the USB cable and remove the SD card.
 
-## Block Diagram
-*Please see the report linked above for more information on the software architecture and design.*
+## Schematic
+
+<center>
+<image src="HardwareDesign\hardwareImages_v1\schematic_png.PNG">
+<i>Partial schematic. At the heart of the device is a STM32F303 microcontroller.</i>
+</center>
+<br>
+
+The full hardware schematic can be found on [Github](HardwareDesign/hardwareImages_v1/serial_snooper_schematic.pdf).
+
+
+## Design Block Diagram
 
 <center>
 <img src="resource/sw_block.png">
@@ -20,7 +49,7 @@ Final report for the project can be found [here](https://docs.google.com/documen
 
 ## Prototype
 
-A prototype board has been created to aid the software development. 
+A prototype board was created to aid development.
 
 Headers have been soldered to a perforated board. A mixture of wire wrapping and soldering used for the connections.
 
@@ -33,27 +62,6 @@ Headers have been soldered to a perforated board. A mixture of wire wrapping and
 
 <img src="resource/pins.png">
 
-## Baud Rate Settings
-
-|DIP Switch Value|Baud Rate|
-|:-:|:-:|
-|0| CLI (19,200) |
-|1|110|
-|2|300|
-|3|600|
-|4|1,200|
-|5|2,400|
-|6|4,800|
-|7|9,600|
-|8|14,400|
-|9|19,200|
-|10|38,400|
-|11|57,600|
-|12|76,800|
-|13|115,200|
-|14|230,400|
-|15|460,800|
-
 # Demo 
 
 All demonstrations below are from the prototype device using the software in this repository.
@@ -64,9 +72,9 @@ The CLI is used to:
 
 - Ascertain the software version number
 - Send commands:
-  - Confirm baud rate configuration
-  - Get the current time
-  - Set the current time
+  - Get DIP switch setting.
+  - Get the current time.
+  - Set the current time.
 
 For example:
 <center>
